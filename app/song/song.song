@@ -1,0 +1,12 @@
+i(./instruments/oscillator, {arg: 1})
+bpm(160)
+E4(1B) 1B
+E4 1B
+A#4 C4 1B
+B4 D5 2B
+C7(1T) 1T
+C6 1T
+C5 1T
+C4 1T
+C3 1T
+
