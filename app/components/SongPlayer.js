@@ -2,14 +2,13 @@
 
 import Image from "next/image";
 import Song from '@/app/song/song.song'
-import player from "@/app/lib/player";
+import {player, stopAllPlayers} from "@/app/lib/player";
 import {useEffect} from "react";
 
 export default function SongPlayer() {
     useEffect(() => {
-        console.log("Playing", Song)
         play();
-    }, []);
+    });
     return <button
         onClick={play}
     >
@@ -25,5 +24,6 @@ export default function SongPlayer() {
 }
 
 function play() {
+    console.log("Playing", Song)
     player(Song);
 }

@@ -1,26 +1,50 @@
-import Instrument from "./instruments/oscillator"
+const Instrument = require("./instruments/oscillator");
+export default async function (track) {
+    const {playNote: n, wait: w} = track;
 
-export default async ({p, i, w, bpm}) => {
-    i(Instrument, "{arg: 1}")
-    bpm(160)
-    p("E4", "1B")
-    await w("1B")
-    p("E4")
-    await w("1B")
-    p("A#4")
-    p("C4")
-    await w("1B")
-    p("B4")
-    p("D5")
-    await w("2B")
-    p("C7", "1T")
-    await w("1T")
-    p("C6")
-    await w("1T")
-    p("C5")
-    await w("1T")
-    p("C4")
-    await w("1T")
-    p("C3")
-    await w("1T")
+
+    track.loadInstrument('lead', Instrument, {arg: 1, envelope: {mixer: 0.1, keyNote: "C4"}});
+    track.setBeatsPerMinute(160);
+
+    while (true) {
+        track.startGroup(groupOne)
+        await w("8B");
+    }
+
+
+    async function groupOne(track) {
+        const {playNote: n, wait: w} = track;
+
+        track.setInstrument('lead');
+        n("C5", .9);
+        await w(".5B");
+        n("C4", .4);
+        await w(".5B");
+        n("G4", .9);
+        await w(".5B");
+        n("Eb4", .4);
+        await w(".5B");
+        n("Eb5", .4);
+        await w(".5B");
+        n("F5", .4);
+        await w(".5B");
+        n("Eb5", .4);
+        await w(".5B");
+        n("D5", .4);
+        await w(".5B");
+        n("C5", .9);
+        await w(".5B");
+        n("C4", .4);
+        await w(".5B");
+        n("G4", .9);
+        await w(".5B");
+        n("Eb4", .4);
+        await w(".5B");
+        n("D5", 1);
+        await w(".5B");
+        n("C4", .4);
+        await w(".5B");
+        n("Bb4", 1);
+        await w("1B");
+    }
 }

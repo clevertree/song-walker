@@ -1,12 +1,21 @@
-i(./instruments/oscillator, {arg: 1})
-bpm(160)
-E4(1B) 1B
-E4 1B
-A#4 C4 1B
-B4 D5 2B
-C7(1T) 1T
-C6 1T
-C5 1T
-C4 1T
-C3 1T
+import Instrument from "./instruments/oscillator";
 
+track.loadInstrument('lead', Instrument, {arg: 1/4, envelope:{mixer: 0.1, keyNote: "C4"}});
+track.setBeatsPerMinute(120)
+
+track.setInstrument('lead')
+C5(1/4D) 1/4
+C4(1/4) 1/4
+G4(1/5B) 1/4
+Eb4(1/4) 1/4
+Eb5(1/4T) 1/4
+F5(1/4T) 1/4
+Eb5(1/4T) 1/4
+D5(1/4T) 1/4
+C5(1/4D) 1/4
+C4(1/4) 1/4
+G4(1/5B) 1/4
+Eb4(1/4) 1/4
+D5(1/4) 1/4
+C4(1/4T) 1/4
+Bb4(1/4) 1/4

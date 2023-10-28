@@ -1,45 +1,51 @@
 const {isFrequencyString, isLengthString} = require("./note");
 module.exports = function (source) {
-    var matches = source.matchAll(/([^\s()]+)(?:\(([^)]+)\))?/gm);
-
     const imports = [], content = [], instruments = {};
 
-    for (const match of matches) {
-        const [full, command, argString] = match;
-        const args = (argString || "").split(/,\s+/).filter(a => a)
-        switch (command) {
-            case 'i':
-                const instrumentPath = args.shift();
-                imports.push(`import Instrument from "${instrumentPath}"`)
-                content.push(`i(Instrument${args.length > 0 ? ',' + exportArgs(args) : ''})`);
-                break;
-            case 'bpm':
-                content.push(`bpm(${exportArgs(args)})`);
-                break;
-            default:
-                if (isFrequencyString(command)) {
-                    args.unshift(command)
-                    content.push(`p(${exportArgs(args)})`);
+    source = source.replace(/^import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/gm, function (full, importName, importPath) {
+        // imports.push(`const ${importName} = require(${importPath});`)
+        imports.push(full); //`import ${importName} from ${importPath};`)
+        return '';
+    })
 
-                } else if (isLengthString(command)) {
-                    args.unshift(command)
-                    content.push(`await w(${exportArgs(args)})`);
+    source = source.replace(/([^\s()]+)(?:\(([^)]+)\))?;?/gm, function (full, command, argString) {
+        if (isFrequencyString(command)) {
+            argString = argString ? parseArgString(argString) : '';
+            return `n("${command}"${argString ? ',' + argString : ''});`;
 
-                } else {
-                    throw new Error("Unknown command: " + command);
-                }
+        } else if (/^(\d*\/?\d+)([BTDt])?$/.test(command)) {
+            argString = parseArgString(command); // + (argString ? ',' + argString : '');
+            return `await w(${argString});`;
 
+        } else {
+            return `${command}(${argString});`;
         }
-    }
-    const scriptContent = `${imports.join("\n")}\n\nexport default async ({p, i, w, bpm}) => {
-    ${content.join("\n")}
-    }`
+
+    })
+
+    const scriptContent = `${imports.join("\n")}
+export default async function (track) {
+    const {playNote: n, wait: w} = track;
+${source.split("\n").join("\t\n")}
+}`
     console.log('scriptContent', scriptContent)
     return scriptContent;
 }
 
-function exportArgs(args) {
-    return args.map(arg => isNumeric(arg) ? arg : `"${arg}"`).join(",")
+function parseArgString(argString) {
+    return argString.replace(/(\d*\/?\d+)([BTDt])/g, function (full, number, factorString) {
+        switch (factorString) {
+            default:
+            case 'B':
+                return number;
+            case 'D':
+                return `(${number})*1.5`
+            case 'T':
+                return `(${number})/1.5`
+            case 't':
+                return `(${number})/td()`
+        }
+    })
 }
 
 function isNumeric(str) {
