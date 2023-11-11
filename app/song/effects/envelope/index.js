@@ -1,13 +1,14 @@
 const DEFAULT_VELOCITY = 1;
 
 export default function EnvelopeEffect(audioCtx, config = {}) {
+    console.log('EnvelopeEffect', config, config.mixer);
     // const destination = audioCtx.destination;
     let activeOscillators = [];
     return {
-        createEnvelope: function (destination, startTime, velocity) {
+        createEnvelope: function (destination, startTime, velocity = null) {
             let amplitude = config.mixer || 1;
             if (velocity !== null)
-                amplitude *= parseFloat(velocity || 127) / 127;
+                amplitude *= velocity;
             let source = audioCtx.createGain();
             source.connect(destination);
 

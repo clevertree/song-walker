@@ -4,17 +4,16 @@ const DEFAULT_VELOCITY = 1;
 const DEFAULT_DURATION = 1;
 const DEFAULT_FREQUENCY = 432 * 12;
 const DEFAULT_OSCILLATOR_TYPE = 'square';
+const DEFAULT_PULSE_WIDTH = 0;
 
 export default function OscillatorInstrument(audioContext, config = {}) {
+    console.log('OscillatorInstrument', config, config.type);
     const destination = audioContext.destination;
     let lastDuration = DEFAULT_DURATION;
     let lastFrequency = DEFAULT_FREQUENCY
     let lastVelocity = DEFAULT_VELOCITY
     let activeOscillators = [];
-    let envelope = EnvelopeEffect(audioContext, config.envelope || {
-        attack: 200,
-        // mixer: 0.5
-    })
+    let envelope = EnvelopeEffect(audioContext, config.envelope)
     return {
         playNote: function (frequency, startTime, duration, velocity) {
             // const gainNode = audioContext.createGain(); //to get smooth rise/fall
@@ -101,7 +100,6 @@ export default function OscillatorInstrument(audioContext, config = {}) {
     }
 
     function createPulseWaveShaper(destination) {
-        const audioContext = destination.context;
         // Use a normal oscillator as the basis of our new oscillator.
         const source = audioContext.createOscillator();
         source.type = "sawtooth";
@@ -117,9 +115,9 @@ export default function OscillatorInstrument(audioContext, config = {}) {
         // Use a GainNode as our new "width" audio parameter.
 
         const widthGain = audioContext.createGain();
-        widthGain.gain.value = (typeof this.config.pulseWidth !== "undefined"
-            ? this.config.pulseWidth
-            : OscillatorInstrument.inputParameters.pulseWidth.default);
+        widthGain.gain.value = (typeof config.pulseWidth !== "undefined"
+            ? config.pulseWidth
+            : DEFAULT_PULSE_WIDTH);
 
         source.width = widthGain.gain; //Add parameter to oscillator node.
         widthGain.connect(pulseShaper);
@@ -138,3 +136,20 @@ export default function OscillatorInstrument(audioContext, config = {}) {
 
 }
 
+
+// Calculate the WaveShaper curves so that we can reuse them.
+let pulseCurve = null, constantOneCurve = null;
+
+function getPulseCurve() {
+    if (!pulseCurve) {
+        pulseCurve = new Float32Array(256);
+        for (let i = 0; i < 128; i++) {
+            pulseCurve[i] = -1;
+            pulseCurve[i + 128] = 1;
+        }
+        constantOneCurve = new Float32Array(2);
+        constantOneCurve[0] = 1;
+        constantOneCurve[1] = 1;
+    }
+    return {pulseCurve, constantOneCurve};
+}

@@ -1,18 +1,20 @@
 const DEFAULT_FREQUENCY_A4 = 432;
 module.exports = {
-    isLengthString,
+    isDurationString,
     parseDurationString,
     parseVelocityString,
     isFrequencyString,
     parseFrequencyString
 }
 
-function isLengthString(noteLengthString) {
-    return /^(\d*\/?\d+)([BTDt])?$/.test(noteLengthString)
+const REGEX_DURATION = /^(\d*[\/.]{0,1}\d+)([BTDt])?$/;
+
+function isDurationString(noteLengthString) {
+    return REGEX_DURATION.test(noteLengthString)
 }
 
 function parseDurationString(noteLength, bpm = 60) {
-    const [, valueString, factorString] = noteLength.match(/^(\d*\/?\d+)([BTD])?$/);
+    const [, valueString, factorString] = noteLength.match(REGEX_DURATION);
     let value = parseFloat(valueString);
     switch (factorString) {
         // TODO: support ticks?

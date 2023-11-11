@@ -2,13 +2,16 @@
 
 import Image from "next/image";
 import Song from '@/app/song/song.song'
-import {player, stopAllPlayers} from "@/app/lib/player";
+import {startSong, stopAllPlayers} from "@/app/lib/songPlayer";
 import {useEffect} from "react";
 
 export default function SongPlayer() {
     useEffect(() => {
-        play();
-    });
+        window.clearTimeout(timeout);
+        timeout = window.setTimeout(() => {
+            play();
+        }, 300)
+    }, []);
     return <button
         onClick={play}
     >
@@ -23,7 +26,10 @@ export default function SongPlayer() {
     </button>
 }
 
+let timeout;
+
 function play() {
     console.log("Playing", Song)
-    player(Song);
+    stopAllPlayers();
+    startSong(Song);
 }

@@ -1,0 +1,41 @@
+import Instrument from "./instruments/oscillator";
+export default async function rootTrack({loadInstrument, setBeatsPerMinute, setInstrument, startTrack, wait}) {
+
+
+    loadInstrument('lead', Instrument, {type: 'pulse', pulseWidth: 0, envelope:{mixer: 1}});
+    loadInstrument('lead2', Instrument, {type: 'square', envelope:{mixer: 0.5}});
+    setBeatsPerMinute(120)
+
+    setInstrument('lead')
+    startTrack(groupOne)
+    await wait(3/8);
+    setInstrument('lead2')
+    startTrack(groupOne)
+    await wait(5/8);
+    await wait(3, );
+
+
+
+}
+
+async function groupOne({playNote, wait}) {
+
+
+    playNote('C5', (1/4)*1.5); await wait(1/4);
+    playNote('C4', (1/4)*1.5, 0.8);await wait(1/4);
+    playNote('G4', 1/4); await wait(1/4);
+    playNote('Eb4', (1/4)*1.5, 0.8); await wait(1/4);
+    playNote('Eb5', (1/4)/1.5); await wait(1/4);
+    playNote('F5', (1/4)/1.5); await wait(1/4);
+    playNote('Eb5', (1/4)/1.5); await wait(1/4);
+    playNote('D5', (1/4)/1.5); await wait(1/4);
+    playNote('C5', (1/4)*1.5); await wait(1/4);
+    playNote('C4', (1/4)*1.5, 0.8); await wait(1/4);
+    playNote('G4', 1/4); await wait(1/4);
+    playNote('Eb4', (1/4)*1.5, 0.8); await wait(1/4);
+    playNote('D5', 1/4); await wait(1/4);
+    playNote('C4', 1/4, .8); await wait(1/4);
+    playNote('Bb4', 1/4); await wait(1/4);
+
+
+}
