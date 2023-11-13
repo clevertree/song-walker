@@ -1,0 +1,34 @@
+.editor {
+  padding: 1em;
+  font-family: monospace;
+  font-size: 1.2em;
+  white-space: pre;
+  max-width: 90vw;
+
+  & > [data-slate-node=element] {
+    //display: inline;
+  }
+
+
+  & > [data-token-type=function-call] {
+    color: #f99
+  }
+
+  & > [data-token-type=wait-statement] {
+    color: #99f
+  }
+
+  & > [data-token-type=play-statement] {
+    color: #9f9;
+    font-weight: bold;
+  }
+
+  & > [data-token-type=import] {
+    color: #814186;
+    font-weight: bold;
+  }
+
+  & > [data-token-type=unknown] {
+    color: #b04d4d;
+  }
+}

@@ -1,32 +1,34 @@
-const {isFrequencyString, isDurationString} = require("./note");
 const Prism = require('prismjs');
-const REGEXP_FUNCTION_CALL = /([^\s()]+)(?:\(([^)]+)\));?/;
-const REGEXP_PLAY_STATEMENT = /([A-G][#qb]{0,2}\d?)((?::[^:;\s]+)+);?/;
-const REGEXP_DURATION_STATEMENT = /(\d*[\/.]?\d+)([BTDt])?;?/;
-const REGEXP_IMPORT_STATEMENT = /^import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/;
-const REGEXP_GROUP_START = /@(\w+)/;
-const ROOT_TRACK = 'rootTrack'
-Prism.languages.audioSource = {
-    'group': REGEXP_GROUP_START,
-    'import': REGEXP_IMPORT_STATEMENT,
-    'function-call': REGEXP_FUNCTION_CALL,
-    'play-statement': REGEXP_PLAY_STATEMENT,
-    'wait-statement': REGEXP_DURATION_STATEMENT
-};
+const {
+    ROOT_TRACK,
+    REGEXP_DURATION_STATEMENT,
+    REGEXP_FUNCTION_CALL,
+    REGEXP_GROUP_START,
+    // REGEXP_IMPORT_STATEMENT,
+    REGEXP_PLAY_STATEMENT,
+    LANGUAGE
+} = require("../lang/song");
+const CMD_PRINT = '_';
+const CMD_PLAY_NOTE = 'n';
+const CMD_WAIT = 'w';
 
-module.exports = convertToJavascript
+module.exports = compiler
 
-function convertToJavascript(source) {
+function compiler(source) {
     const imports = [];
     // console.log('source', source, Prism.languages.audioSource)
-    let tokens = Prism.tokenize(source, Prism.languages.audioSource);
+    let tokens = Prism.tokenize(source, LANGUAGE);
+    console.log('tokens', tokens)
 
     let currentGroup = ROOT_TRACK;
     const trackList = {[ROOT_TRACK]: {commands: [], functionNames: {}}}
 
     for (const token of tokens) {
         if (typeof token === "string") {
+            if (token.trim().length > 0)
+                throw new Error("Unrecognized token: " + token.trim())
             trackList[currentGroup].commands.push(token);
+            // trackList[currentGroup].commands.push(`${CMD_PRINT}(${formatArgString([token])});`);
 
         } else {
             switch (token.type) {
@@ -37,7 +39,6 @@ function convertToJavascript(source) {
                     break;
                 case 'function-call':
                     const [fullFunctionCall, functionName, functionArgs] = token.content.match(REGEXP_FUNCTION_CALL);
-                    console.log('function-call match', functionName, functionArgs, token)
                     trackList[currentGroup].functionNames[functionName] = true;
                     trackList[currentGroup].commands.push(fullFunctionCall);
                     // console.log('match', match)
@@ -51,31 +52,30 @@ function convertToJavascript(source) {
                     break;
                 case 'play-statement':
                     const [, noteString, playArgString] = token.content.match(REGEXP_PLAY_STATEMENT);
-                    const playArgs = playArgString ? playArgString.substring(1).split(':').map(a => parseArgString(a)) : [];
-                    trackList[currentGroup].commands.push(`playNote('${noteString}'${playArgs.length > 0 ? ', ' + playArgs.join(', ') : ''});`);
-                    trackList[currentGroup].functionNames.playNote = true;
+                    const playArgs = playArgString ? playArgString.substring(1).split(':') : [];
+                    trackList[currentGroup].commands.push(`${CMD_PLAY_NOTE}(${formatArgString([noteString, ...playArgs])});`);
+                    trackList[currentGroup].functionNames[CMD_PLAY_NOTE] = true;
                     break;
                 case 'wait-statement':
-                    const [, durationString, durationArgString] = token.content.match(REGEXP_DURATION_STATEMENT);
-                    const durationArgs = durationArgString ? durationArgString.substring(1).split(':').map(a => parseArgString(a)) : [];
-                    trackList[currentGroup].commands.push(`await wait(${parseArgString(durationString)}${durationArgs.length > 0 ? ', ' + durationArgs.join(', ') : ''});`);
-                    trackList[currentGroup].functionNames.wait = true;
+                    console.log(token.type, token.content)
+                    trackList[currentGroup].commands.push(`await ${CMD_WAIT}(${formatArgString([token.content])});`);
+                    trackList[currentGroup].functionNames[CMD_WAIT] = true;
                     break;
                 default:
                     throw new Error("Unknown token type: " + token.type);
             }
         }
     }
-    console.log('groups', trackList)
+    console.log('trackList', trackList)
 
 
     const scriptContent = `${imports.join("\n")}
 export default ${Object.keys(trackList).map(trackName => {
             const {commands, functionNames} = trackList[trackName];
             const functionNameList = Object.values(functionNames).length > 0
-                ? `{${Object.keys(functionNames).join(', ')}}`
+                ? `, ${Object.keys(functionNames).join(', ')}`
                 : '';
-            return `async function ${trackName}(${functionNameList}) {
+            return `async function ${trackName}({${CMD_PRINT}${functionNameList}}) {
     ${commands.join('')}
 }`
         }
@@ -83,6 +83,19 @@ export default ${Object.keys(trackList).map(trackName => {
 `
     console.log('scriptContent', scriptContent)
     return scriptContent;
+}
+
+
+function formatArgString(argString) {
+    return argString
+        .map(arg => isNumeric(arg) ? arg : `'${arg}'`)
+        .join(', ')
+}
+
+function isNumeric(str) {
+    if (typeof str != "string") return false // we only process strings!
+    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+        !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
 }
 
 
@@ -103,10 +116,3 @@ function parseArgString(argString) {
         }
     }
 }
-
-function isNumeric(str) {
-    if (typeof str != "string") return false // we only process strings!
-    return !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
-        !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
-}
-

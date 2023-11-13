@@ -1,4 +1,4 @@
-import SongPlayer from "./components/SongPlayer";
+import {SongPlayerComponent, SongEditorComponent} from "./components/";
 
 export default function Home() {
     return (
@@ -6,8 +6,9 @@ export default function Home() {
 
             <div className="App">
                 <header className="App-header">
-                    <SongPlayer></SongPlayer>
+                    <SongPlayerComponent></SongPlayerComponent>
                 </header>
+                <SongEditorComponent/>
             </div>
         </main>
     )

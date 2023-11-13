@@ -3,9 +3,9 @@ const path = require("path");
 const nextConfig = {
     webpack: (config, options) => {
         config.module.rules.push({
-            test: /\.(song)/,
+            test: /\.(song)$/,
             use: [{
-                loader: path.join(process.cwd(), 'app/lib/songLoader.js')
+                loader: path.join(process.cwd(), 'songWalker/song/compiler.js')
             }]
         })
 

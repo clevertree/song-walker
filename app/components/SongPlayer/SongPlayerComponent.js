@@ -1,17 +1,16 @@
 "use client"
 
 import Image from "next/image";
-import Song from '@/app/song/song.song'
-import {startSong, stopAllPlayers} from "@/app/lib/songPlayer";
-import {useEffect} from "react";
+import Song from '@/app/song/test.song'
+import {startSong, stopAllPlayers} from "/songWalker/song/player.js";
 
-export default function SongPlayer() {
-    useEffect(() => {
-        window.clearTimeout(timeout);
-        timeout = window.setTimeout(() => {
-            play();
-        }, 300)
-    }, []);
+export default function SongPlayerComponent() {
+    // useEffect(() => {
+    //     window.clearTimeout(timeout);
+    //     timeout = window.setTimeout(() => {
+    //         play();
+    //     }, 300)
+    // }, []);
     return <button
         onClick={play}
     >

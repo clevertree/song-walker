@@ -1,5 +1,4 @@
 import {parseFrequencyString, parseDurationString} from "./note";
-import {act} from "react-dom/test-utils";
 
 const BUFFER_DURATION = 1;
 const START_DELAY = .1;
@@ -66,18 +65,18 @@ export function startTrackPlayback(trackCallback, trackPosition, trackCurrentTim
         trackInstrument.playNote(frequency, startTime, durationWithBPM, ...args);
     }
 
-    function loadInstrument(instanceName, instrumentCallback, ...args) {
+    async function loadInstrument(instanceName, instrumentCallback, ...args) {
         if (!songInstance.playing)
             throw Error("Playback has ended");
-        trackInstrument = instrumentCallback(audioContext, ...args);
+        trackInstrument = await instrumentCallback(audioContext, ...args);
         activeInstruments[instanceName] = trackInstrument;
         return trackInstrument;
     }
 
     function setInstrument(instanceName) {
-        trackInstrument = activeInstruments[instanceName];
-        if (!trackInstrument)
+        if (!activeInstruments[instanceName])
             throw Error("Active instrument name not found: " + instanceName);
+        trackInstrument = activeInstruments[instanceName];
     }
 
     async function wait(duration) {
@@ -107,10 +106,9 @@ export function startTrackPlayback(trackCallback, trackPosition, trackCurrentTim
     }
 
 
-    async function startTrack(subTrackCallback) {
+    function startTrack(subTrackCallback) {
         const trackInstance = startTrackPlayback(subTrackCallback, trackPosition, trackCurrentTime, trackBeatsPerMinute, trackInstrument, songInstance)
         activeSubTracks.push(trackInstance);
-        await waitForBuffer();
     }
 
     const trackResult = trackCallback({
