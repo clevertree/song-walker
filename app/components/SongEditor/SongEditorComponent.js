@@ -2,6 +2,7 @@
 
 import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
 import songSource from "/app/song/test.song.source.js";
+import Undo from "undoh";
 
 console.log('songSource', songSource)
 import {LANGUAGE} from "/songWalker/lang/song";
@@ -9,15 +10,18 @@ import Prism from "prismjs";
 import styles from "./SongEditorComponent.module.scss"
 
 export default function SongEditorComponent() {
-
+    const [buffer, setBuffer] = useState(null)
     const refEditor = useRef();
 
     useEffect(() => {
         refEditor.current.innerHTML = "";
         renderMarkup(refEditor.current, songSource)
-    });
+        const buffer = new Undo(songSource);
+        buffer.retain(songSource)
+        setBuffer(buffer);
+    }, []);
 
-    const onInput = (e) => updateNode(e)
+    // const onInput = (e) => updateNode(e)
     // const onMouseDown = (e) => getRange()
     // const onMouseUp = (e) => getRange()
 
@@ -35,10 +39,13 @@ export default function SongEditorComponent() {
         // }
 
         const editorPosition = getEditorPosition();
+        if (editorPosition === -1)
+            throw new Error("Invalid Editor Cursor");
         const editorValue = refEditor.current.innerText;
         refEditor.current.innerHTML = ''
         renderMarkup(refEditor.current, editorValue)
         console.log('editorValue', editorValue)
+        buffer.retain(editorValue)
 
         // const prevNode = targetNode.previousSibling;
         // const nextNode = targetNode.nextSibling;
@@ -80,6 +87,9 @@ export default function SongEditorComponent() {
     }
 
     function setEditorPosition(editorPosition) {
+        if (editorPosition < 0)
+            throw new Error("Invalid editor position: " + editorPosition)
+
         console.log('setEditorPosition', editorPosition);
 
         let offset = 0;
@@ -87,7 +97,7 @@ export default function SongEditorComponent() {
             if (childNode.nodeType !== Node.TEXT_NODE)
                 return false;
             const newOffset = offset + childNode.nodeValue.length;
-            if (newOffset > editorPosition) {
+            if (newOffset >= editorPosition) {
                 const focusOffset = editorPosition - offset;
                 const range = document.createRange()
 
@@ -130,35 +140,41 @@ export default function SongEditorComponent() {
         }
     }
 
-    function handleKeyPress(e) {
-        switch (e.type) {
-            case 'keydown':
-                switch (e.code) {
-                    case 'Enter':
-                        e.preventDefault();
-                        const {focusNode, focusOffset} = window.getSelection();
-
-                        const source = focusNode.nodeValue;
-                        focusNode.nodeValue = source.substring(0, focusOffset) + "\n" + source.substring(focusOffset);
-                        // setValue(refEditor.current.innerText)
-                        const range = document.createRange()
-
-                        range.setStart(focusNode, focusOffset + 1)
-                        range.collapse(true)
-
-                        const sel = window.getSelection()
-                        sel.removeAllRanges()
-                        sel.addRange(range)
-                        break;
-                    case 'ControlLeft':
-                        e.preventDefault();
-                        setEditorPosition(getEditorPosition() - 1);
-                        console.log(e.code)
-                        break;
+    function handleKeyDown(e) {
+        switch (e.code) {
+            case 'Enter':
+                e.preventDefault();
+                insertIntoOffset("\n")
+                return;
+            case 'Tab': // TODO group shift?
+                e.preventDefault();
+                insertIntoOffset("\t")
+                return;
+            case 'KeyZ':
+                if (e.ctrlKey) {
+                    e.preventDefault();
+                    if (e.shiftKey) {
+                        const redoValue = buffer.redo();
+                        console.log('redoValue', redoValue)
+                        refEditor.current.innerHTML = "";
+                        renderMarkup(refEditor.current, redoValue)
+                    } else {
+                        const undoValue = buffer.undo();
+                        console.log('undoValue', undoValue)
+                        refEditor.current.innerHTML = "";
+                        renderMarkup(refEditor.current, undoValue)
+                    }
                 }
-                break;
+                return;
+            // case 'ControlLeft':
+            //     e.preventDefault();
+            //     setEditorPosition(getEditorPosition() - 1);
+            //     console.log(e.code)
+            //     break;
             default:
+                console.log(e.key)
                 getEditorPosition();
+                break;
         }
     }
 
@@ -169,15 +185,31 @@ export default function SongEditorComponent() {
             spellCheck={false}
             suppressContentEditableWarning
             ref={refEditor}
-            onKeyUp={handleKeyPress}
-            onKeyDown={handleKeyPress}
-            onInput={onInput}
+            // onKeyUp={handleKeyPress}
+            onKeyDown={handleKeyDown}
+            onInput={updateNode}
             onMouseUp={() => (getEditorPosition())}
             // onMouseDown={onMouseDown}
             // onMouseUp={onMouseUp}
         >
         </div>
     )
+}
+
+function insertIntoOffset(insertString) {
+    const {focusNode, focusOffset} = window.getSelection();
+
+    const source = focusNode.nodeValue;
+    focusNode.nodeValue = source.substring(0, focusOffset) + insertString + source.substring(focusOffset);
+    // setValue(refEditor.current.innerText)
+    const range = document.createRange()
+
+    range.setStart(focusNode, focusOffset + 1)
+    range.collapse(true)
+
+    const sel = window.getSelection()
+    sel.removeAllRanges()
+    sel.addRange(range)
 }
 
 

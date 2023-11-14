@@ -10,6 +10,10 @@
   }
 
 
+  & > [data-token-type]:hover {
+    font-weight: bold;
+  }
+
   & > [data-token-type=function-call] {
     color: #f99
   }
