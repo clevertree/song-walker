@@ -1,9 +1,6 @@
 const songSource = `import Instrument from "./instruments/oscillator";
 
-loadInstrument('lead', Instrument, 
-
-{type: 'pulse', pulseWidth: 0,
- envelope:{mixer: 1}});
+loadInstrument('lead', Instrument, {type: 'pulse', pulseWidth: 0, envelope:{mixer: 1}});
 loadInstrument('lead2', Instrument, {type: 'square', envelope:{mixer: 0.5}});
 setBeatsPerMinute(120)
 

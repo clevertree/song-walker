@@ -1,0 +1,41 @@
+import Instrument from "./instruments/oscillator";
+export default async function rootTrack({loadInstrument, setBeatsPerMinute, setInstrument, startTrack, w}) {
+    
+
+    loadInstrument('lead', Instrument, {type: 'pulse', pulseWidth: 0, envelope:{mixer: 1}});
+    loadInstrument('lead2', Instrument, {type: 'square', envelope:{mixer: 0.5}});
+    setBeatsPerMinute(120)
+
+    setInstrument('lead')
+    startTrack(groupOne)
+    await w('3/8');
+    setInstrument('lead2')
+    startTrack(groupOne)
+    await w('5/8');
+    await w('3T');
+
+
+
+}
+
+async function groupOne({n, w}) {
+    
+
+    n('C5', '1/4D'); await w('1/4;');
+    n('C4', '1/4D', 0.8);await w('1/4;');
+    n('G4', '1/4'); await w('1/4');
+    n('Eb4', '1/4D', 0.8); await w('1/4');
+    n('Eb5', '1/4T'); await w('1/4');
+    n('F5', '1/4T'); await w('1/4');
+    n('Eb5', '1/4T'); await w('1/4');
+    n('D5', '1/4T'); await w('1/4');
+    n('C5', '1/4D'); await w('1/4');
+    n('C4', '1/4D', 0.8); await w('1/4');
+    n('G4', '1/4'); await w('1/4');
+    n('Eb4', '1/4D', 0.8); await w('1/4');
+    n('D5', '1/4'); await w('1/4');
+    n('C4', '1/4', .8); await w('1/4');
+    n('Bb4', '1/4'); await w('1/4');
+
+
+}

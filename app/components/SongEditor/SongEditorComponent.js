@@ -1,13 +1,11 @@
 "use client"
 
-import React, {useCallback, useEffect, useMemo, useRef, useState} from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import songSource from "/app/song/test.song.source.js";
 import Undo from "undoh";
 
-console.log('songSource', songSource)
-import {LANGUAGE} from "/songWalker/lang/song";
-import Prism from "prismjs";
 import styles from "./SongEditorComponent.module.scss"
+import {sourceToTokens} from "../../../songWalker/song/compiler";
 
 export default function SongEditorComponent() {
     const [buffer, setBuffer] = useState(null)
@@ -118,7 +116,7 @@ export default function SongEditorComponent() {
     }
 
     function renderMarkup(container, sourceString, insertBeforeElm = null) {
-        let parsedTokenList = Prism.tokenize(sourceString, LANGUAGE);
+        let parsedTokenList = sourceToTokens(sourceString);
         console.log('renderMarkup', parsedTokenList)
         for (const token of parsedTokenList) {
             if (typeof token === "string") {

@@ -5,7 +5,7 @@ const nextConfig = {
         config.module.rules.push({
             test: /\.(song)$/,
             use: [{
-                loader: path.join(process.cwd(), 'songWalker/song/compiler.js')
+                loader: path.join(process.cwd(), 'songWalker/song/fileLoader.js')
             }]
         })
 

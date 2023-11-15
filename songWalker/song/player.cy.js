@@ -1,5 +1,4 @@
-import {startTrack} from "./songPlayer";
-import Instrument from "../song/instruments/oscillator";
+import {startTrackPlayback} from "./player";
 
 let testInstrumentInstance, testSongInstance;
 describe('songPlayer', () => {
@@ -18,13 +17,13 @@ describe('songPlayer', () => {
     })
 
     it('plays a song', async () => {
-        const songInstance = startTrack(testTrack, 0, 0, 60, testInstrumentInstance, testSongInstance);
+        const songInstance = startTrackPlayback(testTrack, 0, 0, 60, testInstrumentInstance, testSongInstance);
         await songInstance.waitForTrackFinish();
         expect(testInstrumentInstance.playNote.callCount).to.eq(9)
     })
 
     it('plays sub-tracks', async () => {
-        const songInstance = startTrack(testSong, 0, 0, 60, testInstrumentInstance, testSongInstance);
+        const songInstance = startTrackPlayback(testSong, 0, 0, 60, testInstrumentInstance, testSongInstance);
         await songInstance.waitForTrackFinish();
         const status = songInstance.getTrackStatus();
         expect(testInstrumentInstance.playNote.callCount).to.eq(18)

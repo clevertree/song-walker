@@ -8,16 +8,23 @@ const {
     REGEXP_PLAY_STATEMENT,
     LANGUAGE
 } = require("../lang/song");
-const CMD_PRINT = '_';
+// const CMD_PRINT = '_';
 const CMD_PLAY_NOTE = 'n';
 const CMD_WAIT = 'w';
 
-module.exports = compiler
+module.exports = {
+    compiler,
+    sourceToTokens
+}
+
+function sourceToTokens(source) {
+    return Prism.tokenize(source, LANGUAGE);
+}
 
 function compiler(source) {
     const imports = [];
     // console.log('source', source, Prism.languages.audioSource)
-    let tokens = Prism.tokenize(source, LANGUAGE);
+    let tokens = sourceToTokens(source);
     console.log('tokens', tokens)
 
     let currentGroup = ROOT_TRACK;
@@ -73,9 +80,9 @@ function compiler(source) {
 export default ${Object.keys(trackList).map(trackName => {
             const {commands, functionNames} = trackList[trackName];
             const functionNameList = Object.values(functionNames).length > 0
-                ? `, ${Object.keys(functionNames).join(', ')}`
+                ? `${Object.keys(functionNames).join(', ')}`
                 : '';
-            return `async function ${trackName}({${CMD_PRINT}${functionNameList}}) {
+            return `async function ${trackName}({${functionNameList}}) {
     ${commands.join('')}
 }`
         }
