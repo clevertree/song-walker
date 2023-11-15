@@ -1,7 +1,7 @@
 const REGEXP_FUNCTION_CALL = /([^\s()]+)(?:\(([^)]+)\));?/;
-const REGEXP_PLAY_STATEMENT = /([A-G][#qb]{0,2}\d?)((?::[^:;\s]*)*);?/;
-const REGEXP_DURATION_STATEMENT = /(\d*[\/.]?\d+)([BTDt])?;?/;
-const REGEXP_IMPORT_STATEMENT = /(?:\s|^)import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/;
+const REGEXP_PLAY_STATEMENT = /(?:\s|^)([A-G][#qb]{0,2}\d)((?::[^:;\s]*)*)(?:;|\s|$)/;
+const REGEXP_DURATION_STATEMENT = /(?:\s|^)(\d*[\/.]?\d+)([BTDt])?(?:;|\s|$)/;
+const REGEXP_IMPORT_STATEMENT = /import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/;
 const REGEXP_GROUP_START = /@(\w+)/;
 const REGEXP_NEWLINE = /\n\s*$/
 const ROOT_TRACK = 'rootTrack'
@@ -17,9 +17,16 @@ module.exports = {
     LANGUAGE: {
         'group': REGEXP_GROUP_START,
         'import': REGEXP_IMPORT_STATEMENT,
-        'function-call': REGEXP_FUNCTION_CALL,
+        'import': {
+            pattern: REGEXP_IMPORT_STATEMENT,
+            inside: Prism.languages.javascript
+        },
+        'function-call': {
+            pattern: REGEXP_FUNCTION_CALL,
+            inside: Prism.languages.javascript
+        },
+        'newline': REGEXP_NEWLINE,
         'play-statement': REGEXP_PLAY_STATEMENT,
         'wait-statement': REGEXP_DURATION_STATEMENT,
-        // 'newline': REGEXP_NEWLINE
     },
 }

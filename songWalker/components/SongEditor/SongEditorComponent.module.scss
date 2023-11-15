@@ -1,0 +1,77 @@
+.container {
+  padding: 1em;
+  font-family: monospace;
+  font-size: 1.2em;
+  display: flex;
+  background-color: #00F3;
+}
+
+.editor {
+  white-space: pre;
+
+
+  & > [data-slate-node=element] {
+    //display: inline;
+  }
+
+
+  & > [data-token-type]:hover {
+    font-weight: bold;
+  }
+
+  & > [data-token-type=function-call] {
+    color: #f99
+  }
+
+
+  & > [data-token-type=wait-statement] {
+    color: #99f
+  }
+
+  & > [data-token-type=play-statement] {
+    color: #33ff00;
+    font-weight: bold;
+  }
+
+  & > [data-token-type=group] {
+    color: #0004ff;
+    font-weight: bold;
+  }
+
+
+  & > [data-token-type=unknown] {
+    color: #b04d4d;
+  }
+
+  /** Javascript Syntax **/
+
+  & > [data-token-type=import] {
+    color: #814186;
+    font-weight: bold;
+  }
+
+  & > [data-token-type=function] {
+    color: #f99
+  }
+
+  & > [data-token-type=literal-property] {
+    color: #99dbff
+  }
+
+  & > [data-token-type=string] {
+    color: #9f9;
+  }
+
+  & > [data-token-type=number] {
+    color: #99f
+  }
+
+  & > [data-token-type=operator] {
+    color: #afff99
+  }
+
+  & > [data-token-type=keyword] {
+    color: #ffc799
+  }
+
+}

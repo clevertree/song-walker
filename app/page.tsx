@@ -1,15 +1,14 @@
-import {SongPlayerComponent, SongEditorComponent} from "./components/";
+import {SongEditorComponent} from "@songWalker/components";
+import songSource from "@app/song/test.song.source.js";
 
 export default function Home() {
     return (
-        <main className="flex min-h-screen flex-col items-center justify-between p-24">
-
-            <div className="App">
-                <header className="App-header">
-                    <SongPlayerComponent></SongPlayerComponent>
-                </header>
-                <SongEditorComponent/>
-            </div>
-        </main>
+        <>
+            <header className="App-header">
+            </header>
+            <main className="flex flex-col items-center">
+                <SongEditorComponent className="absolute left-0 right-0 top-0 bottom-0" initialValue={songSource}/>
+            </main>
+        </>
     )
 }
