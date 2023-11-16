@@ -9,76 +9,88 @@
 .editor {
   white-space: pre;
 
-
-  & > [data-slate-node=element] {
-    //display: inline;
-  }
-
-  [data-token-type=unknown] {
+  unknown {
     color: #F00;
   }
 
-  [data-token-type=punctuation] {
-    color: #AAA;
-  }
-
-  [data-token-type]:hover {
+  & > *:hover {
     font-weight: bold;
   }
 
 
-  & > [data-token-type=wait-statement] {
+  & > wait-statement {
     margin-right: 4px;
 
-    & > [data-token-type=numeric] {
+    & > numeric {
       color: #99f;
+    }
+
+    & > factor {
+      color: #ff9100;
     }
   }
 
-  & > [data-token-type=play-statement] {
+  & > play-statement {
     color: #33ff00;
     font-weight: bold;
     margin-right: 4px;
   }
 
-  & > [data-token-type=group] {
+
+  & > play-track-statement {
     color: #0004ff;
     font-weight: bold;
   }
 
+  & > track-start {
+    & > name {
+      color: #0004ff;
+      font-weight: bold;
+    }
+  }
 
-  & > [data-token-type=function-call] {
 
-    & > [data-token-type=import] {
+  & > function-call {
+
+    & > import {
       color: #814186;
       font-weight: bold;
     }
 
-    & > [data-token-type=function] {
+    & > function {
       color: #f99;
     }
 
-    & > [data-token-type=literal-property] {
+    & > literal-property {
       color: #99dbff
     }
 
-    & > [data-token-type=string] {
+    & > string {
       color: #9f9;
     }
 
-    & > [data-token-type=number] {
+    & > number {
       color: #99f
     }
 
-    & > [data-token-type=operator] {
+    & > operator {
       color: #afff99
     }
 
-    & > [data-token-type=keyword] {
+    & > keyword {
       color: #ffc799
     }
-
   }
 
+  & > variable-statement {
+    & > name {
+      font-weight: bold;
+      color: #ff5fd8;
+    }
 
+    & > value {
+      font-weight: bold;
+      color: #ff9100;
+    }
+  }
 }

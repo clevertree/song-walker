@@ -1,14 +1,14 @@
-const songSource = `import Instrument from "./instruments/oscillator";
+const songSource = `loadInstrument('lead', "oscillator", {type: 'pulse', pulseWidth: 0, envelope:{mixer: 1}});
+loadInstrument('lead2', "oscillator", {type: 'square', envelope:{mixer: 0.5}});
 
-loadInstrument('lead', Instrument, {type: 'pulse', pulseWidth: 0, envelope:{mixer: 1}});
-loadInstrument('lead2', Instrument, {type: 'square', envelope:{mixer: 0.5}});
-setBeatsPerMinute(120)
+wut=ohok;omfg=1230WUT2of ; rully=yup
 
-setInstrument('lead')
-startTrack(groupOne)
+bpm=120
+inst=lead
+@track1
 3/8
-setInstrument('lead2')
-startTrack(groupOne)
+inst=lead2
+@track1
 5/8
 3T
 
@@ -20,7 +20,7 @@ F3D3E4B72 3
 
 F3 1/2 4/3T 2/43
 
-@groupOne
+[track1]
 
 C5:1/4D; 1/4;
 C4:1/4D:0.8;1/4;

@@ -19,7 +19,7 @@ function compiler(source) {
     let tokens = sourceToTokens(source);
     console.log('tokens', tokens)
 
-    let currentGroup = ROOT_TRACK;
+    let currentTrack = ROOT_TRACK;
     const trackList = {[ROOT_TRACK]: {commands: [], functionNames: {}}}
 
     for (let i = 0; i < tokens.length; i++) {
@@ -27,7 +27,7 @@ function compiler(source) {
         if (typeof token === "string") {
             if (token.trim().length > 0)
                 throw new Error(`Unrecognized token (${i}): ${token.trim()}`)
-            trackList[currentGroup].commands.push(token);
+            trackList[currentTrack].commands.push(token);
             // trackList[currentGroup].commands.push(`${CMD_PRINT}(${formatArgString([token])});`);
 
         } else {
@@ -39,15 +39,15 @@ function compiler(source) {
                     break;
                 case 'function-call':
                     const functionName = findTokenByType(token.content, 'function').content;
-                    trackList[currentGroup].functionNames[functionName] = true;
-                    trackList[currentGroup].commands.push(getTokenContentString(token));
+                    trackList[currentTrack].functionNames[functionName] = true;
+                    trackList[currentTrack].commands.push(getTokenContentString(token));
                     // console.log('match', match)
                     break;
-                case 'group':
-                    const groupName = findTokenByType(token.content, 'name').content;
+                case 'track-start':
+                    const trackName = findTokenByType(token.content, 'name').content;
                     // const match = getTokenContentString(token).match(REGEXP_FUNCTION_CALL);
-                    currentGroup = groupName;
-                    trackList[currentGroup] = {commands: [], functionNames: {}}
+                    currentTrack = trackName;
+                    trackList[currentTrack] = {commands: [], functionNames: {}}
                     // token.content = '';
                     break;
                 case 'play-statement':
@@ -55,8 +55,8 @@ function compiler(source) {
                     const playArgs = findTokensByType(token.content, 'arg').map(token => token.content.substring(1));
                     // const [, noteString, playArgString] = getTokenContentString(token).match(REGEXP_PLAY_STATEMENT);
                     // const playArgs = playArgString ? playArgString.substring(1).split(':') : [];
-                    trackList[currentGroup].commands.push(`${CMD_PLAY_NOTE}(${formatArgString([noteString, ...playArgs])});`);
-                    trackList[currentGroup].functionNames[CMD_PLAY_NOTE] = true;
+                    trackList[currentTrack].commands.push(`${CMD_PLAY_NOTE}(${formatArgString([noteString, ...playArgs])});`);
+                    trackList[currentTrack].functionNames[CMD_PLAY_NOTE] = true;
                     break;
                 case 'wait-statement':
                     let numericString = findTokenByType(token.content, 'numeric').content;
@@ -75,8 +75,8 @@ function compiler(source) {
                             numericString = `(${numericString})/td()`
                             break;
                     }
-                    trackList[currentGroup].commands.push(`await ${CMD_WAIT}(${numericString});`);
-                    trackList[currentGroup].functionNames[CMD_WAIT] = true;
+                    trackList[currentTrack].commands.push(`await ${CMD_WAIT}(${numericString});`);
+                    trackList[currentTrack].functionNames[CMD_WAIT] = true;
                     break;
                 default:
                     throw new Error("Unknown token type: " + token.type);

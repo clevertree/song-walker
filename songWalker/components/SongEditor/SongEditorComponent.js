@@ -90,16 +90,16 @@ export default function SongEditorComponent({initialValue, className}) {
         mapTokensToDOM(parsedTokenList, container, (token) => {
             if (typeof token === "string") {
                 if (token.trim().length > 0) {
-                    let textElm = document.createElement('span');
-                    textElm.setAttribute('data-token-type', 'unknown');
+                    let textElm = document.createElement('unknown');
+                    // textElm.setAttribute('class', 'unknown');
                     textElm.innerText = token;
                     return textElm;
                 } else {
                     return document.createTextNode(token);
                 }
             } else {
-                const spanElm = document.createElement('span');
-                spanElm.setAttribute('data-token-type', token.type);
+                const spanElm = document.createElement(token.type);
+                // spanElm.setAttribute('data-token', token.type);
                 if (!Array.isArray(token.content)) { // If array of tokens, it'll be handled by recursion
                     spanElm.innerText = token.content;
                 }

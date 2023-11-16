@@ -1,4 +1,4 @@
-import {parseFrequencyString, parseDurationString} from "./note";
+import {parseFrequencyString} from "./note";
 
 const BUFFER_DURATION = 1;
 const START_DELAY = .1;
@@ -48,6 +48,7 @@ export function startSong(songCallback, audioContext = null) {
     }
 }
 
+// TODO: trackInstance
 export function startTrackPlayback(trackCallback, trackPosition, trackCurrentTime, trackBeatsPerMinute, trackInstrument, songInstance) {
     const {startTime: songStartTime, audioContext, activeInstruments, bufferDuration} = songInstance;
     const activeSubTracks = [];

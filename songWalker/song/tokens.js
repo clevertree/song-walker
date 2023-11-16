@@ -1,10 +1,19 @@
 const Prism = require("prismjs");
 const ROOT_TRACK = 'rootTrack'
 const LANGUAGE = {
-    'group': {
+    'track-start': {
+        pattern: /\[[^\]]+]/m,
+        lookbehind: true,
+        alias: 'selector',
+        inside: {
+            name: /[^\[\]]+/,
+            punctuation: /[\[\]]/
+        }
+    },
+    'play-track-statement': {
         pattern: /@\w+/,
         inside: {
-            identifier: /^@/,
+            punctuation: /^@/,
             name: /\w+/
         }
     },
@@ -12,8 +21,16 @@ const LANGUAGE = {
         pattern: /import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/,
         inside: Prism.languages.javascript
     },
+    'variable-statement': {
+        pattern: /\w+=\w+;?/,
+        inside: {
+            name: /^\w+(?==)/,
+            value: /\w+/,
+            punctuation: /[=;]/
+        }
+    },
     'function-call': {
-        pattern: /([^\s()]+)(?:\(([^)]*)\));?/,
+        pattern: /([^\s()]+)(\(([^)]*)\));?/,
         inside: Prism.languages.javascript
     },
     'play-statement': {
@@ -32,6 +49,7 @@ const LANGUAGE = {
             punctuation: /;/
         }
     },
+    punctuation: /;/
     // 'newline': REGEXP_NEWLINE,
     // 'play-statement': REGEXP_PLAY_STATEMENT,
 }
