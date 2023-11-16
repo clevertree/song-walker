@@ -6,6 +6,7 @@ import Undo from "undoh";
 import styles from "./SongEditorComponent.module.scss"
 import {sourceToTokens} from "/songWalker/song/compiler";
 import {insertIntoSelection, walkDOM} from "./dom";
+import {mapTokensToDOM} from "../../song/tokens";
 
 export default function SongEditorComponent({initialValue, className}) {
     const [buffer] = useState(new Undo(initialValue))
@@ -50,7 +51,7 @@ export default function SongEditorComponent({initialValue, className}) {
         })
         if (!result)
             console.error("focusNode not found in editor: ", focusNode, focusOffset);
-        console.log('getEditorPosition', editorPosition, focusNode, focusOffset);
+        console.log('getEditorPosition', {editorPosition, focusNode, focusOffset});
         return editorPosition;
     }
 
@@ -86,33 +87,25 @@ export default function SongEditorComponent({initialValue, className}) {
     function renderMarkup(container, sourceString, insertBeforeElm = null) {
         let parsedTokenList = sourceToTokens(sourceString);
         console.log('renderMarkup', parsedTokenList)
-        renderTokens(parsedTokenList);
-
-        // TODO: recursive render
-        function renderTokens(parsedTokenList) {
-            for (const token of parsedTokenList) {
-                if (typeof token === "string") {
-                    let textElm;
-                    if (token.trim().length > 0) {
-                        textElm = document.createElement('span');
-                        textElm.setAttribute('data-token-type', 'unknown');
-                        textElm.innerText = token;
-                    } else {
-                        textElm = document.createTextNode(token);
-                    }
-                    insertBeforeElm ? container.insertBefore(textElm, insertBeforeElm) : container.appendChild(textElm);
+        mapTokensToDOM(parsedTokenList, container, (token) => {
+            if (typeof token === "string") {
+                if (token.trim().length > 0) {
+                    let textElm = document.createElement('span');
+                    textElm.setAttribute('data-token-type', 'unknown');
+                    textElm.innerText = token;
+                    return textElm;
                 } else {
-                    const spanElm = document.createElement('span');
-                    spanElm.setAttribute('data-token-type', token.type);
-                    if (Array.isArray(token.content)) {
-                        renderTokens(token.content);
-                    } else {
-                        spanElm.innerText = token.content;
-                    }
-                    insertBeforeElm ? container.insertBefore(spanElm, insertBeforeElm) : container.appendChild(spanElm);
+                    return document.createTextNode(token);
                 }
+            } else {
+                const spanElm = document.createElement('span');
+                spanElm.setAttribute('data-token-type', token.type);
+                if (!Array.isArray(token.content)) { // If array of tokens, it'll be handled by recursion
+                    spanElm.innerText = token.content;
+                }
+                return spanElm;
             }
-        }
+        })
     }
 
     function handleKeyDown(e) {
@@ -147,7 +140,7 @@ export default function SongEditorComponent({initialValue, className}) {
             //     console.log(e.code)
             //     break;
             default:
-                console.log(e.key)
+                // console.log(e.key)
                 break;
         }
     }
@@ -172,3 +165,14 @@ export default function SongEditorComponent({initialValue, className}) {
 }
 
 
+function walkTokens(tokenList, callback) {
+    for (const token of tokenList) {
+        if (callback(token))
+            return true;
+        if (Array.isArray(token.content)) {
+            if (walkTokens(token.content))
+                return true;
+        }
+    }
+    return false;
+}

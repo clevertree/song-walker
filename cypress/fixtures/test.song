@@ -12,7 +12,6 @@ import Instrument from "./instruments/oscillator";
     5/8
     3T
 
-
 @groupOne
 
     C5:1/4D; 1/4;

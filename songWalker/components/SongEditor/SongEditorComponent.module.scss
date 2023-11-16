@@ -14,23 +14,31 @@
     //display: inline;
   }
 
-
-  & > [data-token-type]:hover {
-    font-weight: bold;
+  [data-token-type=unknown] {
+    color: #F00;
   }
 
-  & > [data-token-type=function-call] {
-    color: #f99
+  [data-token-type=punctuation] {
+    color: #AAA;
+  }
+
+  [data-token-type]:hover {
+    font-weight: bold;
   }
 
 
   & > [data-token-type=wait-statement] {
-    color: #99f
+    margin-right: 4px;
+
+    & > [data-token-type=numeric] {
+      color: #99f;
+    }
   }
 
   & > [data-token-type=play-statement] {
     color: #33ff00;
     font-weight: bold;
+    margin-right: 4px;
   }
 
   & > [data-token-type=group] {
@@ -39,39 +47,38 @@
   }
 
 
-  & > [data-token-type=unknown] {
-    color: #b04d4d;
+  & > [data-token-type=function-call] {
+
+    & > [data-token-type=import] {
+      color: #814186;
+      font-weight: bold;
+    }
+
+    & > [data-token-type=function] {
+      color: #f99;
+    }
+
+    & > [data-token-type=literal-property] {
+      color: #99dbff
+    }
+
+    & > [data-token-type=string] {
+      color: #9f9;
+    }
+
+    & > [data-token-type=number] {
+      color: #99f
+    }
+
+    & > [data-token-type=operator] {
+      color: #afff99
+    }
+
+    & > [data-token-type=keyword] {
+      color: #ffc799
+    }
+
   }
 
-  /** Javascript Syntax **/
-
-  & > [data-token-type=import] {
-    color: #814186;
-    font-weight: bold;
-  }
-
-  & > [data-token-type=function] {
-    color: #f99
-  }
-
-  & > [data-token-type=literal-property] {
-    color: #99dbff
-  }
-
-  & > [data-token-type=string] {
-    color: #9f9;
-  }
-
-  & > [data-token-type=number] {
-    color: #99f
-  }
-
-  & > [data-token-type=operator] {
-    color: #afff99
-  }
-
-  & > [data-token-type=keyword] {
-    color: #ffc799
-  }
 
 }
