@@ -1,4 +1,6 @@
 const Prism = require("prismjs");
+// Prism.languages.javascript.constant = /\b[a-zA-Z](?:[a-zA-Z_]|\dx?)*\b/
+
 const ROOT_TRACK = 'rootTrack'
 const LANGUAGE = {
     'track-start': {
@@ -13,33 +15,65 @@ const LANGUAGE = {
     'play-track-statement': {
         pattern: /@\w+/,
         inside: {
-            punctuation: /^@/,
+            identifier: /^@/,
             name: /\w+/
         }
     },
-    'import': {
-        pattern: /import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/,
-        inside: Prism.languages.javascript
-    },
-    'variable-statement': {
-        pattern: /\w+=\w+;?/,
+    // 'import': {
+    //     pattern: /import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/,
+    //     inside: Prism.languages.javascript
+    // },
+    'function-statement': {
+        pattern: /\b([\w.]+[ \t]*=[ \t]*)?\w+\([^)]*\)[ \t]*;?/,
         inside: {
-            name: /^\w+(?==)/,
-            value: /\w+/,
-            punctuation: /[=;]/
+            "assign-to-variable": /^[\w.]+(?=[ \t]*=[ \t]*)/,
+            'function-name': /\b\w+(?=\()/,
+            'param-string': {
+                pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+                greedy: true
+            },
+            'param-variable': /\b[a-zA-Z_]\w*\b/,
+            'param-numeric': /\d*[\/.]?\d{1,2}([BTDt])?/,
+            'operator': /=/,
+            'punctuation': /[{}[\];(),.:]/
         }
     },
-    'function-call': {
-        pattern: /([^\s()]+)(\(([^)]*)\));?/,
-        inside: Prism.languages.javascript
+    'variable-statement': {
+        pattern: /[\w.]+[ \t]*=[ \t]*([\w'./])+[ \t]*;?/,
+        inside: {
+            "assign-to-variable": /^[\w.]+(?=[ \t]*=[ \t]*)/,
+            // "javascript-statement": {
+            //     pattern: /[\w'.]+/,
+            //     inside: {
+            'param-string': {
+                pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+                greedy: true
+            },
+
+            'param-variable': /\b[a-zA-Z_]\w*\b/,
+            'param-numeric': /\d*[\/.]?\d{1,2}([BTDt])?/,
+            // 'param-numeric': /\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,
+            // 'punctuation': /[={}[\];(),.:]/
+            //     }
+            // },
+            'operator': /=/,
+            punctuation: /;/
+        }
     },
     'play-statement': {
         pattern: /([A-G][#qb]{0,2}\d)(:[^:;\s]*)*;?/,
         inside: {
-            note: /[A-G][#qb]{0,2}\d/,
-            arg: /:[^:;\s]*/,
+            'play-frequency': /[A-G][#qb]{0,2}\d/,
+            arg: {
+                pattern: /:[^:;\s]+/,
+                inside: {
+                    'param-numeric': /\d*[\/.]?\d{1,2}([BTDt])?/,
+                    'param-string': /[^:;]+/,
+                    delimiter: /:/
+                },
+            },
             punctuation: /;/
-        }
+        },
     },
     'wait-statement': {
         pattern: /((\d[\/.])?\d{1,2})([BTDt])?;?/,
@@ -47,6 +81,7 @@ const LANGUAGE = {
             numeric: /\d*[\/.]?\d+/,
             factor: /[BTDt]/,
             punctuation: /;/
+            // punctuation: /;/
         }
     },
     punctuation: /;/
@@ -78,17 +113,21 @@ function getTokenContentString(token) {
 }
 
 function findTokenByType(tokenList, tokenType) {
+    if (!(tokenType instanceof RegExp))
+        tokenType = new RegExp('^' + tokenType + '$');
     return walkTokens(tokenList, token => {
-        if (typeof token !== "string" && token.type === tokenType) {
+        if (typeof token !== "string" && tokenType.test(token.type)) {
             return token;
         }
     })
 }
 
 function findTokensByType(tokenList, tokenType) {
+    if (!(tokenType instanceof RegExp))
+        tokenType = new RegExp('^' + tokenType + '$');
     const foundTokenList = [];
     walkTokens(tokenList, token => {
-        if (typeof token !== "string" && token.type === tokenType) {
+        if (typeof token !== "string" && tokenType.test(token.type)) {
             foundTokenList.push(token);
         }
     })
@@ -103,11 +142,9 @@ function walkTokens(tokenList, callback) {
         if (returnValue)
             return returnValue;
         if (Array.isArray(token.content)) {
-            returnValue = walkTokens(token.content)
+            returnValue = walkTokens(token.content, callback)
             if (returnValue)
                 return returnValue;
-        } else {
-
         }
     }
     return false;

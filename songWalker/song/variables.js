@@ -1,6 +1,7 @@
-const variables = {
-    beatsPerMinute: 'bpm',
-    currentInstrument: 'inst',
-    currentPosition: 'pos',
-    currentTime: 'time'
+module.exports = {
+    currentTrack: 't',
+    beatsPerMinute: 'beatsPerMinute',
+    currentInstrument: 'currentInstrument',
+    currentPosition: 'currentPosition',
+    currentTime: 'currentTime'
 }

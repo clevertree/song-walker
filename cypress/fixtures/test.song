@@ -1,32 +1,36 @@
-import Instrument from "./instruments/oscillator";
+currentInstrument=lead2
+waitTime = 1/4T;
 
-    loadInstrument('lead', Instrument, {type: 'pulse', pulseWidth: 0, envelope:{mixer: 1}});
-    loadInstrument('lead2', Instrument, {type: 'square', envelope:{mixer: 0.5}});
-    setBeatsPerMinute(120)
+lead=loadInstrument("./instruments/oscillator", {wait: 1/8D})
+lead2=loadInstrument("./instruments/oscillator", {type:'square'})
 
-    setInstrument('lead')
-    startTrack(groupOne)
-    3/8
-    setInstrument('lead2')
-    startTrack(groupOne)
-    5/8
-    3T
+lead.config.type='pulse';
+lead.config.pulseWidth=0.5;
+lead.config.envelop.mixer=1;
+lead2.config.type='square';
+lead.config.envelop.mixer=0.5;
 
-@groupOne
 
-    C5:1/4D; 1/4;
-    C4:1/4D:0.8;1/4;
-    G4:1/4 1/4
-    Eb4:1/4D:0.8 1/4
-    Eb5:1/4T 1/4
-    F5:1/4T 1/4
-    Eb5:1/4T 1/4
-    D5:1/4T 1/4
-    C5:1/4D 1/4
-    C4:1/4D:0.8 1/4
-    G4:1/4 1/4
-    Eb4:1/4D:0.8 1/4
-    D5:1/4 1/4
-    C4:1/4:.8 1/4
-    Bb4:1/4 1/4
+wut='ohok';omfg='1230WUT2of' ; rully='yup' bpm=120
+currentInstrument=lead
+@track1 3/8
+currentInstrument=lead2
+@track1 5/8 3T;
 
+[track1]
+
+C5:1/4D; 1/4;
+C4:1/4D:0.8;1/4;
+G4:1/4 1/4
+Eb4:1/4D:0.8 1/4
+Eb5:1/4T 1/4
+F5:1/4T 1/4
+Eb5:1/4T 1/4
+D5:1/4T 1/4
+C5:1/4D 1/4
+C4:1/4D:0.8 1/4
+G4:1/4 1/4
+Eb4:1/4D:0.8 1/4
+D5:1/4 1/4
+C4:1/4:.8 1/4
+Bb4:1/4 1/4

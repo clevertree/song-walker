@@ -1,40 +1,45 @@
-import Instrument from "./instruments/oscillator";
-export default async function rootTrack({loadInstrument, setBeatsPerMinute, setInstrument, startTrack, w}) {
-    
+export default async function rootTrack(t) {
+const {loadInstrument, startTrack, wait} = t;
+t.currentInstrument=t.lead2;
+t.waitTime=(1/4)/1.5;
 
-    loadInstrument('lead', Instrument, {type: 'pulse', pulseWidth: 0, envelope:{mixer: 1}});
-    loadInstrument('lead2', Instrument, {type: 'square', envelope:{mixer: 0.5}});
-    setBeatsPerMinute(120)
+t.lead=loadInstrument(require("./instruments/oscillator"), {})
+t.lead2=loadInstrument(require("./instruments/oscillator"), {type:'square'})
 
-    setInstrument('lead')
-    startTrack(groupOne)
-    await w(3/8);
-    setInstrument('lead2')
-    startTrack(groupOne)
-    await w(5/8);
-    await w((3)/1.5);
+t.lead.config.type='pulse';
+t.lead.config.pulseWidth=0.5;
+t.lead.config.envelop.mixer=1;
+t.lead2.config.type='square';
+t.lead.config.envelop.mixer=0.5;
+
+
+t.wut='ohok';t.omfg='1230WUT2of'; t.rully='yup';t.bpm=120;
+t.currentInstrument=t.lead;
+startTrack('track1'); await wait(3/8);
+t.currentInstrument=t.lead2;
+startTrack('track1'); await wait(5/8); await wait((3)/1.5);
 
 
 }
 
-async function groupOne({n, w}) {
+async function track1(t) {
+const {playNote, wait} = t;
 
 
-    n('C5', '1/4D'); await w(1/4);
-    n('C4', '1/4D', 0.8);await w(1/4);
-    n('G4', '1/4'); await w(1/4);
-    n('Eb4', '1/4D', 0.8); await w(1/4);
-    n('Eb5', '1/4T'); await w(1/4);
-    n('F5', '1/4T'); await w(1/4);
-    n('Eb5', '1/4T'); await w(1/4);
-    n('D5', '1/4T'); await w(1/4);
-    n('C5', '1/4D'); await w(1/4);
-    n('C4', '1/4D', 0.8); await w(1/4);
-    n('G4', '1/4'); await w(1/4);
-    n('Eb4', '1/4D', 0.8); await w(1/4);
-    n('D5', '1/4'); await w(1/4);
-    n('C4', '1/4', .8); await w(1/4);
-    n('Bb4', '1/4'); await w(1/4);
-
+playNote('C5', (1/4)*1.5); await wait(1/4);
+playNote('C4', (1/4)*1.5, 0.8);await wait(1/4);
+playNote('G4', 1/4); await wait(1/4);
+playNote('Eb4', (1/4)*1.5, 0.8); await wait(1/4);
+playNote('Eb5', (1/4)/1.5); await wait(1/4);
+playNote('F5', (1/4)/1.5); await wait(1/4);
+playNote('Eb5', (1/4)/1.5); await wait(1/4);
+playNote('D5', (1/4)/1.5); await wait(1/4);
+playNote('C5', (1/4)*1.5); await wait(1/4);
+playNote('C4', (1/4)*1.5, 0.8); await wait(1/4);
+playNote('G4', 1/4); await wait(1/4);
+playNote('Eb4', (1/4)*1.5, 0.8); await wait(1/4);
+playNote('D5', 1/4); await wait(1/4);
+playNote('C4', 1/4, .8); await wait(1/4);
+playNote('Bb4', 1/4); await wait(1/4);
 
 }

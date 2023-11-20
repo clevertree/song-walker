@@ -14,7 +14,11 @@ export default function OscillatorInstrument(audioContext, config = {}) {
     let lastVelocity = DEFAULT_VELOCITY
     let activeOscillators = [];
     let envelope = EnvelopeEffect(audioContext, config.envelope)
+
+    // TODO?
+    // return function(eventName, ...args) {
     return {
+        config,
         playNote: function (frequency, startTime, duration, velocity) {
             // const gainNode = audioContext.createGain(); //to get smooth rise/fall
             if (duration) {

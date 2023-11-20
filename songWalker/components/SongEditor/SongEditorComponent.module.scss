@@ -3,14 +3,22 @@
   font-family: monospace;
   font-size: 1.2em;
   display: flex;
-  background-color: #00F3;
+  background-color: #000;
 }
 
 .editor {
   white-space: pre;
+  padding: .2em;
+
+  operator,
+  delimiter,
+  punctuation {
+    color: #AAA;
+  }
 
   unknown {
-    color: #F00;
+    color: #ab1b00;
+
   }
 
   & > *:hover {
@@ -18,60 +26,65 @@
   }
 
 
-  & > wait-statement {
+  wait-statement {
     margin-right: 4px;
 
     & > numeric {
-      color: #99f;
+      color: #ff4d4d;
+      font-weight: bold;
     }
 
     & > factor {
-      color: #ff9100;
+      color: #ff944d;
+      font-weight: bold;
     }
   }
 
-  & > play-statement {
-    color: #33ff00;
-    font-weight: bold;
+  play-statement {
     margin-right: 4px;
+
+    & > play-frequency {
+      font-weight: bold;
+      color: #00FF09;
+    }
+
+    & > arg {
+      //color: #db8e57;
+    }
   }
 
 
-  & > play-track-statement {
-    color: #0004ff;
+  play-track-statement {
+    color: #00FF09;
     font-weight: bold;
   }
 
-  & > track-start {
+  track-start {
     & > name {
-      color: #0004ff;
+      color: #FF00F6;
       font-weight: bold;
     }
   }
 
+  function-name {
+    color: #2a34ff;
+  }
 
-  & > function-call {
+  assign-to-variable {
+    //font-weight: bold;
+    color: #55a6ff;
+  }
 
-    & > import {
-      color: #814186;
-      font-weight: bold;
-    }
 
+  javascript-statement {
     & > function {
-      color: #f99;
+      color: #9999ff;
     }
 
     & > literal-property {
       color: #99dbff
     }
 
-    & > string {
-      color: #9f9;
-    }
-
-    & > number {
-      color: #99f
-    }
 
     & > operator {
       color: #afff99
@@ -82,15 +95,18 @@
     }
   }
 
-  & > variable-statement {
-    & > name {
-      font-weight: bold;
-      color: #ff5fd8;
-    }
+  param-variable {
+    //color: #F80;
+    color: #55a6ff;
+    //font-weight: bold;
+  }
 
-    & > value {
-      font-weight: bold;
-      color: #ff9100;
-    }
+  param-string {
+    color: #FFAE55;
+  }
+
+  param-numeric {
+    color: #ddff00;
+    //font-weight: bold;
   }
 }
