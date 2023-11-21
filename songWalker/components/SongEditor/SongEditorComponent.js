@@ -4,14 +4,14 @@ import React, {useEffect, useRef, useState} from 'react'
 import Undo from "undoh";
 
 import styles from "./SongEditorComponent.module.scss"
-import {sourceToTokens} from "/songWalker/song/compiler";
+import {compiler} from "/songWalker/song/compiler";
 import {insertIntoSelection, walkDOM} from "./dom";
 import {mapTokensToDOM} from "../../song/tokens";
 
 export default function SongEditorComponent({initialValue, className}) {
     const [buffer] = useState(new Undo(initialValue))
     const refEditor = useRef();
-
+    let renderedSongCallback = null;
     useEffect(() => {
         refEditor.current.innerHTML = "";
         renderMarkup(refEditor.current, initialValue)
@@ -85,8 +85,13 @@ export default function SongEditorComponent({initialValue, className}) {
     }
 
     function renderMarkup(container, sourceString, insertBeforeElm = null) {
-        let parsedTokenList = sourceToTokens(sourceString);
-        console.log('renderMarkup', parsedTokenList)
+        console.time('renderMarkup')
+        const [scriptContent, parsedTokenList, trackList, errors] = compiler(sourceString, {
+            debugMode: true,
+            exportStatement: 'module.exports='
+        });
+        renderedSongCallback = eval(scriptContent);
+        console.log('renderMarkup', scriptContent, parsedTokenList, trackList, errors, renderedSongCallback)
         mapTokensToDOM(parsedTokenList, container, (token) => {
             if (typeof token === "string") {
                 if (token.trim().length > 0) {
@@ -106,6 +111,7 @@ export default function SongEditorComponent({initialValue, className}) {
                 return spanElm;
             }
         })
+        console.timeEnd('renderMarkup')
     }
 
     function handleKeyDown(e) {
@@ -145,10 +151,22 @@ export default function SongEditorComponent({initialValue, className}) {
         }
     }
 
+    function startPlayback() {
+        const t = {
+            _: (...args) => console.log('_', ...args),
+            loadInstrument: (...args) => console.log('loadInstrument', ...args),
+            require: (...args) => console.log('loadInstrument', ...args),
+        }
+        console.log('startPlayback', renderedSongCallback(t));
+    }
+
     return (
         <div
             className={styles.container + (className ? ' ' + className : '')}
         >
+            <div className={styles.menuContainer}>
+                <button onClick={startPlayback}>Play</button>
+            </div>
             <div
                 ref={refEditor}
                 contentEditable

@@ -1,6 +1,6 @@
 const songSource = `
 lead=loadInstrument("./instruments/oscillator", {duration: 1/4T})
-lead2=loadInstrument("./instruments/oscillator", {})
+lead2=loadInstrument("./instruments/oscillator", {'type':'square'})
 lead.config.type='pulse';
 lead.config.pulseWidth=0.5;
 lead.config.envelop.mixer=1;

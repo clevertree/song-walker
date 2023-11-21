@@ -4,9 +4,11 @@ describe('songLoader', () => {
     it('compiles to javascript', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
-                const compiledSource = compiler(SONG_SOURCE);
-                const cmdList1 = compiledSource.split(' ');
-                const cmdList2 = SONG_SOURCE_COMPILED.split(' ');
+                const [scriptContent, tokens, trackList] = compiler(SONG_SOURCE);
+                expect(Object.values(trackList).length).to.eq(2);
+                expect(Object.values(tokens).length).to.eq(98);
+                const cmdList1 = scriptContent.split(/\s+/);
+                const cmdList2 = SONG_SOURCE_COMPILED.split(/\s+/);
                 for (let i = 0; i < cmdList1.length; i++) {
                     expect(cmdList1[i].trim()).to.eq(cmdList2[i].trim())
                 }

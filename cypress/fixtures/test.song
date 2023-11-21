@@ -2,7 +2,7 @@ currentInstrument=lead2
 waitTime = 1/4T;
 
 lead=loadInstrument("./instruments/oscillator", {wait: 1/8D})
-lead2=loadInstrument("./instruments/oscillator", {type:'square'})
+lead2=loadInstrument("./instruments/oscillator", {'type':'square'})
 
 lead.config.type='pulse';
 lead.config.pulseWidth=0.5;
@@ -18,7 +18,6 @@ currentInstrument=lead2
 @track1 5/8 3T;
 
 [track1]
-
 C5:1/4D; 1/4;
 C4:1/4D:0.8;1/4;
 G4:1/4 1/4

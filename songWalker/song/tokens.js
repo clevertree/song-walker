@@ -1,4 +1,5 @@
 const Prism = require("prismjs");
+const variables = require("./variables");
 // Prism.languages.javascript.constant = /\b[a-zA-Z](?:[a-zA-Z_]|\dx?)*\b/
 
 const ROOT_TRACK = 'rootTrack'
@@ -28,6 +29,10 @@ const LANGUAGE = {
         inside: {
             "assign-to-variable": /^[\w.]+(?=[ \t]*=[ \t]*)/,
             'function-name': /\b\w+(?=\()/,
+            'param-key': {
+                pattern: /((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*:)/m,
+                lookbehind: true
+            },
             'param-string': {
                 pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
                 greedy: true
@@ -88,28 +93,73 @@ const LANGUAGE = {
     // 'newline': REGEXP_NEWLINE,
     // 'play-statement': REGEXP_PLAY_STATEMENT,
 }
-module.exports = {
-    sourceToTokens,
-    getTokenContentString,
-    findTokenByType,
-    findTokensByType,
-    walkTokens,
-    mapTokensToDOM,
-    ROOT_TRACK,
-    LANGUAGE,
-}
 
 
 function sourceToTokens(source) {
     return Prism.tokenize(source, LANGUAGE);
 }
 
-function getTokenContentString(token) {
+
+function getTokenListContent(tokenList) {
+    return tokenList
+        .map(token => {
+            switch (token.type) {
+                case 'param-numeric':
+                    return formatNumericTokenContent(token);
+                case 'param-variable':
+                    return formatVariableTokenContent(token);
+                default:
+                    return formatStringTokenContent(token);
+            }
+        })
+        .join(', ')
+}
+
+function formatTokenContent(token) {
     if (typeof token === "string")
         return token;
     if (Array.isArray(token.content))
-        return token.content.map(token => getTokenContentString(token)).join('');
+        return token.content.map(token => formatTokenContent(token)).join('');
+
+    switch (token.type) {
+        case 'param-numeric':
+            return formatNumericTokenContent(token);
+        case 'param-variable':
+            return formatVariableTokenContent(token);
+        case 'param-string':
+            return formatStringTokenContent(token);
+    }
     return token.content;
+}
+
+function formatNumericTokenContent(token) {
+    let [, numericString, factorString] = token.content.match(/(\d*[\/.]?\d{1,2})([BTDt])?/)
+    return formatNumericString(numericString, factorString);
+}
+
+function formatNumericString(numericString, factorString) {
+    switch (factorString) {
+        default:
+        case 'B':
+            return numericString;
+        case 'D':
+            return `(${numericString})*1.5`
+        case 'T':
+            return numericString = `(${numericString})/1.5`
+        case 't':
+            return numericString = `(${numericString})/td()`
+    }
+}
+
+function formatStringTokenContent(token) {
+    if (!/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/.test(token.content)) {
+        return `'${token.content}'`
+    }
+    return token.content;
+}
+
+function formatVariableTokenContent(token) {
+    return `${variables.currentTrack}.${token.content}`
 }
 
 function findTokenByType(tokenList, tokenType) {
@@ -158,4 +208,19 @@ function mapTokensToDOM(tokenList, container, callback) {
         }
         container.appendChild(element)
     })
+}
+
+module.exports = {
+    sourceToTokens,
+    findTokenByType,
+    findTokensByType,
+    formatNumericString,
+    formatTokenContent,
+    formatVariableTokenContent,
+    formatStringTokenContent,
+    formatNumericTokenContent,
+    walkTokens,
+    mapTokensToDOM,
+    ROOT_TRACK,
+    LANGUAGE,
 }
