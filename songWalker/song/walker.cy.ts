@@ -1,4 +1,5 @@
-import {Instrument, SongState, TrackRenderer, TrackState, walkTrack} from "./walker";
+import {Instrument, SongState, TrackRenderer, TrackState, walkSong, walkTrack} from "./walker";
+import constants from "@songWalker/song/constants";
 
 
 let testInstrumentInstance: Instrument, testSongState: SongState, testTrackInitialState: TrackState;
@@ -28,7 +29,7 @@ describe('songPlayer', () => {
         }
     })
 
-    it('plays a song', async () => {
+    it('plays a track', async () => {
         const songInstance = walkTrack(testTrack, testTrackInitialState, testSongState);
         await songInstance.waitForTrackToFinish();
         // @ts-ignore
@@ -45,6 +46,23 @@ describe('songPlayer', () => {
         expect(status.currentTime).to.eq(12)
     })
 
+
+    it('plays a song', async () => {
+        const songInstance = walkSong(testSong);
+        await songInstance.waitForSongToFinish();
+        // @ts-ignore
+        expect(testInstrumentInstance.playFrequency.callCount).to.eq(9)
+    })
+
+    it('playing a song without an instrument throws an error ', async () => {
+        const songInstance = walkSong(testSong);
+        try {
+            await songInstance.waitForSongToFinish();
+        } catch (e) {
+            expect(e.message).to.eq(constants.ERR_NO_INSTRUMENT)
+        }
+        // @ts-ignore
+    })
 })
 
 
@@ -60,8 +78,9 @@ async function testSong(trackState: TrackState, trackRenderer: TrackRenderer) {
 }
 
 async function testTrack(trackState: TrackState, trackRenderer: TrackRenderer) {
-    const {playNote: n, wait: w} = trackRenderer;
+    const {playNote: n, wait: w, triggerEvent: _} = trackRenderer;
 
+    _(1, 'test-event', null);
     trackRenderer.setVariable('beatsPerMinute', 120)
 
     n("C5", (1 / 4) * 1.5);

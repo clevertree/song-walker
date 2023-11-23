@@ -1,4 +1,5 @@
 import {parseFrequencyString} from "./note";
+import constants from "./constants"
 
 const BUFFER_DURATION = 1;
 const START_DELAY = .1;
@@ -15,7 +16,7 @@ export type SongState = {
 
 export type SongHandler = {
     addEventCallback: (callback: SongEventHandler) => void,
-    waitForTrackToFinish: () => Promise<void>
+    waitForSongToFinish: () => Promise<void>
     stopPlayback: () => void,
     getRootTrackState: () => TrackState
 }
@@ -49,6 +50,7 @@ export type Instrument = {
 
 export type InstrumentCallback = (config: object) => Promise<Instrument> | Instrument
 export type TrackRenderer = {
+    trackState: TrackState,
     playNote: (frequencyString: string, duration?: number, velocity?: number) => void;
     loadInstrument: (instrumentCallback: InstrumentCallback, config: object) => Promise<Instrument>;
     setVariable: (variablePath: string, variableValue: any) => void;
@@ -88,7 +90,7 @@ export function walkSong(
         stopPlayback(): void {
             songState.isPlaying = false;
         },
-        async waitForTrackToFinish(): Promise<void> {
+        async waitForSongToFinish(): Promise<void> {
             await trackHandler.waitForTrackToFinish();
         },
         addEventCallback: function (callback: SongEventHandler) {
@@ -111,6 +113,7 @@ export function walkTrack(
     songState: SongState) {
     const subTrackHandlers: TrackHandler[] = [];
     const trackRenderer: TrackRenderer = {
+        trackState,
         async loadInstrument(instrumentCallback: InstrumentCallback, config: object): Promise<Instrument> {
             if (!songState.isPlaying)
                 throw Error("Playback has ended");
@@ -202,7 +205,7 @@ export function walkTrack(
 
 const UnassignedInstrument: Instrument = {
     playFrequency(destination: AudioDestinationNode, frequency: number, startTime: number, duration: number, velocity: number): void {
-        throw new Error("No instrument is assigned");
+        throw new Error(constants.ERR_NO_INSTRUMENT);
     },
     stopActiveFrequencies(): void {
 

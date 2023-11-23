@@ -1,5 +1,5 @@
 module.exports = {
-    currentTrack: 't',
+    trackRenderer: 'trackRenderer',
     beatsPerMinute: 'beatsPerMinute',
     currentInstrument: 'currentInstrument',
     currentPosition: 'currentPosition',

@@ -100,68 +100,6 @@ function sourceToTokens(source) {
 }
 
 
-function getTokenListContent(tokenList) {
-    return tokenList
-        .map(token => {
-            switch (token.type) {
-                case 'param-numeric':
-                    return formatNumericTokenContent(token);
-                case 'param-variable':
-                    return formatVariableTokenContent(token);
-                default:
-                    return formatStringTokenContent(token);
-            }
-        })
-        .join(', ')
-}
-
-function formatTokenContent(token) {
-    if (typeof token === "string")
-        return token;
-    if (Array.isArray(token.content))
-        return token.content.map(token => formatTokenContent(token)).join('');
-
-    switch (token.type) {
-        case 'param-numeric':
-            return formatNumericTokenContent(token);
-        case 'param-variable':
-            return formatVariableTokenContent(token);
-        case 'param-string':
-            return formatStringTokenContent(token);
-    }
-    return token.content;
-}
-
-function formatNumericTokenContent(token) {
-    let [, numericString, factorString] = token.content.match(/(\d*[\/.]?\d{1,2})([BTDt])?/)
-    return formatNumericString(numericString, factorString);
-}
-
-function formatNumericString(numericString, factorString) {
-    switch (factorString) {
-        default:
-        case 'B':
-            return numericString;
-        case 'D':
-            return `(${numericString})*1.5`
-        case 'T':
-            return numericString = `(${numericString})/1.5`
-        case 't':
-            return numericString = `(${numericString})/td()`
-    }
-}
-
-function formatStringTokenContent(token) {
-    if (!/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/.test(token.content)) {
-        return `'${token.content}'`
-    }
-    return token.content;
-}
-
-function formatVariableTokenContent(token) {
-    return `${variables.currentTrack}.${token.content}`
-}
-
 function findTokenByType(tokenList, tokenType) {
     if (!(tokenType instanceof RegExp))
         tokenType = new RegExp('^' + tokenType + '$');
@@ -214,11 +152,6 @@ module.exports = {
     sourceToTokens,
     findTokenByType,
     findTokensByType,
-    formatNumericString,
-    formatTokenContent,
-    formatVariableTokenContent,
-    formatStringTokenContent,
-    formatNumericTokenContent,
     walkTokens,
     mapTokensToDOM,
     ROOT_TRACK,
