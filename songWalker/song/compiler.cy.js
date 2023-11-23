@@ -17,6 +17,18 @@ describe('songLoader', () => {
         })
     })
 
+    it('compiles to javascript in event mode', () => {
+        cy.fixture('test.song').then((SONG_SOURCE) => {
+            cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
+                const [scriptContent, tokens, trackList] = compiler(SONG_SOURCE, {
+                    eventMode: true
+                });
+                cy.log('scriptContent')
+            })
+        })
+    })
+
+
     it('wait statement compiles to tokens', () => {
         const SONG_SOURCE = `1/4T;`
         const compiledSource = sourceToTokens(SONG_SOURCE);

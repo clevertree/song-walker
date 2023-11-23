@@ -7,6 +7,7 @@ import styles from "./SongEditorComponent.module.scss"
 import {compiler} from "/songWalker/song/compiler";
 import {insertIntoSelection, walkDOM} from "./dom";
 import {mapTokensToDOM} from "../../song/tokens";
+import {walkSong} from "../../song/walker";
 
 export default function SongEditorComponent({initialValue, className}) {
     const [buffer] = useState(new Undo(initialValue))
@@ -87,7 +88,7 @@ export default function SongEditorComponent({initialValue, className}) {
     function renderMarkup(container, sourceString, insertBeforeElm = null) {
         console.time('renderMarkup')
         const [scriptContent, parsedTokenList, trackList, errors] = compiler(sourceString, {
-            debugMode: true,
+            eventMode: true,
             exportStatement: 'module.exports='
         });
         renderedSongCallback = eval(scriptContent);
@@ -152,12 +153,7 @@ export default function SongEditorComponent({initialValue, className}) {
     }
 
     function startPlayback() {
-        const t = {
-            _: (...args) => console.log('_', ...args),
-            loadInstrument: (...args) => console.log('loadInstrument', ...args),
-            require: (...args) => console.log('loadInstrument', ...args),
-        }
-        console.log('startPlayback', renderedSongCallback(t));
+        walkSong(renderedSongCallback);
     }
 
     return (
@@ -180,17 +176,4 @@ export default function SongEditorComponent({initialValue, className}) {
             </div>
         </div>
     )
-}
-
-
-function walkTokens(tokenList, callback) {
-    for (const token of tokenList) {
-        if (callback(token))
-            return true;
-        if (Array.isArray(token.content)) {
-            if (walkTokens(token.content))
-                return true;
-        }
-    }
-    return false;
 }

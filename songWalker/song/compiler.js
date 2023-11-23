@@ -22,7 +22,7 @@ const DEFAULT_EXPORT_STATEMENT = `export default `;
 
 function compiler(source, config = {}) {
     config = {
-        debugMode: false,
+        eventMode: false,
         exportStatement: DEFAULT_EXPORT_STATEMENT,
         ...config
     };
@@ -35,26 +35,24 @@ function compiler(source, config = {}) {
     const trackList = {[ROOT_TRACK]: {commandList: [], functionNames: {}}}
     const errors = [];
 
-    // let instrumentID = 0;
-    let position = 0;
+    for (let tokenID = 0; tokenID < tokens.length; tokenID++) {
+        const token = tokens[tokenID];
 
-    function addCommand(commandString, commandName = null, isPromise = false) {
-        if (commandName)
-            trackList[currentTrack].functionNames[commandName] = true;
-        if (config.debugMode) {
-            commandString = `${commands.debugPosition}(${commandString}, ${position});`
-            // isPromise = true
-            trackList[currentTrack].functionNames[commands.debugPosition] = true;
+        function addCommand(commandString, commandName, isPromise = false) {
+            if (commandName)
+                trackList[currentTrack].functionNames[commandName] = true;
+            if (config.eventMode) {
+                commandString = `${commands.triggerEvent}('${tokenID}', ${commandName}, ${commandString});`
+                // isPromise = true
+                trackList[currentTrack].functionNames[commands.triggerEvent] = true;
+            }
+            trackList[currentTrack].commandList.push("\t" + (isPromise ? 'await ' : '') + commandString + (/;[ \t]*$/.test(commandString) ? '' : ';'));
         }
-        trackList[currentTrack].commandList.push("\t" + (isPromise ? 'await ' : '') + commandString);
-    }
 
-    for (let i = 0; i < tokens.length; i++) {
-        const token = tokens[i];
-        position += token.length;
+
         if (typeof token === "string") {
             if (token.trim().length > 0) {
-                errors.push(`Unrecognized token (${i}): ${token.trim()} at position ${position}`)
+                errors.push(`Unrecognized token: ${token.trim()} at token ${tokenID}`)
 
             } else {
                 trackList[currentTrack].commandList.push(token.replace(/ +/g, ' ').replace(/\n+/g, '\n'));
@@ -69,32 +67,26 @@ function compiler(source, config = {}) {
                 //     break;
                 case 'function-statement':
                     const functionTokenList = [...token.content];
-                    const functionName = findTokenByType(functionTokenList, 'function-name').content;
+                    const functionNameToken = findTokenByType(token.content, 'function-name');
                     const functionAssignResultToVariableToken = findTokenByType(functionTokenList, 'assign-to-variable');
-                    const functionArgTokens = findTokensByType(functionTokenList, /^param-/);
+
                     if (functionAssignResultToVariableToken) {
-                        const pos = functionTokenList.indexOf(functionAssignResultToVariableToken);
-                        functionTokenList.splice(pos, 1, `${variables.currentTrack}.${functionAssignResultToVariableToken.content}`)
+                        const functionTokenPos = functionTokenList.indexOf(functionNameToken);
+                        addCommand(`${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${formatTokenContent({
+                            ...token,
+                            content: functionTokenList.slice(functionTokenPos)
+                        })})`, functionNameToken.content);
+                    } else {
+                        addCommand(formatTokenContent({
+                            ...token,
+                            content: functionTokenList
+                        }), functionNameToken.content);
                     }
-                    switch (functionName) {
-                        case 'loadInstrument':
-                            const firstParamToken = functionArgTokens[0];
-                            if (firstParamToken.type === 'param-string') {
-                                // TODO: move to imports (optionally)
-                                // functionArgTokens[0] = `require(${firstParamToken.content})`
-                                const pos = functionTokenList.indexOf(firstParamToken);
-                                functionTokenList.splice(pos, 1, `require(${firstParamToken.content})`)
-                                trackList[currentTrack].functionNames[commands.require] = true;
-                                // firstParamToken.length = firstParamToken.content.length;
-                                // firstParamToken.type = 'function-statement';
-                            }
-                    }
-                    addCommand(formatTokenContent({...token, content: functionTokenList}), functionName);
                     break;
                 case 'variable-statement':
                     const variableNameToken = findTokenByType(token.content, 'assign-to-variable');
                     const variableValueToken = findTokenByType(token.content, /^param-/);
-                    addCommand(`${variables.currentTrack}.${variableNameToken.content}=${formatTokenContent(variableValueToken)}`);
+                    addCommand(`${commands.setVariable}('${variableNameToken.content}', ${formatTokenContent(variableValueToken)})`, commands.setVariable);
                     break;
                 case 'track-start':
                     const trackName = findTokenByType(token.content, 'name').content;
@@ -106,8 +98,8 @@ function compiler(source, config = {}) {
                 case 'play-statement':
                     const frequencyToken = findTokenByType(token.content, 'play-frequency');
                     const noteArgs = findTokensByType(token.content, /^param-/);
-                    addCommand(`${commands.playNote}('${frequencyToken.content}'${noteArgs.length === 0 ? '' : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`, commands.playNote);
-                    // trackList[currentTrack].functionNames[commands.playNote] = true;
+                    addCommand(`${commands.playFrequency}('${frequencyToken.content}'${noteArgs.length === 0 ? '' : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`, commands.playFrequency);
+                    // trackList[currentTrack].functionNames[commands.playFrequency] = true;
                     break;
                 case 'play-track-statement':
                     const trackNameToken = findTokenByType(token.content, 'name');

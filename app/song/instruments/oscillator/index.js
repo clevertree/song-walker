@@ -1,38 +1,20 @@
 import EnvelopeEffect from "../../effects/envelope";
 
-const DEFAULT_VELOCITY = 1;
-const DEFAULT_DURATION = 1;
-const DEFAULT_FREQUENCY = 432 * 12;
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 const DEFAULT_PULSE_WIDTH = 0;
 
-export default function OscillatorInstrument(audioContext, config = {}) {
+export default function OscillatorInstrument(config = {}) {
     console.log('OscillatorInstrument', config, config.type);
-    const destination = audioContext.destination;
-    let lastDuration = DEFAULT_DURATION;
-    let lastFrequency = DEFAULT_FREQUENCY
-    let lastVelocity = DEFAULT_VELOCITY
     let activeOscillators = [];
-    let envelope = EnvelopeEffect(audioContext, config.envelope)
+    let envelope = EnvelopeEffect(config.envelope)
 
     // TODO?
     // return function(eventName, ...args) {
     return {
         config,
-        playNote: function (frequency, startTime, duration, velocity) {
+        playFrequency: function (destination, frequency, startTime, duration, velocity) {
             // const gainNode = audioContext.createGain(); //to get smooth rise/fall
-            if (duration) {
-                lastDuration = duration;
-            } else {
-                duration = lastDuration
-            }
-            if (frequency) {
-                lastFrequency = frequency;
-            } else {
-                frequency = lastFrequency
-            }
             const endTime = startTime + duration;
-
 
             // Envelope
             const gainNode = envelope.createEnvelope(destination, startTime, velocity);

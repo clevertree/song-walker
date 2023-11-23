@@ -4,7 +4,7 @@ let testInstrumentInstance, testSongInstance;
 describe('songPlayer', () => {
     beforeEach(() => {
         testInstrumentInstance = {
-            playNote: cy.stub()
+            playFrequency: cy.stub()
         }
 
         testSongInstance = {
@@ -19,14 +19,14 @@ describe('songPlayer', () => {
     it('plays a song', async () => {
         const songInstance = startTrackPlayback(testTrack, 0, 0, 60, testInstrumentInstance, testSongInstance);
         await songInstance.waitForTrackFinish();
-        expect(testInstrumentInstance.playNote.callCount).to.eq(9)
+        expect(testInstrumentInstance.playFrequency.callCount).to.eq(9)
     })
 
     it('plays sub-tracks', async () => {
         const songInstance = startTrackPlayback(testSong, 0, 0, 60, testInstrumentInstance, testSongInstance);
         await songInstance.waitForTrackFinish();
         const status = songInstance.getTrackStatus();
-        expect(testInstrumentInstance.playNote.callCount).to.eq(18)
+        expect(testInstrumentInstance.playFrequency.callCount).to.eq(18)
         expect(status.position).to.eq(16)
         expect(status.currentTime).to.eq(12)
     })
@@ -35,7 +35,7 @@ describe('songPlayer', () => {
 
 
 async function testSong(track) {
-    const {playNote: n, wait: w} = track;
+    const {playFrequency: n, wait: w} = track;
 
     track.setBeatsPerMinute(120)
     track.startTrack(testTrack)
@@ -46,7 +46,7 @@ async function testSong(track) {
 }
 
 async function testTrack(track) {
-    const {playNote: n, wait: w} = track;
+    const {playFrequency: n, wait: w} = track;
 
     track.setBeatsPerMinute(120)
 

@@ -1,8 +1,9 @@
 module.exports = {
-    playNote: 'playNote',
+    playFrequency: 'playFrequency',
     startTrack: 'startTrack',
     wait: 'wait',
-    debugPosition: '_',
+    triggerEvent: '_',
     require: 'require',
+    setVariable: 'setVariable'
     // setVariable: 'setVariable',
 }

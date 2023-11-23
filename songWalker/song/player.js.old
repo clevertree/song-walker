@@ -53,7 +53,7 @@ export function startTrackPlayback(trackCallback, trackPosition, trackCurrentTim
     const {startTime: songStartTime, audioContext, activeInstruments, bufferDuration} = songInstance;
     const activeSubTracks = [];
 
-    function playNote(frequency, duration, ...args) {
+    function playFrequency(frequency, duration, ...args) {
         if (!songInstance.playing)
             throw Error("Playback has ended");
         const startTime = songStartTime + trackPosition;
@@ -62,11 +62,11 @@ export function startTrackPlayback(trackCallback, trackPosition, trackCurrentTim
             frequency = parseFrequencyString(frequency);
         // if (typeof duration === "string")
         //     duration = parseDurationString(duration, trackBPM);
-        console.log("playNote", frequency, startTime, ...args)
-        trackInstrument.playNote(frequency, startTime, durationWithBPM, ...args);
+        console.log("playFrequency", frequency, startTime, ...args)
+        trackInstrument.playFrequency(frequency, startTime, durationWithBPM, ...args);
     }
 
-    async function loadInstrument(instanceName, instrumentCallback, ...args) {
+    async function loadInstrument(instrumentCallback, ...args) {
         if (!songInstance.playing)
             throw Error("Playback has ended");
         trackInstrument = await instrumentCallback(audioContext, ...args);
@@ -113,7 +113,7 @@ export function startTrackPlayback(trackCallback, trackPosition, trackCurrentTim
     }
 
     const trackResult = trackCallback({
-        playNote,
+        playFrequency,
         loadInstrument,
         setInstrument,
         wait,

@@ -9,9 +9,9 @@ lead.config.envelop.mixer=0.5;
 
 
 wut='ohok';omfg='1230WUT2of' ; rully='yup' bpm=120
-currentInstrument=lead
+!lead
 @track1 3/8 
-currentInstrument=lead2
+!lead2
 @track1 5/8 3T dfd;
 ddd
 
