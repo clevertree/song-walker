@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Song from '@/app/song/test.song'
-import {startSong, stopAllPlayers} from "/songWalker/song/player.js";
+import {walkSong} from "/songWalker/song/walker";
 
 export default function SongPlayerComponent() {
     // useEffect(() => {
@@ -29,6 +29,6 @@ let timeout;
 
 function play() {
     console.log("Playing", Song)
-    stopAllPlayers();
-    startSong(Song);
+    // stopAllPlayers();
+    walkSong(Song);
 }

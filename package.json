@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev & npm run electron",
+    "dev": "next dev",
+    "dev-electron": "next dev & npm run electron",
     "build": "next build",
     "start": "next start",
     "cypress:component": "cypress run --component",
@@ -18,7 +19,7 @@
     "acorn-loose": "^8.4.0z",
     "electron": "^27.0.0",
     "esprima": "^4.0.1",
-    "next": "^14.0.3",
+    "next": "^13.5.7-canary.37",
     "prismjs": "^1.29.0",
     "react": "^18",
     "react-dom": "^18",

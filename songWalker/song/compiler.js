@@ -20,65 +20,74 @@ function compiler(source, config = {}) {
         exportStatement: DEFAULT_EXPORT_STATEMENT,
         ...config
     };
-    const imports = [];
+    // const imports = [];
     // console.log('source', source, Prism.languages.audioSource)
-    const errors = [];
     let tokens = sourceToTokens(source);
-    const trackList = parseTokenTracks(tokens, errors);
+    const trackList = parseTokenTracks(tokens);
     console.log('tokens', tokens, trackList);
 
     const scriptContent = `${config.exportStatement}${Object.keys(trackList).map(trackName =>
-        formatTrack(trackName, trackList[trackName].tokenList, trackList[trackName].functionNames, errors)
+        formatTrack(trackName, trackList[trackName], config.eventMode)
     ).join('\n\n')}`
     console.log(scriptContent)
-    return [scriptContent, tokens, trackList, errors];
+    const callback = eval(scriptContent)
+    return [scriptContent, callback, tokens, trackList];
 }
 
 function parseTokenTracks(tokens) {
     let currentTrack = ROOT_TRACK;
-    const trackList = {[ROOT_TRACK]: {tokenList: [], functionNames: {}}}
+    const trackList = {[ROOT_TRACK]: []}
     for (let tokenID = 0; tokenID < tokens.length; tokenID++) {
         const token = tokens[tokenID];
         if (typeof token === "string") {
-            trackList[currentTrack].tokenList.push(token);
+            if (token.trim().length > 0) {
+                trackList[currentTrack].push({
+                    type: 'unknown',
+                    content: token,
+                });
+            } else {
+                trackList[currentTrack].push(token);
+            }
         } else {
             switch (token.type) {
                 case 'track-start':
                     const trackName = findTokenByType(token.content, 'name').content;
                     // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
                     currentTrack = trackName;
-                    trackList[currentTrack] = {tokenList: [], functionNames: {}}
+                    trackList[currentTrack] = [];
                     // token.content = '';
                     break;
                 default:
-                    trackList[currentTrack].tokenList.push(token);
+                    trackList[currentTrack].push(token);
             }
         }
     }
     return trackList;
 }
 
-function formatTrack(trackName, tokenList, functionNames, errors = []) {
+function formatTrack(trackName, tokenList, eventMode) {
+    const functionNames = {};
+    let debugWrapper = (s, t) => s+';';
+    if (eventMode) {
+        debugWrapper = (commandString, tokenID) => `${commands.triggerEvent}(${tokenID}, ${commandString});`
+        functionNames[commands.triggerEvent] = true;
+    }
+    const functionContent = tokenList
+        .map((token, tokenID) => {
+            if(typeof token === "string")
+                return token;
+            return "\t" + debugWrapper(formatTokenContent(token, functionNames), tokenID)
+        })
+        .join('');
     const functionNameList = Object.values(functionNames).length > 0
         ? `${Object.keys(functionNames).join(', ')}`
         : '';
     return `async function ${trackName}(${variables.trackRenderer}) {
 \tconst {${functionNameList}} = ${variables.trackRenderer};
-${tokenList.map((token, tokenID) => formatTokenContent(token, tokenID)).join('')}
+${functionContent}
 }`
 
-    function formatTokenContent(token, tokenID) {
-        if (typeof token === "string") {
-            if (token.trim().length > 0) {
-                errors.push(`Unrecognized token: ${token.trim()} at token ${tokenID}`)
-
-            } else {
-                return token;
-            }
-        }
-        // if (Array.isArray(token.content))
-        //     return token.content.map(token => formatTokenContent(token)).join('');
-
+    function formatTokenContent(token) {
         switch (token.type) {
             case 'param-numeric':
                 return formatNumericTokenContent(token);
@@ -94,12 +103,10 @@ ${tokenList.map((token, tokenID) => formatTokenContent(token, tokenID)).join('')
                 functionNames[functionNameToken.content] = true;
                 if (functionAssignResultToVariableToken) {
                     const functionTokenPos = functionTokenList.indexOf(functionNameToken);
-                    return `${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${functionTokenList.slice(functionTokenPos).map(token => formatTokenContent(token))}`;
+                    functionNames[commands.setVariable] = true;
+                    return `${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${functionTokenList.slice(functionTokenPos).map((token) => formatTokenContent(token, functionNames)).join('')})`;
                 } else {
-                    return formatTokenContent({
-                        ...token,
-                        content: functionTokenList
-                    });
+                    return functionTokenList.map((token) => formatTokenContent(token)).join('')
                 }
             case 'variable-statement':
                 const variableNameToken = findTokenByType(token.content, 'assign-to-variable');
@@ -123,10 +130,12 @@ ${tokenList.map((token, tokenID) => formatTokenContent(token, tokenID)).join('')
                 numericString = formatNumericString(numericString, factorString);
                 functionNames[commands.wait] = true;
                 return `await ${commands.wait}(${numericString})`;
-            case 'punctuation':
-                return token.content;
+            case 'unknown':
+                throw new Error(`Unknown token type: ${JSON.stringify(token.content)}`);
+
             default:
-                throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${tokenID}`);
+                return token.content;
+            // throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${tokenID}`);
         }
     }
 
@@ -157,6 +166,8 @@ ${tokenList.map((token, tokenID) => formatTokenContent(token, tokenID)).join('')
     }
 
     function formatVariableTokenContent(token) {
+        functionNames[commands.setVariable] = true;
         return `${variables.trackRenderer}.${token.content}`
     }
+
 }
