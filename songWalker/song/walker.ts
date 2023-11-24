@@ -28,7 +28,7 @@ export type TrackHandler = {
 
 export type TrackState = {
     destination: AudioDestinationNode,
-    instrument: Instrument,
+    instrument: InstrumentInstance,
     // startTime: number,
     currentTime: number,
     position: number,
@@ -39,7 +39,7 @@ export type TrackState = {
     // promise: Promise<void> | null
 }
 
-export type Instrument = {
+export type InstrumentInstance = {
     playFrequency: (destination: AudioDestinationNode,
                     frequency: number,
                     startTime: number,
@@ -48,11 +48,11 @@ export type Instrument = {
     stopActiveFrequencies: () => void;
 }
 
-export type InstrumentCallback = (config: object) => Promise<Instrument> | Instrument
+export type InstrumentLoader = (config: object) => Promise<InstrumentInstance> | InstrumentInstance
 export type TrackRenderer = {
     trackState: TrackState,
     playNote: (frequencyString: string, duration?: number, velocity?: number) => void;
-    loadInstrument: (instrumentCallback: InstrumentCallback, config: object) => Promise<Instrument>;
+    loadInstrument: (instrumentLoader: InstrumentLoader, config?: object) => Promise<InstrumentInstance>;
     setVariable: (variablePath: string, variableValue: any) => void;
     startTrack: (trackCallback: TrackCallback) => void;
     wait: (duration: number) => Promise<void>;
@@ -85,7 +85,6 @@ export function walkSong(
         eventHandlers: [],
         isPlaying: true
     }
-    const trackHandler = walkTrack(songCallback, trackState, songState);
     const songHandler: SongHandler = {
         stopPlayback(): void {
             songState.isPlaying = false;
@@ -103,6 +102,7 @@ export function walkSong(
     if (recentSongHandler)
         recentSongHandler.stopPlayback();
     recentSongHandler = songHandler;
+    const trackHandler = walkTrack(songCallback, trackState, songState);
     return songHandler
 }
 
@@ -114,10 +114,10 @@ export function walkTrack(
     const subTrackHandlers: TrackHandler[] = [];
     const trackRenderer: TrackRenderer = {
         trackState,
-        async loadInstrument(instrumentCallback: InstrumentCallback, config: object): Promise<Instrument> {
+        async loadInstrument(instrumentLoader: InstrumentLoader, config: object): Promise<InstrumentInstance> {
             if (!songState.isPlaying)
                 throw Error("Playback has ended");
-            trackState.instrument = await instrumentCallback(config);
+            trackState.instrument = await instrumentLoader(config);
             return trackState.instrument;
         },
         playNote(frequencyString: string, duration?: number, velocity?: number): void {
@@ -203,7 +203,7 @@ export function walkTrack(
 }
 
 
-const UnassignedInstrument: Instrument = {
+const UnassignedInstrument: InstrumentInstance = {
     playFrequency(destination: AudioDestinationNode, frequency: number, startTime: number, duration: number, velocity: number): void {
         throw new Error(constants.ERR_NO_INSTRUMENT);
     },

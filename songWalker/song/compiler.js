@@ -12,25 +12,27 @@ module.exports = {
     compiler,
 }
 
-const DEFAULT_EXPORT_STATEMENT = `export default `;
+// const DEFAULT_EXPORT_STATEMENT = `export default `;
+const DEFAULT_EXPORT_STATEMENT = `module.exports=`;
 
 function compiler(source, config = {}) {
     config = {
         eventMode: false,
         exportStatement: DEFAULT_EXPORT_STATEMENT,
+        requireStatment: DEFAULT_EXPORT_STATEMENT,
         ...config
     };
     // const imports = [];
     // console.log('source', source, Prism.languages.audioSource)
     let tokens = sourceToTokens(source);
     const trackList = parseTokenTracks(tokens);
-    console.log('tokens', tokens, trackList);
 
     const scriptContent = `${config.exportStatement}${Object.keys(trackList).map(trackName =>
         formatTrack(trackName, trackList[trackName], config.eventMode)
     ).join('\n\n')}`
     console.log(scriptContent)
     const callback = eval(scriptContent)
+    console.log('compiler', scriptContent, callback, tokens, trackList);
     return [scriptContent, callback, tokens, trackList];
 }
 
@@ -67,14 +69,14 @@ function parseTokenTracks(tokens) {
 
 function formatTrack(trackName, tokenList, eventMode) {
     const functionNames = {};
-    let debugWrapper = (s, t) => s+';';
+    let debugWrapper = (s, t) => s + ';';
     if (eventMode) {
         debugWrapper = (commandString, tokenID) => `${commands.triggerEvent}(${tokenID}, ${commandString});`
         functionNames[commands.triggerEvent] = true;
     }
     const functionContent = tokenList
         .map((token, tokenID) => {
-            if(typeof token === "string")
+            if (typeof token === "string")
                 return token;
             return "\t" + debugWrapper(formatTokenContent(token, functionNames), tokenID)
         })
@@ -100,6 +102,14 @@ ${functionContent}
                 const functionNameToken = findTokenByType(token.content, 'function-name');
                 const functionAssignResultToVariableToken = findTokenByType(functionTokenList, 'assign-to-variable');
 
+                switch (functionNameToken.content) {
+                    case 'loadInstrument':
+                        const firstParamToken = findTokenByType(functionTokenList, /^param-/);
+                        if (firstParamToken.type === 'param-string') {
+                            const pos = functionTokenList.indexOf(firstParamToken);
+                            functionTokenList.splice(pos, 1, `require(${firstParamToken.content})`)
+                        }
+                }
                 functionNames[functionNameToken.content] = true;
                 if (functionAssignResultToVariableToken) {
                     const functionTokenPos = functionTokenList.indexOf(functionNameToken);

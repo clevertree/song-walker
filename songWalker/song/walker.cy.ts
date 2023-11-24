@@ -1,15 +1,17 @@
-import {Instrument, SongState, TrackRenderer, TrackState, walkSong, walkTrack} from "./walker";
+import {InstrumentInstance, SongState, TrackRenderer, TrackState, walkSong, walkTrack} from "./walker";
 import constants from "@songWalker/song/constants";
+import {registerInstrument} from "./instruments"
 
 
-let testInstrumentInstance: Instrument, testSongState: SongState, testTrackInitialState: TrackState;
+let testSongState: SongState, testTrackInitialState: TrackState;
 describe('songPlayer', () => {
     beforeEach(() => {
-        testInstrumentInstance = {
-            stopActiveFrequencies(): void {
-            },
-            playFrequency: cy.stub()
-        }
+        registerInstrument('testInstrument', testInstrument)
+        // testInstrumentInstance = {
+        //     stopActiveFrequencies(): void {
+        //     },
+        //     playFrequency: cy.stub()
+        // }
 
         testSongState = {
             eventHandlers: [],
@@ -65,10 +67,17 @@ describe('songPlayer', () => {
     })
 })
 
+function testInstrument(config: object): InstrumentInstance {
+    return {
+        playFrequency: cy.stub(),
+        stopActiveFrequencies: cy.stub(),
+    };
+}
+
 
 async function testSong(trackState: TrackState, trackRenderer: TrackRenderer) {
     const {playNote: n, wait: w} = trackRenderer;
-
+    await trackRenderer.loadInstrument(testInstrument)
     trackRenderer.setVariable('beatsPerMinute', 120)
     trackRenderer.startTrack(testTrack)
     await w(8);

@@ -5,7 +5,7 @@ describe('songLoader', () => {
     it('compiles to javascript', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
-                const [scriptContent, tokens, trackList] = compiler(SONG_SOURCE);
+                const [scriptContent, callback, tokens, trackList] = compiler(SONG_SOURCE);
                 expect(Object.values(trackList).length).to.eq(2);
                 expect(Object.values(tokens).length).to.eq(98);
                 const cmdList1 = scriptContent.split(/\s+/);
@@ -23,7 +23,6 @@ describe('songLoader', () => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
                 const [scriptContent, tokens, trackList] = compiler(SONG_SOURCE, {
                     eventMode: true,
-                    exportStatement: 'module.exports='
                 });
                 cy.log('scriptContent')
             })

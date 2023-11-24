@@ -66,10 +66,10 @@ export function startTrackPlayback(trackCallback, trackPosition, trackCurrentTim
         trackInstrument.playFrequency(frequency, startTime, durationWithBPM, ...args);
     }
 
-    async function loadInstrument(instrumentCallback, ...args) {
+    async function loadInstrument(instrumentLoader, ...args) {
         if (!songInstance.playing)
             throw Error("Playback has ended");
-        trackInstrument = await instrumentCallback(audioContext, ...args);
+        trackInstrument = await instrumentLoader(audioContext, ...args);
         activeInstruments[instanceName] = trackInstrument;
         return trackInstrument;
     }

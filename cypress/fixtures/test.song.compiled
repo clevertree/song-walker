@@ -1,4 +1,4 @@
-export default async function rootTrack(trackRenderer) {
+module.exports=async function rootTrack(trackRenderer) {
 	const {setVariable, loadInstrument, startTrack, wait} = trackRenderer;
 	setVariable('currentInstrument', trackRenderer.lead2);
 	setVariable('waitTime', (1/4)/1.5);
