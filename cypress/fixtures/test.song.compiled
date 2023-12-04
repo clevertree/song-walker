@@ -1,22 +1,15 @@
 module.exports=async function rootTrack(trackRenderer) {
-	const {setVariable, loadInstrument, startTrack, wait} = trackRenderer;
-	setVariable('currentInstrument', trackRenderer.lead2);
+	const {setVariable, trackState, loadInstrument, startTrack, wait} = trackRenderer;
+	setVariable('currentInstrument', trackState.lead2);
 	setVariable('waitTime', (1/4)/1.5);
 
-	setVariable('lead', loadInstrument("./instruments/oscillator",{wait:(1/8)*1.5}));
-	setVariable('lead2', loadInstrument("./instruments/oscillator",{'type':'square'}));
-
-	setVariable('lead.config.type', 'pulse');
-	setVariable('lead.config.pulseWidth', 0.5);
-	setVariable('lead.config.envelop.mixer', 1);
-	setVariable('lead2.config.type', 'square');
-	setVariable('lead.config.envelop.mixer', 0.5);
-
+	setVariable('lead', loadInstrument(require("./instruments/oscillator"), {wait: (1/8)*1.5}));
+	setVariable('lead2', loadInstrument(require("./instruments/oscillator"), {'type':'square'}));
 
 	setVariable('wut', 'ohok');	setVariable('omfg', '1230WUT2of'); 	setVariable('rully', 'yup');	setVariable('bpm', 120);
-	setVariable('currentInstrument', trackRenderer.lead);
+	setVariable('currentInstrument', trackState.lead);
 	startTrack(track1); 	await wait(3/8);
-	setVariable('currentInstrument', trackRenderer.lead2);
+	setVariable('currentInstrument', trackState.lead2);
 	startTrack(track1); 	await wait(5/8); 	await wait((3)/1.5);
 
 

@@ -7,13 +7,13 @@ describe('songLoader', () => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
                 const [scriptContent, callback, tokens, trackList] = compiler(SONG_SOURCE);
                 expect(Object.values(trackList).length).to.eq(2);
-                expect(Object.values(tokens).length).to.eq(98);
+                expect(Object.values(tokens).length).to.eq(88);
                 const cmdList1 = scriptContent.split(/\s+/);
                 const cmdList2 = SONG_SOURCE_COMPILED.split(/\s+/);
                 for (let i = 0; i < cmdList1.length; i++) {
                     expect(cmdList1[i].trim()).to.eq(cmdList2[i].trim())
                 }
-                // expect(compiledSource).to.eq(SONG_SOURCE_COMPILED)
+                expect(scriptContent).to.eq(SONG_SOURCE_COMPILED)
             })
         })
     })

@@ -19,7 +19,7 @@ function compiler(source, config = {}) {
     config = {
         eventMode: false,
         exportStatement: DEFAULT_EXPORT_STATEMENT,
-        requireStatment: DEFAULT_EXPORT_STATEMENT,
+        // requireStatement: DEFAULT_EXPORT_STATEMENT,
         ...config
     };
     // const imports = [];
@@ -69,16 +69,18 @@ function parseTokenTracks(tokens) {
 
 function formatTrack(trackName, tokenList, eventMode) {
     const functionNames = {};
-    let debugWrapper = (s, t) => s + ';';
+    let currentTokenID = null;
+    let debugWrapper = (s) => s + '';
     if (eventMode) {
-        debugWrapper = (commandString, tokenID) => `${commands.triggerEvent}(${tokenID}, ${commandString});`
-        functionNames[commands.triggerEvent] = true;
+        debugWrapper = (commandString) => `${commands.setCurrentToken}(${currentTokenID});${commandString}`
+        functionNames[commands.setCurrentToken] = true;
     }
     const functionContent = tokenList
         .map((token, tokenID) => {
             if (typeof token === "string")
                 return token;
-            return "\t" + debugWrapper(formatTokenContent(token, functionNames), tokenID)
+            currentTokenID = tokenID;
+            return `\t${formatTokenContent(token)};`;
         })
         .join('');
     const functionNameList = Object.values(functionNames).length > 0
@@ -90,6 +92,8 @@ ${functionContent}
 }`
 
     function formatTokenContent(token) {
+        if (typeof token === "string")
+            return token;
         switch (token.type) {
             case 'param-numeric':
                 return formatNumericTokenContent(token);
@@ -114,7 +118,7 @@ ${functionContent}
                 if (functionAssignResultToVariableToken) {
                     const functionTokenPos = functionTokenList.indexOf(functionNameToken);
                     functionNames[commands.setVariable] = true;
-                    return `${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${functionTokenList.slice(functionTokenPos).map((token) => formatTokenContent(token, functionNames)).join('')})`;
+                    return `${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${functionTokenList.slice(functionTokenPos).map((token) => formatTokenContent(token)).join('')})`;
                 } else {
                     return functionTokenList.map((token) => formatTokenContent(token)).join('')
                 }
@@ -129,19 +133,19 @@ ${functionContent}
                 const frequencyToken = findTokenByType(token.content, 'play-frequency');
                 const noteArgs = findTokensByType(token.content, /^param-/);
                 functionNames[commands.playFrequency] = true;
-                return `${commands.playFrequency}('${frequencyToken.content}'${noteArgs.length === 0 ? '' : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`;
+                return debugWrapper(`${commands.playFrequency}('${frequencyToken.content}'${noteArgs.length === 0 ? '' : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`);
             case 'play-track-statement':
                 const trackNameToken = findTokenByType(token.content, 'name');
                 functionNames[commands.startTrack] = true;
-                return `${commands.startTrack}(${formatTokenContent(trackNameToken)})`;
+                return debugWrapper(`${commands.startTrack}(${formatTokenContent(trackNameToken)})`);
             case 'wait-statement':
                 let numericString = findTokenByType(token.content, 'numeric').content;
                 const factorString = findTokenByType(token.content, 'factor').content;
                 numericString = formatNumericString(numericString, factorString);
                 functionNames[commands.wait] = true;
-                return `await ${commands.wait}(${numericString})`;
+                return debugWrapper(`await ${commands.wait}(${numericString})`);
             case 'unknown':
-                throw new Error(`Unknown token type: ${JSON.stringify(token.content)}`);
+                throw new Error(`Unknown token type: ${JSON.stringify(token.content)} at tokenID ${currentTokenID}`);
 
             default:
                 return token.content;
@@ -176,8 +180,8 @@ ${functionContent}
     }
 
     function formatVariableTokenContent(token) {
-        functionNames[commands.setVariable] = true;
-        return `${variables.trackRenderer}.${token.content}`
+        functionNames[commands.trackState] = true;
+        return `${commands.trackState}.${token.content}`
     }
 
 }

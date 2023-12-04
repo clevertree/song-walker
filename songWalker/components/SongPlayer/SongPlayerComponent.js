@@ -27,8 +27,13 @@ export default function SongPlayerComponent() {
 
 let timeout;
 
+let recentSongHandler = null;
+
 function play() {
     console.log("Playing", Song)
     // stopAllPlayers();
-    walkSong(Song);
+    if (recentSongHandler)
+        recentSongHandler.stopPlayback();
+    recentSongHandler = walkSong(Song);
+
 }
