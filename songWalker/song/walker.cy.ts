@@ -14,7 +14,7 @@ describe('songPlayer', () => {
         await songInstance.waitForSongToFinish();
         const status = songInstance.getRootTrackState();
         expect(status.instrument.callCount).to.eq(16)
-        expect(logCallback.callCount).to.eq(2)
+        expect(logCallback.callCount).to.eq(16)
         expect(status.position).to.eq(4)
         expect(status.currentTime).to.eq(2.25)
     })
@@ -55,8 +55,8 @@ async function testSongNoInstrument(trackRenderer: TrackRenderer) {
 async function testTrack(trackRenderer: TrackRenderer) {
     const {playNote: n, wait: w, setCurrentToken: _} = trackRenderer;
 
-
-    _(n("C5", (1 / 4)), 1);
+    _(1);
+    n("C5", (1 / 4));
     await w(1 / 4);
     n("C4", 1 / 4);
     await w(1 / 4);

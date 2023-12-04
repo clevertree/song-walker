@@ -45,7 +45,8 @@ export type NoteEvent = {
     frequency: number,
     startTime: number,
     duration: number,
-    velocity: number
+    velocity: number,
+    handler?: NoteHandler
 }
 
 export type SongEvent = NoteEvent;
@@ -146,12 +147,15 @@ export function walkTrack(
                 destination: trackState.destination,
                 duration: durationWithBPM,
                 frequency,
-                startTime,  // Move to local variable?
+                startTime,
                 velocity
             }        // if (typeof duration === "string")
             //     duration = parseDurationString(duration, trackBPM);
             // console.log("noteEvent", noteEvent)
-            trackState.instrument(noteEvent);
+            noteEvent.handler = trackState.instrument(noteEvent);
+            for (const eventHandler of songState.eventHandlers) {
+                eventHandler(noteEvent, trackState.currentTokenID)
+            }
             return noteEvent;
         },
         setVariable(variablePath: string, variableValue: any): void {
