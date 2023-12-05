@@ -117,8 +117,12 @@ ${functionContent}
                 functionNames[functionNameToken.content] = true;
                 if (functionAssignResultToVariableToken) {
                     const functionTokenPos = functionTokenList.indexOf(functionNameToken);
+                    const functionParamString = functionTokenList.slice(functionTokenPos)
+                        .filter(token => typeof token === "string" || token.content !== ';')
+                        .map((token) => formatTokenContent(token))
+                        .join('');
                     functionNames[commands.setVariable] = true;
-                    return `${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${functionTokenList.slice(functionTokenPos).map((token) => formatTokenContent(token)).join('')})`;
+                    return `${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${functionParamString})`;
                 } else {
                     return functionTokenList.map((token) => formatTokenContent(token)).join('')
                 }

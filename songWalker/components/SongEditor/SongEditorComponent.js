@@ -87,12 +87,12 @@ export default function SongEditorComponent({initialValue, className}) {
 
     function renderMarkup(container, sourceString, insertBeforeElm = null) {
         console.time('renderMarkup')
-        const [scriptContent, parsedTokenList, trackList, errors] = compiler(sourceString, {
+        const [scriptContent, callback, parsedTokenList, trackList] = compiler(sourceString, {
             eventMode: true,
             exportStatement: 'module.exports='
         });
         renderedSongCallback = eval(scriptContent);
-        console.log('renderMarkup', scriptContent, parsedTokenList, trackList, errors, renderedSongCallback)
+        console.log('renderMarkup', scriptContent, parsedTokenList, trackList, renderedSongCallback)
         mapTokensToDOM(parsedTokenList, container, (token) => {
             if (typeof token === "string") {
                 if (token.trim().length > 0) {
