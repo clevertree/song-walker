@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image";
-import Song from '@/app/song/test.song'
+// import Song from '@/app/song/test.song'
 import {walkSong} from "/songWalker/song/walker";
 
 export default function SongPlayerComponent() {
@@ -30,7 +30,7 @@ let timeout;
 let recentSongHandler = null;
 
 function play() {
-    console.log("Playing", Song)
+    // console.log("Playing", Song)
     // stopAllPlayers();
     if (recentSongHandler)
         recentSongHandler.stopPlayback();

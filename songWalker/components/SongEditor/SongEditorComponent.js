@@ -4,9 +4,8 @@ import React, {useEffect, useRef, useState} from 'react'
 import Undo from "undoh";
 
 import styles from "./SongEditorComponent.module.scss"
-import {compiler} from "/songWalker/song/compiler";
+import {compileTrackTokensToJavascript, sourceToTrackTokens} from "/songWalker/song/compiler";
 import {insertIntoSelection, walkDOM} from "./dom";
-import {mapTokensToDOM} from "../../song/tokens";
 import {walkSong} from "../../song/walker";
 
 export default function SongEditorComponent({initialValue, className}) {
@@ -14,9 +13,9 @@ export default function SongEditorComponent({initialValue, className}) {
     const refEditor = useRef();
     let renderedSongCallback = null;
     useEffect(() => {
-        refEditor.current.innerHTML = "";
+        // refEditor.current.innerHTML = "";
         renderMarkup(refEditor.current, initialValue)
-    }, [initialValue]);
+    },);// [initialValue]);
 
     function getValue() {
         return refEditor.current.innerText
@@ -27,19 +26,13 @@ export default function SongEditorComponent({initialValue, className}) {
         if (editorPosition === -1)
             throw new Error("Invalid Editor Cursor");
         const editorValue = getValue();
-        refEditor.current.innerHTML = ''
+        // refEditor.current.innerHTML = ''
         renderMarkup(refEditor.current, editorValue)
         console.log('editorValue', editorValue)
         buffer.retain(editorValue)
         setEditorPosition(editorPosition)
     }
 
-    function getNodeTextContent(childNode) {
-        if (childNode.nodeType === Node.TEXT_NODE) // or if (el[i].nodeType != 3)
-            return childNode.nodeValue;
-        return childNode.innerText;
-        // throw new Error("No children text nodes found.")
-    }
 
     function getEditorPosition() {
         const {focusNode, focusOffset} = window.getSelection();
@@ -85,34 +78,24 @@ export default function SongEditorComponent({initialValue, className}) {
 
     }
 
-    function renderMarkup(container, sourceString, insertBeforeElm = null) {
-        console.time('renderMarkup')
-        const [scriptContent, callback, parsedTokenList, trackList] = compiler(sourceString, {
-            eventMode: true,
-            exportStatement: 'module.exports='
-        });
-        renderedSongCallback = eval(scriptContent);
-        console.log('renderMarkup', scriptContent, parsedTokenList, trackList, renderedSongCallback)
-        mapTokensToDOM(parsedTokenList, container, (token) => {
-            if (typeof token === "string") {
-                if (token.trim().length > 0) {
-                    let textElm = document.createElement('unknown');
-                    // textElm.setAttribute('class', 'unknown');
-                    textElm.innerText = token;
-                    return textElm;
-                } else {
-                    return document.createTextNode(token);
-                }
-            } else {
-                const spanElm = document.createElement(token.type);
-                // spanElm.setAttribute('data-token', token.type);
-                if (!Array.isArray(token.content)) { // If array of tokens, it'll be handled by recursion
-                    spanElm.innerText = token.content;
-                }
-                return spanElm;
-            }
-        })
-        console.timeEnd('renderMarkup')
+    function renderMarkup(container, sourceString) {
+        console.time('time:renderMarkup')
+        const {tokenList, trackTokenList} = sourceToTrackTokens(sourceString);
+        console.log('renderMarkup', trackTokenList, sourceString)
+        mapTokensToDOM(tokenList, container)
+
+        // Compiling
+        try {
+            const javascriptContent = compileTrackTokensToJavascript(trackTokenList, {
+                eventMode: true,
+                // exportStatement: 'module.exports='
+            })
+            renderedSongCallback = eval(javascriptContent);
+            console.log('renderedSongCallback', renderedSongCallback, javascriptContent)
+        } catch (e) {
+            console.error("TODO", e);
+        }
+        console.timeEnd('time:renderMarkup')
     }
 
     function handleKeyDown(e) {
@@ -131,12 +114,12 @@ export default function SongEditorComponent({initialValue, className}) {
                     if (e.shiftKey) {
                         const redoValue = buffer.redo();
                         console.log('redoValue', redoValue)
-                        refEditor.current.innerHTML = "";
+                        // refEditor.current.innerHTML = "";
                         renderMarkup(refEditor.current, redoValue)
                     } else {
                         const undoValue = buffer.undo();
                         console.log('undoValue', undoValue)
-                        refEditor.current.innerHTML = "";
+                        // refEditor.current.innerHTML = "";
                         renderMarkup(refEditor.current, undoValue)
                     }
                 }
@@ -152,17 +135,11 @@ export default function SongEditorComponent({initialValue, className}) {
         }
     }
 
-    function startPlayback() {
-        walkSong(renderedSongCallback);
-    }
-
     return (
         <div
             className={styles.container + (className ? ' ' + className : '')}
         >
-            <div className={styles.menuContainer}>
-                <button onClick={startPlayback}>Play</button>
-            </div>
+            <EditorMenuComponent/>
             <div
                 ref={refEditor}
                 contentEditable
@@ -176,4 +153,60 @@ export default function SongEditorComponent({initialValue, className}) {
             </div>
         </div>
     )
+}
+
+function EditorMenuComponent({}) {
+    function startPlayback() {
+        walkSong(renderedSongCallback);
+    }
+
+    return (
+        <div className={styles.menuContainer}>
+            <button onClick={startPlayback}>Play</button>
+        </div>
+    )
+}
+
+
+function mapTokensToDOM(tokenList, container) {
+    let elmID = 0;
+    let childNodes = container.childNodes;
+    container.replaceChildren(...tokenList.map(token => {
+        const oldNode = childNodes[elmID++];
+        // console.log('token', token, oldNode);
+        if (typeof token === "string") {
+            if (token.trim().length > 0) {
+                let newNode = oldNode;
+                if (!newNode || newNode.nodeName !== 'UNKNOWN') {
+                    newNode = document.createElement('unknown');
+                } else {
+                    // console.info("Reusing", oldNode);
+                }
+                newNode.innerText = token;
+                return newNode
+            } else {
+                if (oldNode && oldNode.nodeType === 3) {
+                    oldNode.textContent = token;
+                    // console.info("Reusing", oldNode);
+                    return oldNode;
+                } else {
+                    return document.createTextNode(token);
+                }
+            }
+        } else {
+            let newNode = oldNode;
+            if (!newNode || newNode.nodeName.toLowerCase() !== token.type) {
+                newNode = document.createElement(token.type);
+            } else {
+                // console.info("Reusing", oldNode);
+            }
+            if (Array.isArray(token.content)) {
+                mapTokensToDOM(token.content, newNode)
+            } else {
+                newNode.innerText = token.content;
+            }
+            return newNode;
+        }
+    }));
+
 }

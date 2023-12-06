@@ -1,19 +1,19 @@
-import {compiler} from './compiler'
+import {compileSongToJavascript} from './compiler'
 import {sourceToTokens} from "./tokens";
 
 describe('songLoader', () => {
     it('compiles to javascript', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
-                const [scriptContent, callback, tokens, trackList] = compiler(SONG_SOURCE);
-                expect(Object.values(trackList).length).to.eq(2);
+                const {javascriptContent, tokens, trackTokenList} = compileSongToJavascript(SONG_SOURCE);
+                expect(Object.values(trackTokenList).length).to.eq(2);
                 expect(Object.values(tokens).length).to.eq(88);
-                const cmdList1 = scriptContent.split(/\s+/);
+                const cmdList1 = javascriptContent.split(/\s+/);
                 const cmdList2 = SONG_SOURCE_COMPILED.split(/\s+/);
                 for (let i = 0; i < cmdList1.length; i++) {
                     expect(cmdList1[i].trim()).to.eq(cmdList2[i].trim())
                 }
-                expect(scriptContent).to.eq(SONG_SOURCE_COMPILED)
+                expect(javascriptContent).to.eq(SONG_SOURCE_COMPILED)
             })
         })
     })
@@ -21,10 +21,10 @@ describe('songLoader', () => {
     it('compiles to javascript in event mode', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
-                const [scriptContent, callback, tokens, trackList] = compiler(SONG_SOURCE, {
+                const {javascriptContent, tokens, trackTokenList} = compileSongToJavascript(SONG_SOURCE, {
                     eventMode: true,
                 });
-                cy.log('scriptContent')
+                cy.log('javascriptContent', javascriptContent)
             })
         })
     })

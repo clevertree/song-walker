@@ -1,5 +1,5 @@
-const {compiler} = require("./compiler");
+const {compileSongToJavascript} = require("./compiler.js");
 module.exports = function fileLoader(source) {
-    const [scriptContent] = compiler(source, {eventMode: false});
-    return scriptContent;
+    const {javascriptContent} = compileSongToJavascript(source, {eventMode: false});
+    return javascriptContent;
 }

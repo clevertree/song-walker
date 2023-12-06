@@ -138,22 +138,11 @@ function walkTokens(tokenList, callback) {
     return false;
 }
 
-function mapTokensToDOM(tokenList, container, callback) {
-    tokenList.map(token => {
-        let element = callback(token);
-        if (Array.isArray(token.content)) {
-            mapTokensToDOM(token.content, element, callback)
-        }
-        container.appendChild(element)
-    })
-}
-
 module.exports = {
     sourceToTokens,
     findTokenByType,
     findTokensByType,
     walkTokens,
-    mapTokensToDOM,
     ROOT_TRACK,
     LANGUAGE,
 }

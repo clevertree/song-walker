@@ -9,77 +9,84 @@ const commands = require("./commands");
 const variables = require("./variables");
 
 module.exports = {
-    compiler,
+    compileSongToJavascript,
+    compileTrackTokensToJavascript,
+    sourceToTrackTokens,
 }
 
 // const DEFAULT_EXPORT_STATEMENT = `export default `;
 const DEFAULT_EXPORT_STATEMENT = `module.exports=`;
 
-function compiler(source, config = {}) {
+function sourceToTrackTokens(source) {
+    // const imports = [];
+    // console.log('source', source, Prism.languages.audioSource)
+    let tokenList = sourceToTokens(source);
+    let currentTrack = ROOT_TRACK;
+    const trackTokenList = {[ROOT_TRACK]: []}
+    for (let tokenID = 0; tokenID < tokenList.length; tokenID++) {
+        const token = tokenList[tokenID];
+        if (typeof token === "string") {
+            if (token.trim().length > 0) {
+                trackTokenList[currentTrack].push({
+                    type: 'unknown',
+                    content: token,
+                });
+            } else {
+                trackTokenList[currentTrack].push(token);
+            }
+        } else {
+            token.tokenID = tokenID;
+            switch (token.type) {
+                case 'track-start':
+                    const trackName = findTokenByType(token.content, 'name').content;
+                    // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
+                    currentTrack = trackName;
+                    trackTokenList[currentTrack] = [];
+                    // token.content = '';
+                    break;
+                default:
+                    trackTokenList[currentTrack].push(token);
+            }
+        }
+    }
+    return {tokenList, trackTokenList}
+}
+
+function compileTrackTokensToJavascript(trackTokenList, config = {}) {
     config = {
         eventMode: false,
         exportStatement: DEFAULT_EXPORT_STATEMENT,
         // requireStatement: DEFAULT_EXPORT_STATEMENT,
         ...config
     };
-    // const imports = [];
-    // console.log('source', source, Prism.languages.audioSource)
-    let tokens = sourceToTokens(source);
-    const trackList = parseTokenTracks(tokens);
-
-    const scriptContent = `${config.exportStatement}${Object.keys(trackList).map(trackName =>
-        formatTrack(trackName, trackList[trackName], config.eventMode)
+    const javascriptContent = `${config.exportStatement}${Object.keys(trackTokenList).map(trackName =>
+        formatTrack(trackName, trackTokenList[trackName], config.eventMode)
     ).join('\n\n')}`
-    console.log(scriptContent)
-    const callback = eval(scriptContent)
-    console.log('compiler', scriptContent, callback, tokens, trackList);
-    return [scriptContent, callback, tokens, trackList];
+    // const callback = eval(scriptContent)
+    console.log('compiler', javascriptContent, trackTokenList);
+    return javascriptContent;
 }
 
-function parseTokenTracks(tokens) {
-    let currentTrack = ROOT_TRACK;
-    const trackList = {[ROOT_TRACK]: []}
-    for (let tokenID = 0; tokenID < tokens.length; tokenID++) {
-        const token = tokens[tokenID];
-        if (typeof token === "string") {
-            if (token.trim().length > 0) {
-                trackList[currentTrack].push({
-                    type: 'unknown',
-                    content: token,
-                });
-            } else {
-                trackList[currentTrack].push(token);
-            }
-        } else {
-            switch (token.type) {
-                case 'track-start':
-                    const trackName = findTokenByType(token.content, 'name').content;
-                    // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
-                    currentTrack = trackName;
-                    trackList[currentTrack] = [];
-                    // token.content = '';
-                    break;
-                default:
-                    trackList[currentTrack].push(token);
-            }
-        }
-    }
-    return trackList;
+
+function compileSongToJavascript(songSource, config = {}) {
+
+    const {tokens, trackTokenList} = sourceToTrackTokens(songSource)
+    const javascriptContent = compileTrackTokensToJavascript(trackTokenList, config);
+    return {javascriptContent, tokens, trackTokenList};
 }
+
 
 function formatTrack(trackName, tokenList, eventMode) {
     const functionNames = {};
-    let currentTokenID = null;
-    let debugWrapper = (s) => s + '';
+    let debugWrapper = (s, t) => s + '';
     if (eventMode) {
-        debugWrapper = (commandString) => `${commands.setCurrentToken}(${currentTokenID});${commandString}`
+        debugWrapper = (commandString, tokenID) => `${commands.setCurrentToken}(${tokenID});${commandString}`
         functionNames[commands.setCurrentToken] = true;
     }
     const functionContent = tokenList
         .map((token, tokenID) => {
             if (typeof token === "string")
                 return token;
-            currentTokenID = tokenID;
             return `\t${formatTokenContent(token)};`;
         })
         .join('');
@@ -137,19 +144,19 @@ ${functionContent}
                 const frequencyToken = findTokenByType(token.content, 'play-frequency');
                 const noteArgs = findTokensByType(token.content, /^param-/);
                 functionNames[commands.playFrequency] = true;
-                return debugWrapper(`${commands.playFrequency}('${frequencyToken.content}'${noteArgs.length === 0 ? '' : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`);
+                return debugWrapper(`${commands.playFrequency}('${frequencyToken.content}'${noteArgs.length === 0 ? '' : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`, token.tokenID);
             case 'play-track-statement':
                 const trackNameToken = findTokenByType(token.content, 'name');
                 functionNames[commands.startTrack] = true;
-                return debugWrapper(`${commands.startTrack}(${formatTokenContent(trackNameToken)})`);
+                return debugWrapper(`${commands.startTrack}(${formatTokenContent(trackNameToken)})`, token.tokenID);
             case 'wait-statement':
                 let numericString = findTokenByType(token.content, 'numeric').content;
                 const factorString = findTokenByType(token.content, 'factor').content;
                 numericString = formatNumericString(numericString, factorString);
                 functionNames[commands.wait] = true;
-                return debugWrapper(`await ${commands.wait}(${numericString})`);
+                return debugWrapper(`await ${commands.wait}(${numericString})`, token.tokenID);
             case 'unknown':
-                throw new Error(`Unknown token type: ${JSON.stringify(token.content)} at tokenID ${currentTokenID}`);
+                throw new Error(`Unknown token type: ${JSON.stringify(token.content)} at tokenID ${token.tokenID}`);
 
             default:
                 return token.content;
