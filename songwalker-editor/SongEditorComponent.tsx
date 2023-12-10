@@ -20,7 +20,7 @@ export default function SongEditorComponent({initialValue, className}: SongEdito
     const {activeEditors} = useSelector((state: RootState) => state.document);
     useEffect(() => {
         dispatch(setEditorStringValue(initialValue))
-        dispatch(openActiveEditor('trackRoot', 0, -1)) TODO
+        dispatch(openActiveEditor({trackName: 'trackRoot', mode: "full"}))
     }, [dispatch, initialValue]);
     return (
         <Provider store={store}>
@@ -30,7 +30,7 @@ export default function SongEditorComponent({initialValue, className}: SongEdito
                 <MenuPanel/>
                 <div>
                     {activeEditors.map(activeEditor => (
-                        <SourceEditor key={activeEditor.name} {...activeEditor}/>
+                        <SourceEditor key={activeEditor.trackName} {...activeEditor}/>
                     ))}
                 </div>
             </div>

@@ -1,5 +1,5 @@
 import Prism from "prismjs";
-import {TokenItem, TokenList, TokenRange, TokenRangeTrackList} from "@songwalker/types";
+import {TokenItem, TokenList} from "@songwalker/types";
 // Prism.languages.javascript.constant = /\b[a-zA-Z](?:[a-zA-Z_]|\dx?)*\b/
 
 export const ROOT_TRACK = 'rootTrack'
@@ -99,39 +99,6 @@ export function sourceToTokens(source: string): TokenList {
     return Prism.tokenize(source, LANGUAGE) as TokenList;
 }
 
-export function parseTrackList(tokens: TokenList): TokenRangeTrackList {
-    let currentTrack: TokenRange = {
-        name: 'trackRoot',
-        start: 0,
-        end: -1
-    };
-    const trackTokenList: TokenRangeTrackList = [currentTrack]
-    for (let tokenID = 0; tokenID < tokens.length; tokenID++) {
-        const token = tokens[tokenID];
-        if (typeof token === 'string') {
-
-        } else {
-            switch (token.type) {
-                case 'track-start':
-                    const trackName = findTokenByType(token.content as TokenList, /^name$/).content as string;
-                    // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
-                    currentTrack.end = tokenID - 1;
-                    currentTrack = {
-                        name: trackName,
-                        start: tokenID,
-                        end: -1
-                    };
-                    trackTokenList.push(currentTrack)
-                    // token.content = '';
-                    break;
-                // default:
-                //     trackTokenList[currentTrack].tokens.push(token);
-            }
-        }
-    }
-    currentTrack.end = tokens.length - 1;
-    return trackTokenList
-}
 
 export function findTokenByType(tokenList: TokenList, tokenType: RegExp): TokenItem {
     let foundToken = null;
@@ -154,6 +121,16 @@ export function findTokensByType(tokenList: TokenList, tokenType: RegExp) {
         }
     })
     return foundTokenList;
+}
+
+export function tokensToKeys(tokenList: TokenList) {
+    const keyValues: { [key: string]: any } = {}
+    for (const token of tokenList) {
+        if (typeof token !== 'string') {
+            keyValues[token.type as string] = token.content;
+        }
+    }
+    return keyValues;
 }
 
 

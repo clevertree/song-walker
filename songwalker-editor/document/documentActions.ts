@@ -1,12 +1,13 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {WritableDraft} from "immer/src/types/types-external";
-import {DocumentState} from "@songwalker-editor/types";
-import {TokenList} from "@songwalker/types";
-import {sourceToTokens} from "@songwalker/tokens";
+import {ActiveEditor, DocumentState} from "@songwalker-editor/types";
+import {TokenList, TokenRangeTrackList} from "@songwalker/types";
+import {parseTrackList, sourceToTokens} from "@songwalker/tokens";
 
 const initialState: DocumentState = {
-    activeEditors: [],
-    tokens: []
+    tokens: [],
+    trackList: [],
+    activeEditors: []
 }
 export const documentActions = createSlice({
     name: 'documentSlice',
@@ -14,60 +15,47 @@ export const documentActions = createSlice({
     reducers: {
         setEditorValue(
             state: WritableDraft<DocumentState>,
-            action: { payload: TokenList }
+            action: {
+                payload: {
+                    tokens: TokenList,
+                    trackList: TokenRangeTrackList,
+                }
+            }
         ) {
-            state.tokens = action.payload
+            state.tokens = action.payload.tokens;
+            state.trackList = action.payload.trackList;
         },
-        setEditorPartialValue: {
-            reducer(
-                state: WritableDraft<DocumentState>,
-                action
-            ) {
-                const {start, end} = action.meta;
-                if (end <= start)
-                    throw new Error("end <= start");
-                state.tokens = state.tokens.splice(start, end - start, action.payload)
-            },
-            prepare(payload: TokenList, start: number, end: number) {
-                return {payload, meta: {start, end}, error: []}
-            },
-        },
-        openActiveEditor: {
-            reducer(
-                state: WritableDraft<DocumentState>,
-                action
-            ) {
-                const {start, end} = action.meta;
-                if (end <= start)
-                    throw new Error("end <= start");
-                state.activeEditors.push({
-                    name: action.payload,
-                    range: {
-                        start,
-                        end
-                    }
-                })
-            },
-            prepare(payload: string, start: number, end: number) {
-                return {payload, meta: {start, end}, error: []}
-            },
+        openActiveEditor(
+            state: WritableDraft<DocumentState>,
+            action: { payload: ActiveEditor }
+        ) {
+            state.activeEditors.push(action.payload);
         },
     },
 });
 
 export function setEditorStringValue(sourceString: string) {
     const tokens = sourceToTokens(sourceString);
-    return documentActions.actions.setEditorValue(tokens)
+    const trackList = parseTrackList(tokens)
+    return documentActions.actions.setEditorValue({
+        tokens,
+        trackList
+    })
 }
 
-export function setEditorPartialStringValue(sourceString: string, start: number, end: number) {
-    const tokens = sourceToTokens(sourceString);
-    return documentActions.actions.setEditorPartialValue(tokens, start, end)
+export function setEditorPartialStringValue(sourceString: string, fullTokens: TokenList, start: number, end: number) {
+    const partialTokens = sourceToTokens(sourceString);
+    const tokens = fullTokens.splice(start, end - start, ...partialTokens)
+    const trackList = parseTrackList(tokens)
+    return documentActions.actions.setEditorValue({
+        tokens,
+        trackList
+    })
 }
 
 
 export const {
-    setEditorValue,
     openActiveEditor
+    // setEditorValue,
     // setEditorPartialValue
 } = documentActions.actions

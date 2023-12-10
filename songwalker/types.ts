@@ -15,9 +15,10 @@ export type TokenTrackList = {
     }
 }
 export type TokenRange = {
-    name: string
     start: number,
     end: number,
 }
 
-export type TokenRangeTrackList = Array<TokenRange>
+export type TokenRangeTrackList = {
+    [trackName: string]: TokenRange,
+}

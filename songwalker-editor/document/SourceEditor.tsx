@@ -7,28 +7,24 @@ import {tokensToSource} from "@songwalker/tokens.js";
 import {insertIntoSelection, walkDOM} from "../domUtils";
 import {useDispatch, useSelector} from "react-redux";
 import Undo from "undoh";
-import {RootState} from "../types";
+import {RootState, ActiveEditor} from "../types";
 import {setEditorPartialStringValue} from "@songwalker-editor/document/documentActions";
 import {TokenItemOrString} from "@songwalker/types";
 
 export type SourceEditorProps = {
-    name: string,
-    // mode: 'full' | 'track'
-    range: {
-        start: number,
-        end: number
-    }
+    trackName: string,
 }
 
 
-export default function SourceEditor({name, range}: SourceEditorProps) {
+export default function SourceEditor(props: ActiveEditor) {
     // const [editorPosition, setEditorPosition] = useState(0)
     const dispatch = useDispatch();
-    const {tokens} = useSelector((state: RootState) => state.document);
-    let partialTokenList = tokens.slice(range.start, range.end);
+    const {tokens, trackList} = useSelector((state: RootState) => state.document);
+    const trackRange = trackList[props.trackName];
+    let partialTokenList = tokens.slice(trackRange.start, trackRange.end);
     // const documentValue: string = useSelector((state: RootState) => state.document.value);
 
-    const undoBuffer = useMemo(() => new Undo(tokensToSource(partialTokenList)), [name])
+    const undoBuffer = useMemo(() => new Undo(tokensToSource(partialTokenList)), [props.trackName])
     const refEditor = useRef<HTMLInputElement>(null);
 
     function getEditor() {
@@ -47,7 +43,7 @@ export default function SourceEditor({name, range}: SourceEditorProps) {
             throw new Error("Invalid Editor Cursor");
         const editorValue = getValue();
         // renderMarkup(getEditor(), editorValue)
-        dispatch(setEditorPartialStringValue(editorValue, range.start, range.end))
+        dispatch(setEditorPartialStringValue(editorValue, tokens, trackRange.start, trackRange.end))
         setEditorPosition(editorPosition)
     }
 
@@ -133,12 +129,12 @@ export default function SourceEditor({name, range}: SourceEditorProps) {
                     e.preventDefault();
                     if (e.shiftKey) {
                         const redoValue = undoBuffer.redo();
-                        console.log('redoValue', redoValue)
-                        dispatch(setEditorPartialStringValue(redoValue, range.start, range.end))
+                        console.log('redoValue', redoValue, tokens, trackRange.start, trackRange.end)
+                        dispatch(setEditorPartialStringValue(redoValue, tokens, trackRange.start, trackRange.end))
                     } else {
                         const undoValue = undoBuffer.undo();
-                        console.log('undoValue', undoValue)
-                        dispatch(setEditorPartialStringValue(undoValue, range.start, range.end))
+                        console.log('undoValue', undoValue, tokens, trackRange.start, trackRange.end)
+                        dispatch(setEditorPartialStringValue(undoValue, tokens, trackRange.start, trackRange.end))
                     }
                 }
                 return;
@@ -155,7 +151,7 @@ export default function SourceEditor({name, range}: SourceEditorProps) {
 
     return (
         <div
-            key={name}
+            key={props.trackName}
             className={styles.container}
             ref={refEditor}
             contentEditable

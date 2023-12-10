@@ -1,6 +1,5 @@
 import {MenuState} from "./menu/menuActions";
-import {SourceEditorProps} from "./document/SourceEditor";
-import {TokenList} from "@songwalker/types";
+import {TokenList, TokenRangeTrackList} from "@songwalker/types";
 
 export type RootState = {
     menu: MenuState,
@@ -11,5 +10,11 @@ export type RootState = {
 
 export type DocumentState = {
     tokens: TokenList,
-    activeEditors: SourceEditorProps[],
+    trackList: TokenRangeTrackList,
+    activeEditors: Array<ActiveEditor>,
+}
+
+export type ActiveEditor = {
+    trackName: string,
+    mode: 'track' | 'full'
 }
