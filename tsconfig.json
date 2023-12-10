@@ -26,8 +26,11 @@
       "@app/*": [
         "./app/*"
       ],
-      "@songWalker/*": [
-        "./songWalker/*"
+      "@songwalker/*": [
+        "./songwalker/*"
+      ],
+      "@songwalker-editor/*": [
+        "./songwalker-editor/*"
       ],
       "@/*": [
         "./*"

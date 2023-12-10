@@ -16,19 +16,21 @@
     "electron": "electron ./scripts/runElectron.js"
   },
   "dependencies": {
-    "acorn-loose": "^8.4.0z",
+    "@reduxjs/toolkit": "^2.0.1",
     "electron": "^27.0.0",
     "esprima": "^4.0.1",
     "next": "^13.5.7-canary.37",
     "prismjs": "^1.29.0",
     "react": "^18",
     "react-dom": "^18",
-    "sass": "^1.69.5",
-    "undoh": "^1.2.2"
+    "react-redux": "^9.0.2",
+    "undoh": "^1.2.2",
+    "sass": "^1.69.5"
   },
   "devDependencies": {
     "@types/node": "^20",
     "@types/react": "^18",
+    "@types/prismjs": "^1.26.3",
     "@types/react-dom": "^18",
     "autoprefixer": "^10",
     "cypress": "^13.3.0",

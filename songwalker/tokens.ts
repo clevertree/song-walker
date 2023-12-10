@@ -1,9 +1,9 @@
-const Prism = require("prismjs");
-const variables = require("./variables");
+import Prism from "prismjs";
+import {TokenItem, TokenList, TokenRange, TokenRangeTrackList} from "@songwalker/types";
 // Prism.languages.javascript.constant = /\b[a-zA-Z](?:[a-zA-Z_]|\dx?)*\b/
 
-const ROOT_TRACK = 'rootTrack'
-const LANGUAGE = {
+export const ROOT_TRACK = 'rootTrack'
+export const LANGUAGE = {
     'track-start': {
         pattern: /\[[^\]]+]/m,
         lookbehind: true,
@@ -95,26 +95,60 @@ const LANGUAGE = {
 }
 
 
-function sourceToTokens(source) {
-    return Prism.tokenize(source, LANGUAGE);
+export function sourceToTokens(source: string): TokenList {
+    return Prism.tokenize(source, LANGUAGE) as TokenList;
 }
 
+export function parseTrackList(tokens: TokenList): TokenRangeTrackList {
+    let currentTrack: TokenRange = {
+        name: 'trackRoot',
+        start: 0,
+        end: -1
+    };
+    const trackTokenList: TokenRangeTrackList = [currentTrack]
+    for (let tokenID = 0; tokenID < tokens.length; tokenID++) {
+        const token = tokens[tokenID];
+        if (typeof token === 'string') {
 
-function findTokenByType(tokenList, tokenType) {
-    if (!(tokenType instanceof RegExp))
-        tokenType = new RegExp('^' + tokenType + '$');
-    return walkTokens(tokenList, token => {
+        } else {
+            switch (token.type) {
+                case 'track-start':
+                    const trackName = findTokenByType(token.content as TokenList, /^name$/).content as string;
+                    // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
+                    currentTrack.end = tokenID - 1;
+                    currentTrack = {
+                        name: trackName,
+                        start: tokenID,
+                        end: -1
+                    };
+                    trackTokenList.push(currentTrack)
+                    // token.content = '';
+                    break;
+                // default:
+                //     trackTokenList[currentTrack].tokens.push(token);
+            }
+        }
+    }
+    currentTrack.end = tokens.length - 1;
+    return trackTokenList
+}
+
+export function findTokenByType(tokenList: TokenList, tokenType: RegExp): TokenItem {
+    let foundToken = null;
+    walkTokens(tokenList, token => {
         if (typeof token !== "string" && tokenType.test(token.type)) {
-            return token;
+            foundToken = token;
+            return true;
         }
     })
+    if (!foundToken)
+        throw new Error("Token type not found: " + tokenType);
+    return foundToken;
 }
 
-function findTokensByType(tokenList, tokenType) {
-    if (!(tokenType instanceof RegExp))
-        tokenType = new RegExp('^' + tokenType + '$');
-    const foundTokenList = [];
-    walkTokens(tokenList, token => {
+export function findTokensByType(tokenList: TokenList, tokenType: RegExp) {
+    const foundTokenList: TokenList = [];
+    walkTokens(tokenList, (token: TokenItem | string) => {
         if (typeof token !== "string" && tokenType.test(token.type)) {
             foundTokenList.push(token);
         }
@@ -123,26 +157,30 @@ function findTokensByType(tokenList, tokenType) {
 }
 
 
-function walkTokens(tokenList, callback) {
-    let returnValue;
+export function walkTokens(tokenList: TokenList, callback: (token: string | TokenItem) => boolean | undefined | void): boolean {
     for (const token of tokenList) {
-        returnValue = callback(token)
-        if (returnValue)
-            return returnValue;
-        if (Array.isArray(token.content)) {
-            returnValue = walkTokens(token.content, callback)
-            if (returnValue)
-                return returnValue;
+        if (callback(token))
+            return true;
+        if (typeof token !== "string" && Array.isArray(token.content)) {
+            if (walkTokens(token.content, callback))
+                return true;
         }
     }
     return false;
 }
 
-module.exports = {
-    sourceToTokens,
-    findTokenByType,
-    findTokensByType,
-    walkTokens,
-    ROOT_TRACK,
-    LANGUAGE,
+export function tokensToSource(tokenList: TokenList): string {
+    return tokenList.map(token => tokenToSource(token)).join('')
+}
+
+export function tokenToSource(token: TokenItem | string): string {
+    if (typeof token === 'string') {
+        return token;
+    } else {
+        if (Array.isArray(token.content)) {
+            return tokensToSource(token.content);
+        } else {
+            return token.content
+        }
+    }
 }

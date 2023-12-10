@@ -1,4 +1,4 @@
-import {SongEditorComponent} from "@songWalker/components";
+import {SongEditorComponent} from "@songwalker/components";
 import songSource from "@app/song/test.song.source.js";
 
 export default function Home() {

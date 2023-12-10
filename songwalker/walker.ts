@@ -73,7 +73,7 @@ export type TrackRenderer = {
     // promise: Promise<void> | null
 }
 
-export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void>;
+export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void> | void;
 
 
 export function walkSong(

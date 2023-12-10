@@ -1,4 +1,4 @@
-import {NoteEvent} from "@songWalker/song/walker";
+import {NoteEvent} from "@songwalker/song/walker";
 
 const DEFAULT_VELOCITY = 1;
 

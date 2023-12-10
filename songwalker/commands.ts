@@ -1,4 +1,4 @@
-module.exports = {
+export default {
     playFrequency: 'playFrequency',
     startTrack: 'startTrack',
     wait: 'wait',
@@ -8,4 +8,4 @@ module.exports = {
     setVariable: 'setVariable',
     // getVariable: 'getVariable'
     // setVariable: 'setVariable',
-}
+};
