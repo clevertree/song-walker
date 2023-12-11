@@ -6,7 +6,7 @@ import {Provider, useDispatch, useSelector} from "react-redux";
 import styles from "./SongEditorComponent.module.scss"
 import MenuPanel from "./menu/MenuPanel";
 import store from "./store";
-import {openActiveEditor, setEditorStringValue} from "@songwalker-editor/document/documentActions";
+import {openActiveEditor, setDocumentStringValue} from "@songwalker-editor/document/documentActions";
 import {RootState} from "@songwalker-editor/types";
 import SourceEditor from "@songwalker-editor/document/SourceEditor";
 import {ROOT_TRACK} from "@songwalker/tokens";
@@ -33,9 +33,9 @@ export default function SongEditorComponent(props: SongEditorComponentProps) {
 export function ActiveEditors({initialValue}: SongEditorComponentProps) {
     const dispatch = useDispatch();
     useEffect(() => {
-        dispatch(setEditorStringValue(initialValue))
-        dispatch(openActiveEditor({trackName: ROOT_TRACK, mode: "full"}))
-        dispatch(openActiveEditor({trackName: 'track1', mode: "track"}))
+        dispatch(setDocumentStringValue(initialValue))
+        dispatch(openActiveEditor({trackName: ROOT_TRACK, mode: "full", cursorPosition: 0}))
+        dispatch(openActiveEditor({trackName: 'track1', mode: "track", cursorPosition: 0}))
     }, [dispatch, initialValue]);
     const {activeEditors} = useSelector((state: RootState) => state.document);
     // console.log('activeEditors', activeEditors)

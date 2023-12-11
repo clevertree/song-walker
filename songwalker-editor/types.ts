@@ -16,5 +16,6 @@ export type DocumentState = {
 
 export type ActiveEditor = {
     trackName: string,
+    cursorPosition: number,
     mode: 'track' | 'full'
 }
