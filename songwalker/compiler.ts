@@ -4,16 +4,12 @@ import commands from "./commands";
 import variables from "./variables";
 import {TokenItem, TokenItemOrString, TokenList, TokenRange, TokenRangeTrackList} from "@songwalker/types";
 
-module.exports = {
-    compileSongToJavascript,
-    compileTrackTokensToJavascript,
-}
 
 // const DEFAULT_EXPORT_STATEMENT = `export default `;
 const DEFAULT_EXPORT_STATEMENT = `module.exports=`;
 
 
-function compileSongToJavascript(
+export function compileSongToJavascript(
     songSource: string,
     eventMode: boolean = false,
     exportStatement: string = DEFAULT_EXPORT_STATEMENT) {
@@ -24,7 +20,7 @@ function compileSongToJavascript(
 }
 
 
-function compileTrackTokensToJavascript(
+export function compileTrackTokensToJavascript(
     tokenList: TokenList,
     tokenTrackList: TokenRangeTrackList,
     eventMode: boolean = false,
@@ -50,9 +46,9 @@ export function parseTrackList(tokens: TokenList): TokenRangeTrackList {
         } else {
             switch (token.type) {
                 case 'track-start':
-                    const trackName = findTokenByType(token.content as TokenList, /^name$/).content as string;
+                    const trackName = findTokenByType(token.content as TokenList, /^track-start-name$/).content as string;
                     // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
-                    currentTrack.end = tokenID - 1;
+                    currentTrack.end = tokenID;
                     currentTrackName = trackName;
                     currentTrack = {
                         start: tokenID + 1,

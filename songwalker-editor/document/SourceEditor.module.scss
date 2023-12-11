@@ -1,14 +1,14 @@
 .container {
   white-space: pre;
   padding: .2em;
+  color: #AAA;
 
-  operator,
-  delimiter,
-  punctuation {
-    color: #AAA;
-  }
+  //operator,
+  //delimiter,
+  //punctuation {
+  //}
 
-  unknown {
+  token-unknown {
     color: #ab1b00;
 
   }
@@ -20,85 +20,60 @@
 
   wait-statement {
     margin-right: 4px;
-
-    & > numeric {
-      color: #ff4d4d;
-      font-weight: bold;
-    }
-
-    & > factor {
-      color: #ff944d;
-      font-weight: bold;
-    }
+    color: #F5E960;
   }
 
   play-statement {
     margin-right: 4px;
+    color: #00FF09;
 
     & > play-frequency {
       font-weight: bold;
-      color: #00FF09;
-    }
-
-    & > arg {
-      //color: #db8e57;
     }
   }
 
-
   play-track-statement {
+    margin-right: 4px;
     color: #00FF09;
     font-weight: bold;
   }
 
   track-start {
-    & > name {
-      color: #FF00F6;
-      font-weight: bold;
-    }
+    color: #FF00F6;
+    font-weight: bold;
   }
+
+  //
+  //function-statement {
+  //  color: #8367C7;
+  //
+  //}
 
   function-name {
-    color: #2a34ff;
+    color: #b571ff;
   }
 
-  assign-to-variable {
-    //font-weight: bold;
-    color: #55a6ff;
-  }
-
-
-  javascript-statement {
-    & > function {
-      color: #9999ff;
-    }
-
-    & > literal-property {
-      color: #99dbff
-    }
-
-
-    & > operator {
-      color: #afff99
-    }
-
-    & > keyword {
-      color: #ffc799
-    }
-  }
-
+  param-key,
+  assign-to-variable,
   param-variable {
-    //color: #F80;
-    color: #55a6ff;
-    //font-weight: bold;
+    color: #38B9FF;
   }
 
   param-string {
-    color: #FFAE55;
+    color: #55D6C2;
   }
 
   param-numeric {
-    color: #ddff00;
+    //color: #ff944d;
     //font-weight: bold;
+  }
+
+  param-duration {
+    color: #ff944d;
+
+  }
+
+  param-factor {
+    font-weight: bold;
   }
 }

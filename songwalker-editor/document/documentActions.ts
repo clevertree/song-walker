@@ -2,11 +2,12 @@ import {createSlice} from "@reduxjs/toolkit";
 import {WritableDraft} from "immer/src/types/types-external";
 import {ActiveEditor, DocumentState} from "@songwalker-editor/types";
 import {TokenList, TokenRangeTrackList} from "@songwalker/types";
-import {parseTrackList, sourceToTokens} from "@songwalker/tokens";
+import {sourceToTokens} from "@songwalker/tokens";
+import {parseTrackList} from "@songwalker/compiler";
 
 const initialState: DocumentState = {
     tokens: [],
-    trackList: [],
+    trackList: {},
     activeEditors: []
 }
 export const documentActions = createSlice({
@@ -29,7 +30,11 @@ export const documentActions = createSlice({
             state: WritableDraft<DocumentState>,
             action: { payload: ActiveEditor }
         ) {
-            state.activeEditors.push(action.payload);
+            if (state.activeEditors.find(editor => editor.trackName === action.payload.trackName)) {
+                console.info("Active editor already open: " + action.payload.trackName)
+            } else {
+                state.activeEditors.push(action.payload);
+            }
         },
     },
 });
@@ -45,7 +50,8 @@ export function setEditorStringValue(sourceString: string) {
 
 export function setEditorPartialStringValue(sourceString: string, fullTokens: TokenList, start: number, end: number) {
     const partialTokens = sourceToTokens(sourceString);
-    const tokens = fullTokens.splice(start, end - start, ...partialTokens)
+    const tokens = [...fullTokens];
+    tokens.splice(start, end - start, ...partialTokens)
     const trackList = parseTrackList(tokens)
     return documentActions.actions.setEditorValue({
         tokens,

@@ -5,11 +5,28 @@
     <inspection_tool class="HtmlUnknownTag" enabled="true" level="WARNING" enabled_by_default="true">
       <option name="myValues">
         <value>
-          <list size="30">
+          <list size="14">
+            <item index="0" class="java.lang.String" itemvalue="token" />
+            <item index="1" class="java.lang.String" itemvalue="param-numeric" />
+            <item index="2" class="java.lang.String" itemvalue="param-string" />
+            <item index="3" class="java.lang.String" itemvalue="param-variable" />
+            <item index="4" class="java.lang.String" itemvalue="wait-statement" />
+            <item index="5" class="java.lang.String" itemvalue="play-statement" />
+            <item index="6" class="java.lang.String" itemvalue="play-frequency" />
+            <item index="7" class="java.lang.String" itemvalue="play-track-statement" />
+            <item index="8" class="java.lang.String" itemvalue="track-start" />
+            <item index="9" class="java.lang.String" itemvalue="param-factor" />
+            <item index="10" class="java.lang.String" itemvalue="param-duration" />
+            <item index="11" class="java.lang.String" itemvalue="assign-to-variable" />
+            <item index="12" class="java.lang.String" itemvalue="param-key" />
+            <item index="13" class="java.lang.String" itemvalue="function-name" />
           </list>
         </value>
       </option>
       <option name="myCustomValuesEnabled" value="true" />
+    </inspection_tool>
+    <inspection_tool class="RequiredAttributes" enabled="true" level="WARNING" enabled_by_default="true">
+      <option name="myAdditionalRequiredHtmlAttributes" value="children" />
     </inspection_tool>
   </profile>
 </component>

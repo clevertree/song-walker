@@ -3,11 +3,11 @@ lead=loadInstrument("./instruments/oscillator", {duration: 1/4T})
 lead2=loadInstrument("./instruments/oscillator", {'type':'square'})
 
 
-wut='ohok';omfg='1230WUT2of' ; rully='yup' bpm=120
+wut='ohok';omfg='1230WewfwUT2of' ; rully='yup' bpm=120
 instrument=lead
 @track1 3/8 
 instrument=lead2
-@track1 5/8 3T;
+@track1 5/8 3T; dsfC 5; blah blah 3 fefs
 
 [track1]
 

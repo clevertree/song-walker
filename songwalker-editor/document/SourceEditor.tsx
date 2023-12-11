@@ -1,27 +1,27 @@
 "use client"
 
 import React, {useMemo, useRef} from 'react'
+import Undo from "undoh";
 
-import styles from "./SourceEditor.module.scss"
-import {tokensToSource} from "@songwalker/tokens.js";
 import {insertIntoSelection, walkDOM} from "../domUtils";
 import {useDispatch, useSelector} from "react-redux";
-import Undo from "undoh";
-import {RootState, ActiveEditor} from "../types";
+import {ActiveEditor, RootState} from "../types";
 import {setEditorPartialStringValue} from "@songwalker-editor/document/documentActions";
 import {TokenItemOrString} from "@songwalker/types";
+import {tokensToSource} from "@songwalker/tokens";
+import styles from "./SourceEditor.module.scss"
 
-export type SourceEditorProps = {
-    trackName: string,
-}
-
+let saveTimeout: string | number | NodeJS.Timeout | undefined;
 
 export default function SourceEditor(props: ActiveEditor) {
     // const [editorPosition, setEditorPosition] = useState(0)
     const dispatch = useDispatch();
     const {tokens, trackList} = useSelector((state: RootState) => state.document);
     const trackRange = trackList[props.trackName];
+    if (!trackRange)
+        throw new Error("Invalid track name: " + props.trackName + JSON.stringify(trackList))
     let partialTokenList = tokens.slice(trackRange.start, trackRange.end);
+    console.log('partialTokenList', tokens, trackList, partialTokenList)
     // const documentValue: string = useSelector((state: RootState) => state.document.value);
 
     const undoBuffer = useMemo(() => new Undo(tokensToSource(partialTokenList)), [props.trackName])
@@ -38,13 +38,20 @@ export default function SourceEditor(props: ActiveEditor) {
     }
 
     function updateNode() {
-        const editorPosition = getEditorPosition();
-        if (editorPosition === -1)
-            throw new Error("Invalid Editor Cursor");
-        const editorValue = getValue();
-        // renderMarkup(getEditor(), editorValue)
-        dispatch(setEditorPartialStringValue(editorValue, tokens, trackRange.start, trackRange.end))
-        setEditorPosition(editorPosition)
+        clearTimeout(saveTimeout)
+        saveTimeout = setTimeout(() => {
+            const editorPosition = getEditorPosition();
+            if (editorPosition === -1)
+                throw new Error("Invalid Editor Cursor");
+            const editorValue = getValue();
+            console.log('editorValue', editorPosition, editorValue)
+            // renderMarkup(getEditor(), editorValue)
+            dispatch(setEditorPartialStringValue(editorValue, tokens, trackRange.start, trackRange.end))
+            saveTimeout = setTimeout(() => {
+                setEditorPosition(editorPosition)
+                
+            }, 1);
+        }, 1000)
     }
 
 
@@ -62,7 +69,7 @@ export default function SourceEditor(props: ActiveEditor) {
         })
         if (!result)
             console.error("focusNode not found in editor: ", focusNode, focusOffset);
-        console.log('getEditorPosition', {editorPosition, focusNode, focusOffset});
+        console.log('getEditorPosition', editorPosition);
         return editorPosition;
     }
 
@@ -70,7 +77,6 @@ export default function SourceEditor(props: ActiveEditor) {
         if (editorPosition < 0)
             throw new Error("Invalid editor position: " + editorPosition)
 
-        console.log('setEditorPosition', editorPosition);
 
         const result = walkDOM(getEditor(), (childNode, offset) => {
             if (childNode.nodeType !== Node.TEXT_NODE)
@@ -83,14 +89,20 @@ export default function SourceEditor(props: ActiveEditor) {
                 const range = document.createRange()
 
                 range.setStart(childNode, focusOffset)
-                range.collapse(true)
+                // range.collapse(true)
 
                 const sel = window.getSelection()
                 if (!sel)
                     throw new Error("Invalid window.getSelection()");
                 sel.removeAllRanges()
                 sel.addRange(range)
-                console.log('setEditorPosition', offset, editorPosition, childNode, focusOffset);
+                setTimeout(() => {
+                    if (getEditorPosition() !== editorPosition)
+                        throw new Error(`getEditorPosition() !== setEditorPosition.editorPosition ${getEditorPosition()} != ${editorPosition}`)
+
+                }, 500)
+                console.log('setEditorPosition', editorPosition, focusOffset, childNode, sel, range);
+                // console.log('setEditorPosition', offset, editorPosition, childNode, focusOffset);
                 return true;
             }
         })
@@ -155,32 +167,35 @@ export default function SourceEditor(props: ActiveEditor) {
             className={styles.container}
             ref={refEditor}
             contentEditable
+            suppressContentEditableWarning
             spellCheck={false}
             onKeyDown={handleKeyDown}
             onKeyUp={getEditorPosition}
             onInput={updateNode}
             onMouseUp={getEditorPosition}
         >
-            {partialTokenList.map(token => {
-                return renderToken(token)
+            {partialTokenList.map((token, i) => {
+                return renderToken(token, trackRange.start + i)
             })}
         </div>
     )
 }
 
 
-function renderToken(token: TokenItemOrString): any {
+function renderToken(token: TokenItemOrString, key: number): any {
     if (typeof token === "string") {
-        if (token.trim().length > 0) {
-            return <unknown>{token}</unknown>
-        } else {
-            return token
-        }
+        // if (token.trim().length > 0) {
+        //     return <token-unknown key={key}>{token}</token-unknown>
+        // } else {
+        return token
+        // }
     } else {
-        if (Array.isArray(token.content)) {
-            return token.content.map(token => renderToken(token))
-        } else {
-            return token.content
+        let content = token.content;
+        if (Array.isArray(content)) {
+            content = content.map((token, i) => renderToken(token, i))
         }
+        const Tag = token.type
+        // @ts-ignore
+        return <Tag key={key}>{content}</Tag>
     }
 }

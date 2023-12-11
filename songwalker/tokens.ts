@@ -1,5 +1,5 @@
-import Prism from "prismjs";
-import {TokenItem, TokenList} from "@songwalker/types";
+import Prism, {Token} from "prismjs";
+import {TokenItem, TokenItemOrString, TokenList} from "@songwalker/types";
 // Prism.languages.javascript.constant = /\b[a-zA-Z](?:[a-zA-Z_]|\dx?)*\b/
 
 export const ROOT_TRACK = 'rootTrack'
@@ -7,17 +7,17 @@ export const LANGUAGE = {
     'track-start': {
         pattern: /\[[^\]]+]/m,
         lookbehind: true,
-        alias: 'selector',
+        // alias: 'selector',
         inside: {
-            name: /[^\[\]]+/,
-            punctuation: /[\[\]]/
+            'track-start-name': /[^\[\]]+/,
+            // punctuation: /[\[\]]/
         }
     },
     'play-track-statement': {
         pattern: /@\w+/,
         inside: {
-            identifier: /^@/,
-            name: /\w+/
+            'play-track-identifier': /^@/,
+            'play-track-name': /\w+/
         }
     },
     // 'import': {
@@ -28,6 +28,7 @@ export const LANGUAGE = {
         pattern: /\b([\w.]+[ \t]*=[ \t]*)?\w+\([^)]*\)[ \t]*;?/,
         inside: {
             "assign-to-variable": /^[\w.]+(?=[ \t]*=[ \t]*)/,
+            // 'assign-operator': /=/,
             'function-name': /\b\w+(?=\()/,
             'param-key': {
                 pattern: /((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*:)/m,
@@ -38,15 +39,21 @@ export const LANGUAGE = {
                 greedy: true
             },
             'param-variable': /\b[a-zA-Z_]\w*\b/,
-            'param-numeric': /\d*[\/.]?\d{1,2}([BTDt])?/,
-            'operator': /=/,
-            'punctuation': /[{}[\];(),.:]/
+            'param-duration': {
+                pattern: /\d*[\/.]?\d{1,2}([BTDt])?/,
+                inside: {
+                    'param-numeric': /\d*[\/.]?\d+/,
+                    'param-factor': /[BTDt]/,
+                }
+            },
+            // 'punctuation': /[{}[\];(),.:]/
         }
     },
     'variable-statement': {
         pattern: /[\w.]+[ \t]*=[ \t]*([\w'./])+[ \t]*;?/,
         inside: {
             "assign-to-variable": /^[\w.]+(?=[ \t]*=[ \t]*)/,
+            // 'assign-operator': /=/,
             // "javascript-statement": {
             //     pattern: /[\w'.]+/,
             //     inside: {
@@ -56,47 +63,71 @@ export const LANGUAGE = {
             },
 
             'param-variable': /\b[a-zA-Z_]\w*\b/,
-            'param-numeric': /\d*[\/.]?\d{1,2}([BTDt])?/,
+            'param-duration': {
+                pattern: /\d*[\/.]?\d{1,2}([BTDt])?/,
+                inside: {
+                    'param-numeric': /\d*[\/.]?\d+/,
+                    'param-factor': /[BTDt]/,
+                }
+            },
             // 'param-numeric': /\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,
             // 'punctuation': /[={}[\];(),.:]/
             //     }
             // },
-            'operator': /=/,
-            punctuation: /;/
+            // punctuation: /;/
         }
     },
     'play-statement': {
         pattern: /([A-G][#qb]{0,2}\d)(:[^:;\s]*)*;?/,
         inside: {
             'play-frequency': /[A-G][#qb]{0,2}\d/,
-            arg: {
+            'play-arg': {
                 pattern: /:[^:;\s]+/,
                 inside: {
-                    'param-numeric': /\d*[\/.]?\d{1,2}([BTDt])?/,
+                    'param-duration': {
+                        pattern: /\d*[\/.]?\d{1,2}([BTDt])?/,
+                        inside: {
+                            'param-numeric': /\d*[\/.]?\d+/,
+                            'param-factor': /[BTDt]/,
+                        }
+                    },
                     'param-string': /[^:;]+/,
-                    delimiter: /:/
+                    // delimiter: /:/
                 },
             },
-            punctuation: /;/
+            // punctuation: /;/
         },
     },
     'wait-statement': {
-        pattern: /((\d[\/.])?\d{1,2})([BTDt])?;?/,
+        pattern: /\d*[\/.]?\d{1,2}([BTDt])?;?/,
         inside: {
-            numeric: /\d*[\/.]?\d+/,
-            factor: /[BTDt]/,
-            punctuation: /;/
-            // punctuation: /;/
+            'param-numeric': /\d*[\/.]?\d+/,
+            'param-factor': /[BTDt]/,
         }
     },
-    punctuation: /;/
+    // punctuation: /;/
     // 'newline': REGEXP_NEWLINE,
     // 'play-statement': REGEXP_PLAY_STATEMENT,
 }
 
 
 export function sourceToTokens(source: string): TokenList {
-    return Prism.tokenize(source, LANGUAGE) as TokenList;
+    function mapToken(token: string | Token): TokenItemOrString {
+        if (typeof token === "string") {
+            return token;
+        } else {
+            let content = token.content as TokenList;
+            if (Array.isArray(token.content)) {
+                content = token.content.map(mapToken);
+            }
+            return {
+                type: token.type,
+                content
+            }
+        }
+    }
+
+    return Prism.tokenize(source, LANGUAGE).map(mapToken);
 }
 
 
