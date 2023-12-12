@@ -1,35 +1,15 @@
 import {configureStore} from "@reduxjs/toolkit";
 import {menuSlice} from "@songwalker-editor/menu/menuActions";
 import {documentActions} from "@songwalker-editor/document/documentActions";
+import {configSlice} from "@songwalker-editor/config/configActions";
 
 
 const store = configureStore({
     reducer: {
         menu: menuSlice.reducer,
-        document: documentActions.reducer
+        document: documentActions.reducer,
+        config: configSlice.reducer
     }
 })
 export default store;
 
-
-// const trackReducers: { [key: string]: Reducer } = {};
-
-// export function addTrackReducer(trackKey: string, trackReducer: Reducer) {
-//     if (trackReducers.hasOwnProperty(trackKey))
-//         throw new Error("Track reducer key already exists: " + trackKey);
-//     trackReducers[trackKey] = trackReducer;
-//     store.replaceReducer(combineReducers({
-//         ...defaultReducer,
-//         ...trackReducers
-//     }))
-// }
-//
-// export function removeTrackReducer(trackKey: string) {
-//     if (!trackReducers.hasOwnProperty(trackKey))
-//         throw new Error("Track reducer key does not exist: " + trackKey);
-//     delete trackReducers[trackKey];
-//     store.replaceReducer(combineReducers({
-//         ...defaultReducer,
-//         ...trackReducers
-//     }))
-// }

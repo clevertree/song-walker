@@ -7,14 +7,9 @@ export type TokenItemOrString = TokenItem | string
 
 
 export type TokenList = Array<TokenItemOrString>
-export type TokenTrackList = {
-    [key: string]: {
-        tokens: TokenList,
-        tokenStart: number,
-        tokenEnd: number
-    }
-}
+
 export type TokenRange = {
+    tokens: TokenList,
     start: number,
     end: number,
 }

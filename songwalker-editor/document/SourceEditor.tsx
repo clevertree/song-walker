@@ -6,25 +6,26 @@ import Undo from "undoh";
 import {insertIntoSelection, walkDOM} from "../domUtils";
 import {useDispatch, useSelector} from "react-redux";
 import {ActiveEditor, RootState} from "../types";
-import {setActiveEditorPosition, setDocumentPartialStringValue} from "@songwalker-editor/document/documentActions";
-import {TokenItemOrString} from "@songwalker/types";
+import {setActiveEditorPosition, setDocumentTrackValue} from "@songwalker-editor/document/documentActions";
+import {TokenItemOrString, TokenRange} from "@songwalker/types";
 import {tokensToSource} from "@songwalker/tokens";
 import styles from "./SourceEditor.module.scss"
 
 let saveTimeout: string | number | NodeJS.Timeout | undefined;
 
-export default function SourceEditor({trackName, cursorPosition, mode}: ActiveEditor) {
+interface SourceEditorProps {
+    activeEditor: ActiveEditor,
+    tokenRange: TokenRange
+}
+
+export default function SourceEditor({activeEditor, tokenRange}: SourceEditorProps) {
+    const {trackName, cursorPosition, mode} = activeEditor;
     // const [editorPosition, setEditorPosition] = useState(0)
     const dispatch = useDispatch();
-    const {tokens, trackList} = useSelector((state: RootState) => state.document);
-    const trackRange = trackList[trackName];
-    if (!trackRange)
-        throw new Error("Invalid track name: " + trackName + JSON.stringify(trackList))
-    let partialTokenList = tokens.slice(trackRange.start, trackRange.end);
-    console.log('SourceEditor', {cursorPosition, tokens, trackList, partialTokenList})
+    const config = useSelector((state: RootState) => state.config);
     // const documentValue: string = useSelector((state: RootState) => state.document.value);
 
-    const undoBuffer = useMemo(() => new Undo(tokensToSource(partialTokenList)), [trackName])
+    const undoBuffer = useMemo(() => new Undo(tokensToSource(tokenRange.tokens)), [trackName])
     const refEditor = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -42,18 +43,23 @@ export default function SourceEditor({trackName, cursorPosition, mode}: ActiveEd
     }
 
     function updateNode() {
-        clearTimeout(saveTimeout)
-        saveTimeout = setTimeout(() => {
-            const cursorPosition = getEditorPosition();
-            if (cursorPosition === -1)
-                throw new Error("Invalid Editor Cursor");
-            const editorValue = getValue();
-            console.log('editorValue', cursorPosition, editorValue)
-            // renderMarkup(getEditor(), editorValue)
+        const editorValue = getValue();
 
-            dispatch(setActiveEditorPosition(trackName, cursorPosition))
-            dispatch(setDocumentPartialStringValue(editorValue, trackName))
-        }, EDITOR_UPDATE_TIMEOUT)
+        // clearTimeout(saveTimeout)
+        // saveTimeout = setTimeout(updateEditorState, config.editorUpdateTimeout)
+    }
+
+    function updateEditorState() {
+        const cursorPosition = getEditorPosition();
+        if (cursorPosition === -1)
+            throw new Error("Invalid Editor Cursor");
+        const editorValue = getValue();
+        console.log('editorValue', cursorPosition, editorValue)
+        // renderMarkup(getEditor(), editorValue)
+
+        dispatch(setActiveEditorPosition(trackName, cursorPosition))
+        dispatch(setDocumentTrackValue(trackName, editorValue))
+        // parse tokens immediately on editor and then update document value. after timeout
     }
 
 
@@ -91,12 +97,12 @@ export default function SourceEditor({trackName, cursorPosition, mode}: ActiveEd
                     e.preventDefault();
                     if (e.shiftKey) {
                         const redoValue = undoBuffer.redo();
-                        console.log('redoValue', redoValue, tokens, trackRange.start, trackRange.end)
-                        dispatch(setDocumentPartialStringValue(redoValue, trackName))
+                        console.log('redoValue', redoValue, tokenRange)
+                        dispatch(setDocumentTrackValue(trackName, redoValue))
                     } else {
                         const undoValue = undoBuffer.undo();
                         console.log('undoValue', undoValue, tokens, trackRange.start, trackRange.end)
-                        dispatch(setDocumentPartialStringValue(undoValue, trackName))
+                        dispatch(setDocumentTrackValue(trackName, undoValue))
                     }
                 }
                 return;
@@ -124,8 +130,8 @@ export default function SourceEditor({trackName, cursorPosition, mode}: ActiveEd
             onInput={updateNode}
             onMouseUp={getEditorPosition}
         >
-            {partialTokenList.map((token, i) => {
-                return renderToken(token, trackRange.start + i)
+            {tokenRange.tokens.map((token, i) => {
+                return renderToken(token, tokenRange.start + i)
             })}
         </div>
     )

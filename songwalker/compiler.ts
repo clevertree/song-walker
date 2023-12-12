@@ -33,12 +33,17 @@ export function compileTrackTokensToJavascript(
 }
 
 export function parseTrackList(tokens: TokenList): TokenRangeTrackList {
-    let currentTrack: TokenRange = {
-        start: 0,
-        end: -1
-    };
+    let start = 0, end = -1;
     let currentTrackName = ROOT_TRACK;
-    const trackTokenList: TokenRangeTrackList = {[currentTrackName]: currentTrack}
+    const trackTokenList: TokenRangeTrackList = {}
+
+    function addTrack() {
+        trackTokenList[currentTrackName] = {
+            start, end,
+            tokens: tokens.slice(start, end)
+        }
+    }
+
     for (let tokenID = 0; tokenID < tokens.length; tokenID++) {
         const token = tokens[tokenID];
         if (typeof token === 'string') {
@@ -48,21 +53,17 @@ export function parseTrackList(tokens: TokenList): TokenRangeTrackList {
                 case 'track-start':
                     const trackName = findTokenByType(token.content as TokenList, /^track-start-name$/).content as string;
                     // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
-                    currentTrack.end = tokenID;
+                    end = tokenID;
+                    addTrack();
                     currentTrackName = trackName;
-                    currentTrack = {
-                        start: tokenID + 1,
-                        end: -1
-                    };
-                    trackTokenList[currentTrackName] = currentTrack
-                    // token.content = '';
+                    start = tokenID + 1;
+                    end = -1
                     break;
-                // default:
-                //     trackTokenList[currentTrack].tokens.push(token);
             }
         }
     }
-    currentTrack.end = tokens.length;
+    end = tokens.length;
+    addTrack();
     return trackTokenList
 }
 

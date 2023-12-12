@@ -1,4 +1,3 @@
-module.exports = {
-    EDITOR_UPDATE_TIMEOUT: 
+export default {
     ERR_NO_INSTRUMENT: "No instrument is assigned"
 }

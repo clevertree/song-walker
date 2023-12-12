@@ -1,10 +1,8 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {WritableDraft} from "immer/src/types/types-external";
 import {ActiveEditor, DocumentState} from "@songwalker-editor/types";
-import {TokenList, TokenRangeTrackList} from "@songwalker/types";
 import {sourceToTokens} from "@songwalker/tokens";
 import {parseTrackList} from "@songwalker/compiler";
-import store from "../store";
 
 const initialState: DocumentState = {
     tokens: [],
@@ -18,14 +16,33 @@ export const documentActions = createSlice({
         setDocumentValue(
             state: WritableDraft<DocumentState>,
             action: {
+                payload: string,
+            }
+        ) {
+            const sourceString = action.payload;
+            const tokens = sourceToTokens(sourceString);
+            const trackList = parseTrackList(tokens)
+            state.tokens = tokens;
+            state.trackList = trackList;
+        },
+        setDocumentTrackValue(
+            state: WritableDraft<DocumentState>,
+            action: {
                 payload: {
-                    tokens: TokenList,
-                    trackList: TokenRangeTrackList,
+                    sourceString: string,
+                    trackName: string
                 }
             }
         ) {
-            state.tokens = action.payload.tokens;
-            state.trackList = action.payload.trackList;
+            const {trackName, sourceString} = action.payload;
+            const {start, end} = state.trackList[trackName];
+            const partialTokens = sourceToTokens(sourceString);
+            const tokens = [...state.tokens];
+            tokens.splice(start, end - start, ...partialTokens)
+            const trackList = parseTrackList(tokens)
+
+            state.tokens = tokens;
+            state.trackList = trackList;
         },
         openActiveEditor(
             state: WritableDraft<DocumentState>,
@@ -55,28 +72,6 @@ export const documentActions = createSlice({
     },
 });
 
-export function setDocumentStringValue(sourceString: string) {
-    const tokens = sourceToTokens(sourceString);
-    const trackList = parseTrackList(tokens)
-    return documentActions.actions.setDocumentValue({
-        tokens,
-        trackList
-    })
-}
-
-export function setDocumentPartialStringValue(sourceString: string, trackName: string) {
-    const {document: oldDocument} = store.getState();
-    const {start, end} = oldDocument.trackList[trackName];
-    const partialTokens = sourceToTokens(sourceString);
-    const tokens = [...oldDocument.tokens];
-    tokens.splice(start, end - start, ...partialTokens)
-    const trackList = parseTrackList(tokens)
-    return documentActions.actions.setDocumentValue({
-        tokens,
-        trackList
-    })
-}
-
 export function setActiveEditorPosition(trackName: string, cursorPosition: number) {
     return documentActions.actions.setActiveEditorPosition({
         trackName,
@@ -84,9 +79,15 @@ export function setActiveEditorPosition(trackName: string, cursorPosition: numbe
     })
 }
 
+export function setDocumentTrackValue(trackName: string, sourceString: string) {
+    return documentActions.actions.setDocumentTrackValue({
+        trackName,
+        sourceString
+    })
+}
+
 
 export const {
-    openActiveEditor
-    // setDocumentValue,
-    // setEditorPartialValue
+    openActiveEditor,
+    setDocumentValue,
 } = documentActions.actions

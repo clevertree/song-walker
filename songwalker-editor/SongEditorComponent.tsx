@@ -1,15 +1,13 @@
 "use client"
 
-import React, {useEffect} from 'react'
-import {Provider, useDispatch, useSelector} from "react-redux";
+import React from 'react'
+import {Provider} from "react-redux";
 
 import styles from "./SongEditorComponent.module.scss"
 import MenuPanel from "./menu/MenuPanel";
 import store from "./store";
-import {openActiveEditor, setDocumentStringValue} from "@songwalker-editor/document/documentActions";
-import {RootState} from "@songwalker-editor/types";
-import SourceEditor from "@songwalker-editor/document/SourceEditor";
-import {ROOT_TRACK} from "@songwalker/tokens";
+import {ActiveEditors} from "@songwalker-editor/document/ActiveEditors";
+import {setDocumentValue} from "@songwalker-editor/document/documentActions";
 
 interface SongEditorComponentProps {
     initialValue: string,
@@ -17,33 +15,18 @@ interface SongEditorComponentProps {
 }
 
 export default function SongEditorComponent(props: SongEditorComponentProps) {
-    const {className} = props;
+    const {className, initialValue} = props;
+    store.dispatch(setDocumentValue(initialValue))
+    console.log('SongEditorComponent', props);
     return (
         <Provider store={store}>
             <div
                 className={styles.container + (className ? ' ' + className : '')}
             >
                 <MenuPanel/>
-                <ActiveEditors {...props} />
+                <ActiveEditors/>
             </div>
         </Provider>)
 }
 
 
-export function ActiveEditors({initialValue}: SongEditorComponentProps) {
-    const dispatch = useDispatch();
-    useEffect(() => {
-        dispatch(setDocumentStringValue(initialValue))
-        dispatch(openActiveEditor({trackName: ROOT_TRACK, mode: "full", cursorPosition: 0}))
-        dispatch(openActiveEditor({trackName: 'track1', mode: "track", cursorPosition: 0}))
-    }, [dispatch, initialValue]);
-    const {activeEditors} = useSelector((state: RootState) => state.document);
-    // console.log('activeEditors', activeEditors)
-    return (
-        <div>
-            {activeEditors.map(activeEditor => (
-                <SourceEditor key={activeEditor.trackName} {...activeEditor}/>
-            ))}
-        </div>
-    )
-}
