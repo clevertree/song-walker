@@ -1,12 +1,10 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {WritableDraft} from "immer/src/types/types-external";
 import {ActiveEditor, DocumentState} from "@songwalker-editor/types";
-import {sourceToTokens} from "@songwalker/tokens";
-import {parseTrackList} from "@songwalker/compiler";
+import {TrackRange} from "@songwalker/types";
 
 const initialState: DocumentState = {
-    tokens: [],
-    trackList: {},
+    value: '',
     activeEditors: []
 }
 export const documentActions = createSlice({
@@ -19,30 +17,20 @@ export const documentActions = createSlice({
                 payload: string,
             }
         ) {
-            const sourceString = action.payload;
-            const tokens = sourceToTokens(sourceString);
-            const trackList = parseTrackList(tokens)
-            state.tokens = tokens;
-            state.trackList = trackList;
+            state.value = action.payload;
         },
         setDocumentTrackValue(
             state: WritableDraft<DocumentState>,
             action: {
                 payload: {
                     sourceString: string,
-                    trackName: string
+                    trackRange: TrackRange
                 }
             }
         ) {
-            const {trackName, sourceString} = action.payload;
-            const {start, end} = state.trackList[trackName];
-            const partialTokens = sourceToTokens(sourceString);
-            const tokens = [...state.tokens];
-            tokens.splice(start, end - start, ...partialTokens)
-            const trackList = parseTrackList(tokens)
-
-            state.tokens = tokens;
-            state.trackList = trackList;
+            const {trackRange, sourceString} = action.payload;
+            const {start, end} = trackRange;
+            state.value = state.value.substring(0, start) + sourceString + state.value.substring(end);
         },
         openActiveEditor(
             state: WritableDraft<DocumentState>,
@@ -54,35 +42,35 @@ export const documentActions = createSlice({
                 state.activeEditors.push(action.payload);
             }
         },
-        setActiveEditorPosition(
-            state: WritableDraft<DocumentState>,
-            action: {
-                payload: {
-                    trackName: string,
-                    cursorPosition: number
-                }
-            }
-        ) {
-            const {trackName, cursorPosition} = action.payload;
-            const activeEditor = state.activeEditors.find(editor => editor.trackName === trackName);
-            if (!activeEditor)
-                throw new Error("Active editor not found: " + trackName)
-            activeEditor.cursorPosition = cursorPosition
-        },
+        // setActiveEditorPosition(
+        //     state: WritableDraft<DocumentState>,
+        //     action: {
+        //         payload: {
+        //             trackName: string,
+        //             cursorPosition: number
+        //         }
+        //     }
+        // ) {
+        //     const {trackName, cursorPosition} = action.payload;
+        //     const activeEditor = state.activeEditors.find(editor => editor.trackName === trackName);
+        //     if (!activeEditor)
+        //         throw new Error("Active editor not found: " + trackName)
+        //     activeEditor.cursorPosition = cursorPosition
+        // },
     },
 });
 
-export function setActiveEditorPosition(trackName: string, cursorPosition: number) {
-    return documentActions.actions.setActiveEditorPosition({
-        trackName,
-        cursorPosition
-    })
-}
+// export function setActiveEditorPosition(trackName: string, cursorPosition: number) {
+//     return documentActions.actions.setActiveEditorPosition({
+//         trackName,
+//         cursorPosition
+//     })
+// }
 
-export function setDocumentTrackValue(trackName: string, sourceString: string) {
+export function setDocumentTrackValue(trackRange: TrackRange, sourceString: string) {
     return documentActions.actions.setDocumentTrackValue({
-        trackName,
-        sourceString
+        sourceString,
+        trackRange
     })
 }
 

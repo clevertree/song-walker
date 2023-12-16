@@ -1,8 +1,8 @@
-import {findTokenByType, findTokensByType, ROOT_TRACK, sourceToTokens, tokensToKeys} from "./tokens";
+import {findTokenByType, findTokensByType, getTokenLength, ROOT_TRACK, sourceToTokens, tokensToKeys} from "./tokens";
 
 import commands from "./commands";
 import variables from "./variables";
-import {TokenItem, TokenItemOrString, TokenList, TokenRange, TokenRangeTrackList} from "@songwalker/types";
+import {TokenItem, TokenItemOrString, TokenList, TrackRange, TrackRanges} from "@songwalker/types";
 
 
 // const DEFAULT_EXPORT_STATEMENT = `export default `;
@@ -22,7 +22,7 @@ export function compileSongToJavascript(
 
 export function compileTrackTokensToJavascript(
     tokenList: TokenList,
-    tokenTrackList: TokenRangeTrackList,
+    tokenTrackList: TrackRanges,
     eventMode: boolean = false,
     exportStatement: string = DEFAULT_EXPORT_STATEMENT) {
     const javascriptContent = `${exportStatement}${Object.keys(tokenTrackList).map((trackName) =>
@@ -32,42 +32,43 @@ export function compileTrackTokensToJavascript(
     return javascriptContent;
 }
 
-export function parseTrackList(tokens: TokenList): TokenRangeTrackList {
+export function parseTrackList(tokens: TokenList): TrackRanges {
     let start = 0, end = -1;
     let currentTrackName = ROOT_TRACK;
-    const trackTokenList: TokenRangeTrackList = {}
+    const trackTokenList: TrackRanges = {}
 
     function addTrack() {
         trackTokenList[currentTrackName] = {
             start, end,
-            tokens: tokens.slice(start, end)
+            // tokens: tokens.slice(start, end)
         }
     }
 
+    let pos = 0;
     for (let tokenID = 0; tokenID < tokens.length; tokenID++) {
         const token = tokens[tokenID];
         if (typeof token === 'string') {
-
         } else {
             switch (token.type) {
                 case 'track-start':
                     const trackName = findTokenByType(token.content as TokenList, /^track-start-name$/).content as string;
                     // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
-                    end = tokenID;
+                    end = pos;
                     addTrack();
                     currentTrackName = trackName;
-                    start = tokenID + 1;
+                    start = pos + getTokenLength(token);
                     end = -1
                     break;
             }
         }
+        pos += getTokenLength(token);
     }
-    end = tokens.length;
+    end = pos;
     addTrack();
     return trackTokenList
 }
 
-function formatTrack(trackName: string, tokenRange: TokenRange, tokenList: TokenList, eventMode: boolean) {
+function formatTrack(trackName: string, tokenRange: TrackRange, tokenList: TokenList, eventMode: boolean) {
     const functionNames: { [key: string]: boolean } = {};
     let debugWrapper = (s: string, t: number) => s + '';
     if (eventMode) {

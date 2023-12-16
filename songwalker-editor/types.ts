@@ -1,4 +1,3 @@
-import {TokenList, TokenRangeTrackList} from "@songwalker/types";
 import {MenuState} from "./menu/menuActions";
 import {ConfigObject} from "./config/configActions";
 
@@ -11,13 +10,14 @@ export type RootState = {
 
 
 export type DocumentState = {
-    tokens: TokenList,
-    trackList: TokenRangeTrackList,
+    value: string,
+    // tokens: TokenList,
+    // trackList: TrackRanges,
     activeEditors: Array<ActiveEditor>,
 }
 
 export type ActiveEditor = {
     trackName: string,
-    cursorPosition: number,
+    // cursorPosition: number,
     mode: 'track' | 'full'
 }

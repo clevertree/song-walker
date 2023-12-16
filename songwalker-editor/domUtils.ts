@@ -1,3 +1,5 @@
+import {TokenList} from "@songwalker/types";
+
 export function insertIntoSelection(insertString: string) {
     const selection: Selection | null = window.getSelection();
     if (!selection)
@@ -46,4 +48,46 @@ export function walkDOM(node: Node, callback: (childNode: Node, offset: number) 
         }
         return false; // callback never returned true
     }
+}
+
+export function mapTokensToDOM(tokenList: TokenList, container: HTMLElement) {
+    let elmID = 0;
+    let childNodes = container.childNodes;
+    container.replaceChildren(...tokenList.map(token => {
+        const oldNode = childNodes[elmID++];
+        // console.log('token', token, oldNode);
+        if (typeof token === "string") {
+            if (token.trim().length > 0) {
+                let newNode: HTMLElement = <HTMLElement>oldNode;
+                if (!newNode || newNode.nodeName !== 'UNKNOWN') {
+                    newNode = document.createElement('unknown');
+                } else {
+                    // console.info("Reusing", oldNode);
+                }
+                newNode.innerText = token;
+                return newNode
+            } else {
+                if (oldNode && oldNode.nodeType === 3) {
+                    oldNode.textContent = token;
+                    // console.info("Reusing", oldNode);
+                    return oldNode;
+                } else {
+                    return document.createTextNode(token);
+                }
+            }
+        } else {
+            let newNode: HTMLElement = <HTMLElement>oldNode;
+            if (!newNode || newNode.nodeName.toLowerCase() !== token.type) {
+                newNode = document.createElement(token.type);
+            } else {
+                // console.info("Reusing", oldNode);
+            }
+            if (Array.isArray(token.content)) {
+                mapTokensToDOM(token.content, <HTMLElement>newNode)
+            } else {
+                newNode.innerText = token.content;
+            }
+            return newNode;
+        }
+    }));
 }

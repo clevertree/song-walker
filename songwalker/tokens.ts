@@ -192,3 +192,15 @@ export function tokenToSource(token: TokenItem | string): string {
         }
     }
 }
+
+export function getTokenLength(token: TokenItem | string): number {
+    if (typeof token === 'string') {
+        return token.length;
+    } else {
+        if (Array.isArray(token.content)) {
+            return token.content.reduce((sum, token) => sum + getTokenLength(token), 0);
+        } else {
+            return token.content.length
+        }
+    }
+}

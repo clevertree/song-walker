@@ -3,34 +3,37 @@
 import React, {useEffect, useMemo, useRef} from 'react'
 import Undo from "undoh";
 
-import {insertIntoSelection, walkDOM} from "../domUtils";
+import {insertIntoSelection, mapTokensToDOM, walkDOM} from "../domUtils";
 import {useDispatch, useSelector} from "react-redux";
 import {ActiveEditor, RootState} from "../types";
-import {setActiveEditorPosition, setDocumentTrackValue} from "@songwalker-editor/document/documentActions";
-import {TokenItemOrString, TokenRange} from "@songwalker/types";
-import {tokensToSource} from "@songwalker/tokens";
+import {setDocumentTrackValue} from "@songwalker-editor/document/documentActions";
+import {TrackRange} from "@songwalker/types";
+import {sourceToTokens} from "@songwalker/tokens";
 import styles from "./SourceEditor.module.scss"
 
 let saveTimeout: string | number | NodeJS.Timeout | undefined;
 
 interface SourceEditorProps {
+    trackInitialValue: string,
     activeEditor: ActiveEditor,
-    tokenRange: TokenRange
+    tokenRange: TrackRange
 }
 
-export default function SourceEditor({activeEditor, tokenRange}: SourceEditorProps) {
-    const {trackName, cursorPosition, mode} = activeEditor;
-    // const [editorPosition, setEditorPosition] = useState(0)
+export default function SourceEditor({trackInitialValue, activeEditor, tokenRange}: SourceEditorProps) {
+    const {trackName, mode} = activeEditor;
     const dispatch = useDispatch();
     const config = useSelector((state: RootState) => state.config);
+    // const [tokenList, setTokenList] = useState(tokenRange.tokens)
+    // const [cursorPosition, setCursorPosition] = useState(0)
     // const documentValue: string = useSelector((state: RootState) => state.document.value);
 
-    const undoBuffer = useMemo(() => new Undo(tokensToSource(tokenRange.tokens)), [trackName])
+    const undoBuffer = useMemo(() => new Undo(trackInitialValue), [trackInitialValue])
     const refEditor = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
-        setEditorPosition(getEditor(), cursorPosition)
-    }, [cursorPosition]);
+        render(trackInitialValue)
+        // setEditorPosition(getEditor(), cursorPosition)
+    }, [trackInitialValue]);
 
     function getEditor() {
         if (!refEditor.current)
@@ -42,8 +45,26 @@ export default function SourceEditor({activeEditor, tokenRange}: SourceEditorPro
         return getEditor().innerText
     }
 
+    function render(trackValueString: string) {
+        const cursorPosition = getEditorPosition();
+        const tokenList = sourceToTokens(trackValueString);
+        console.log('render', cursorPosition, trackValueString, tokenList)
+        mapTokensToDOM(tokenList, getEditor())
+        setCursorPosition(cursorPosition);
+    }
+
     function updateNode() {
         const editorValue = getValue();
+        render(editorValue);
+        // const tokenList = sourceToTokens(editorValue);
+        // const editorValue2 = tokensToSource(tokenList);
+        // if (editorValue !== editorValue2)
+        //     throw new Error("Invalid editorValue")
+        // console.log('editorValue', cursorPosition, editorValue, tokenList)
+        // dispatch(setActiveEditorPosition(trackName, cursorPosition))
+        // setCursorPosition(cursorPosition);
+        // getEditor().innerText = '';
+        // setTokenList(tokenList);
 
         // clearTimeout(saveTimeout)
         // saveTimeout = setTimeout(updateEditorState, config.editorUpdateTimeout)
@@ -101,7 +122,7 @@ export default function SourceEditor({activeEditor, tokenRange}: SourceEditorPro
                         dispatch(setDocumentTrackValue(trackName, redoValue))
                     } else {
                         const undoValue = undoBuffer.undo();
-                        console.log('undoValue', undoValue, tokens, trackRange.start, trackRange.end)
+                        console.log('undoValue', undoValue, tokenRange)
                         dispatch(setDocumentTrackValue(trackName, undoValue))
                     }
                 }
@@ -123,37 +144,14 @@ export default function SourceEditor({activeEditor, tokenRange}: SourceEditorPro
             className={styles.container}
             ref={refEditor}
             contentEditable
-            suppressContentEditableWarning
             spellCheck={false}
             onKeyDown={handleKeyDown}
             onKeyUp={getEditorPosition}
             onInput={updateNode}
             onMouseUp={getEditorPosition}
         >
-            {tokenRange.tokens.map((token, i) => {
-                return renderToken(token, tokenRange.start + i)
-            })}
         </div>
     )
-}
-
-
-function renderToken(token: TokenItemOrString, key: number): any {
-    if (typeof token === "string") {
-        // if (token.trim().length > 0) {
-        //     return <token-unknown key={key}>{token}</token-unknown>
-        // } else {
-        return token
-        // }
-    } else {
-        let content = token.content;
-        if (Array.isArray(content)) {
-            content = content.map((token, i) => renderToken(token, i))
-        }
-        const Tag = token.type
-        // @ts-ignore
-        return <Tag key={key}>{content}</Tag>
-    }
 }
 
 

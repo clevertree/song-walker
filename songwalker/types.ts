@@ -8,12 +8,12 @@ export type TokenItemOrString = TokenItem | string
 
 export type TokenList = Array<TokenItemOrString>
 
-export type TokenRange = {
-    tokens: TokenList,
+export type TrackRange = {
+    // tokens: TokenList,
     start: number,
     end: number,
 }
 
-export type TokenRangeTrackList = {
-    [trackName: string]: TokenRange,
+export type TrackRanges = {
+    [trackName: string]: TrackRange,
 }
