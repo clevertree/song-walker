@@ -29,8 +29,10 @@ export const documentActions = createSlice({
             }
         ) {
             const {trackRange, sourceString} = action.payload;
-            const {start, end} = trackRange;
-            state.value = state.value.substring(0, start) + sourceString + state.value.substring(end);
+            const {offsetStart, offsetEnd} = trackRange;
+            const oldValue = state.value;
+            state.value = oldValue.substring(0, offsetStart) + sourceString + oldValue.substring(offsetEnd);
+            console.log('setDocumentTrackValue', action.payload, trackRange, state.value, oldValue.substring(0, offsetStart))
         },
         openActiveEditor(
             state: WritableDraft<DocumentState>,

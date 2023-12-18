@@ -36,12 +36,10 @@ describe('songLoader', () => {
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
             [{
                 "type": "wait-statement",
-                "content": [{"type": "numeric", "content": "1/4", "length": 3}, {
-                    "type": "factor",
-                    "content": "T",
-                    "length": 1
-                }, {"type": "punctuation", "content": ";", "length": 1}],
-                "length": 5
+                "content": [
+                    {"type": "param-numeric", "content": "1/4"},
+                    {"type": "param-factor", "content": "T"},
+                    ";"]
             }]
         ))
     })
@@ -52,16 +50,10 @@ describe('songLoader', () => {
         expect(JSON.stringify(compiledSource)).to.eq(JSON.stringify(
             [{
                 "type": "function-statement",
-                "content": [{"type": "function-name", "content": "testFunction", "length": 12}, {
-                    "type": "punctuation",
-                    "content": "(",
-                    "length": 1
-                }, {"type": "param-string", "content": "'arg'", "length": 5}, {
-                    "type": "punctuation",
-                    "content": ")",
-                    "length": 1
-                }, {"type": "punctuation", "content": ";", "length": 1}],
-                "length": 20
+                "content": [{"type": "function-name", "content": "testFunction"}, "(", {
+                    "type": "param-string",
+                    "content": "'arg'"
+                }, ");"]
             }]
         ))
     })

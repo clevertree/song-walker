@@ -10,8 +10,10 @@ export type TokenList = Array<TokenItemOrString>
 
 export type TrackRange = {
     // tokens: TokenList,
-    start: number,
-    end: number,
+    offsetStart: number,
+    offsetEnd: number,
+    tokenStart: number,
+    tokenEnd: number
 }
 
 export type TrackRanges = {

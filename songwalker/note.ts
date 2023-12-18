@@ -1,71 +1,69 @@
 const DEFAULT_FREQUENCY_A4 = 432;
-module.exports = {
-    isDurationString,
-    parseDurationString,
-    parseVelocityString,
-    isFrequencyString,
-    parseFrequencyString
-}
 
-const REGEX_DURATION = /^(\d*[\/.]{0,1}\d+)([BTDt])?$/;
+// const REGEX_DURATION = /^(\d*[\/.]{0,1}\d+)([BTDt])?$/;
 
-function isDurationString(noteLengthString) {
-    return REGEX_DURATION.test(noteLengthString)
-}
+// function isDurationString(noteLengthString) {
+//     return REGEX_DURATION.test(noteLengthString)
+// }
 
-function parseDurationString(noteLength, bpm = 60) {
-    const [, valueString, factorString] = noteLength.match(REGEX_DURATION);
-    let value = parseFloat(valueString);
-    switch (factorString) {
-        // TODO: support ticks?
-        case 'T':
-            value /= 1.5;
-            break;
-        case 'D':
-            value *= 1.5;
-            break;
-    }
-    return value * (60 / bpm);
-}
+// function parseDurationString(noteLength, bpm = 60) {
+//     const [, valueString, factorString] = noteLength.match(REGEX_DURATION);
+//     let value = parseFloat(valueString);
+//     switch (factorString) {
+//         // TODO: support ticks?
+//         case 'T':
+//             value /= 1.5;
+//             break;
+//         case 'D':
+//             value *= 1.5;
+//             break;
+//     }
+//     return value * (60 / bpm);
+// }
 
-function parseVelocityString(noteLength) {
-    return noteLength || DEFAULT_VELOCITY;
-}
+// function parseVelocityString(noteLength) {
+//     return noteLength || DEFAULT_VELOCITY;
+// }
+//
+// function isFrequencyString(noteString) {
+//     return /^[A-G][#qb]{0,2}\d?$/.test(noteString);
+// }
 
-function isFrequencyString(noteString) {
-    return /^[A-G][#qb]{0,2}\d?$/.test(noteString);
-}
-
-function parseFrequencyString(noteString) {
+export function parseFrequencyString(noteString: string) {
     const {frequency} = parseFrequencyParts(noteString);
     return frequency;
 }
 
-function parseFrequencyParts(noteString) {
-    if (typeof noteString !== "string")
-        throw new Error("Frequency is not a string");
+export function parseFrequencyParts(noteString: string) {
     if (!noteString)
         throw new Error("Frequency is null");
 
-    const ret = {
-        note: noteString.slice(0, -1),
-    }
-    ret.octave = parseInt(noteString.slice(-1));
-    if (isNaN(ret.octave))
+    const note = noteString.slice(0, -1);
+    const octave = parseInt(noteString.slice(-1));
+    if (isNaN(octave))
         throw new Error("Invalid octave value: " + noteString);
-    if (typeof LIST_NOTE_NAMES[ret.note] === "undefined")
-        throw new Error("Unrecognized Note: " + ret.note);
-    ret.keyNumber = LIST_NOTE_NAMES[ret.note];
-    if (ret.keyNumber < 6)
-        ret.keyNumber = ret.keyNumber + 24 + ((ret.octave - 1) * 24) + 2;
+    if (typeof LIST_NOTE_NAMES[note] === "undefined")
+        throw new Error("Unrecognized Note: " + note);
+    let keyNumber: number = LIST_NOTE_NAMES[note];
+    if (keyNumber < 6)
+        keyNumber = keyNumber + 24 + ((octave - 1) * 24) + 2;
     else
-        ret.keyNumber = ret.keyNumber + ((ret.octave - 1) * 24) + 2;
-    ret.frequency = DEFAULT_FREQUENCY_A4 * Math.pow(2, (ret.keyNumber - 98) / 24);
-    return ret;
+        keyNumber = keyNumber + ((octave - 1) * 24) + 2;
+    let frequency = DEFAULT_FREQUENCY_A4 * Math.pow(2, (keyNumber - 98) / 24);
+    return {
+        note,
+        octave,
+        keyNumber,
+        frequency
+    };
+}
+
+interface NoteToKeyNumberMap {
+    [note: string]: number
 }
 
 // TODO: change to regex calculation
-const LIST_NOTE_NAMES = {
+const LIST_NOTE_NAMES: NoteToKeyNumberMap = {
     'A': 0,
     'Aq': 1,
     'A#': 2,

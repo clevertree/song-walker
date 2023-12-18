@@ -11,6 +11,7 @@ module.exports=async function rootTrack(trackRenderer) {
 	startTrack(track1); 	await wait(3/8);
 	setVariable('currentInstrument', trackState.lead2);
 	startTrack(track1); 	await wait(5/8); 	await wait((3)/1.5);
+
 }
 
 async function track1(trackRenderer) {

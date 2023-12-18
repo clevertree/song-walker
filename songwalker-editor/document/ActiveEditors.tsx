@@ -14,25 +14,24 @@ export function ActiveEditors() {
         dispatch(openActiveEditor({trackName: 'track1', mode: "track"}))
     }, [dispatch]);
     const {value, activeEditors} = useSelector((state: RootState) => state.document);
-    const trackList = useMemo<TrackRanges>(() => {
+    const trackRanges = useMemo<TrackRanges>(() => {
         const tokens = sourceToTokens(value);
         console.log("ActiveEditors parsing tokens", tokens);
         return parseTrackList(tokens)
     }, [value])
-    console.log('ActiveEditors', activeEditors, trackList, value)
+    console.log('ActiveEditors', activeEditors, trackRanges, value)
     return (
         <div>
             {activeEditors.map(activeEditor => {
                     const {trackName} = activeEditor;
-                    const trackRange = trackList[trackName];
+                    const trackRange = trackRanges[trackName];
                     if (!trackRange)
-                        throw new Error("Invalid track name: " + trackName + JSON.stringify(trackList))
+                        throw new Error("Invalid track name: " + trackName + JSON.stringify(trackRanges))
 
-                    const trackInitialValue = value.substring(trackRange.start, trackRange.end)
-                    console.log('trackInitialValue', trackInitialValue, trackRange.start, trackRange.end)
+                    const trackInitialValue = value.substring(trackRange.offsetStart, trackRange.offsetEnd)
                     return <SourceEditor key={activeEditor.trackName}
                                          trackInitialValue={trackInitialValue}
-                                         tokenRange={trackRange}
+                                         trackRange={trackRange}
                                          activeEditor={activeEditor}/>
                 }
             )}

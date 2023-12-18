@@ -9,7 +9,6 @@ currentInstrument=lead
 @track1 3/8
 currentInstrument=lead2
 @track1 5/8 3T;
-
 [track1]
 C5:1/4D; 1/4;
 C4:1/4D:0.8;1/4;
