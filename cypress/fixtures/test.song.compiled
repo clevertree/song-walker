@@ -16,7 +16,6 @@ module.exports=async function rootTrack(trackRenderer) {
 
 async function track1(trackRenderer) {
 	const {playFrequency, wait} = trackRenderer;
-
 	playFrequency('C5', (1/4)*1.5); 	await wait(1/4);
 	playFrequency('C4', (1/4)*1.5, 0.8);	await wait(1/4);
 	playFrequency('G4', 1/4); 	await wait(1/4);

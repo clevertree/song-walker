@@ -1,6 +1,6 @@
 import React, {RefObject} from "react";
 import Undo from "undoh";
-import {ConfigObject} from "@songwalker-editor/config/configActions";
+import {ConfigObject} from "../config/configActions";
 import {sourceToTokens} from "@songwalker/tokens";
 import {insertIntoSelection, mapTokensToDOM, walkDOM} from "@songwalker-editor/domUtils";
 import {EditorState} from "./SourceEditor";
@@ -8,14 +8,12 @@ import {EditorState} from "./SourceEditor";
 export class EditorNodeManager {
     private readonly ref: RefObject<HTMLElement>;
     private readonly undoBuffer: Undo<EditorState>;
-    private readonly config: ConfigObject;
     private saveTimeout: NodeJS.Timeout | undefined;
     private undoTimeout: NodeJS.Timeout | undefined;
     private lastCursorPosition: number;
 
-    constructor(editorRef: RefObject<HTMLElement>, config: ConfigObject, initialValue: EditorState) {
+    constructor(editorRef: RefObject<HTMLElement>, initialValue: EditorState) {
         this.ref = editorRef;
-        this.config = config;
         this.undoBuffer = new Undo<EditorState>(initialValue);
         this.lastCursorPosition = 0;
     }
@@ -37,9 +35,9 @@ export class EditorNodeManager {
         // console.log('this.undoBuffer', this.undoBuffer)
     }
 
-    startRetainTimeout() {
+    startRetainTimeout(editorRetainTimeout: number) {
         clearTimeout(this.saveTimeout)
-        this.saveTimeout = setTimeout(() => this.retainEditorState(), this.config.editorRetainTimeout)
+        this.saveTimeout = setTimeout(() => this.retainEditorState(), editorRetainTimeout)
     }
 
     getNode() {
@@ -56,7 +54,6 @@ export class EditorNodeManager {
         const tokenList = sourceToTokens(trackValueString);
         // console.log('render', trackValueString, tokenList)
         mapTokensToDOM(tokenList, this.getNode())
-        console.log('this.getValue() !== trackValueString', this.getValue() !== trackValueString)
         if (this.getValue() !== trackValueString)
             throw new Error("Rendering value mismatch");
     }
@@ -89,7 +86,7 @@ export class EditorNodeManager {
         })
         if (!result)
             throw new Error("focusNode not found in editor");
-        console.log('getEditorPosition', editorPosition);
+        // console.log('getEditorPosition', editorPosition);
         this.lastCursorPosition = editorPosition;
         return editorPosition;
     }
@@ -129,7 +126,7 @@ export class EditorNodeManager {
     }
 
 
-    handleEvent(e: React.SyntheticEvent<HTMLDivElement>) {
+    handleEvent(e: React.SyntheticEvent<HTMLDivElement>, config: ConfigObject) {
         switch (e.type) {
             default:
                 console.log(e.type, e);
@@ -142,7 +139,7 @@ export class EditorNodeManager {
                 break;
             case 'keyup':
                 this.getCursorPosition()
-                this.startRetainTimeout();
+                this.startRetainTimeout(config.editorRetainTimeout);
                 break;
             case 'keydown':
                 let ke = e as React.KeyboardEvent<HTMLDivElement>

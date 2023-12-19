@@ -1,5 +1,4 @@
-const songSource = `
-lead=loadInstrument("./instruments/oscillator", {duration: 1/4T})
+const songSource = `lead=loadInstrument("./instruments/oscillator", {duration: 1/4T})
 @track1
 
 [track1]

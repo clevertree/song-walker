@@ -1,8 +1,15 @@
-import {findTokenByType, findTokensByType, getTokenLength, ROOT_TRACK, sourceToTokens, tokensToKeys} from "./tokens";
+import {
+    findTokenByType,
+    findTokensByType,
+    PATTERN_TRACK_START,
+    ROOT_TRACK,
+    sourceToTokens,
+    tokensToKeys
+} from "./tokens";
 
 import commands from "./commands";
 import variables from "./variables";
-import {TokenItem, TokenItemOrString, TokenList, TrackRange, TrackRanges} from "@songwalker/types";
+import {TokenItem, TokenItemOrString, TokenList, TrackSourceMap} from "@songwalker/types";
 
 
 // const DEFAULT_EXPORT_STATEMENT = `export default `;
@@ -13,76 +20,66 @@ export function compileSongToJavascript(
     songSource: string,
     eventMode: boolean = false,
     exportStatement: string = DEFAULT_EXPORT_STATEMENT) {
-    const tokens = sourceToTokens(songSource)
-    const trackTokenList = parseTrackList(tokens)
-    const javascriptContent = compileTrackTokensToJavascript(tokens, trackTokenList, eventMode, exportStatement);
-    return {javascriptContent, tokens, trackTokenList};
+    // const tokens = sourceToTokens(songSource)
+    const trackList = parseTrackList(songSource)
+    const javascriptContent = compileTrackTokensToJavascript(trackList, eventMode, exportStatement);
+    return javascriptContent;
 }
 
 
-export function parseTrackList(tokens: TokenList): TrackRanges {
-    let offsetStart = 0;
-    let tokenStart = 0;
+export function parseTrackList(songSource: string): TrackSourceMap {
+    const LANGUAGE = {
+        'track-start': PATTERN_TRACK_START,
+    }
+    const tokens: TokenList = sourceToTokens(songSource, LANGUAGE);
+
     let currentTrackName = ROOT_TRACK;
-    const trackTokenList: TrackRanges = {}
-    let pos = 0;
+    const trackList: TrackSourceMap = {}
+    let lastTrackSource = '';
     for (let tokenID = 0; tokenID < tokens.length; tokenID++) {
         const token = tokens[tokenID];
         if (typeof token === 'string') {
+            lastTrackSource = token;
         } else {
             switch (token.type) {
                 case 'track-start':
                     const trackName = findTokenByType(token.content as TokenList, /^track-start-name$/).content as string;
                     // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
-                    trackTokenList[currentTrackName] = {
-                        offsetStart,
-                        offsetEnd: pos,
-                        tokenStart,
-                        tokenEnd: tokenID
-                    }
+                    trackList[currentTrackName] = lastTrackSource
                     currentTrackName = trackName;
-                    offsetStart = pos + getTokenLength(token);
-                    tokenStart = tokenID + 1;
                     break;
             }
         }
-        pos += getTokenLength(token);
     }
-    trackTokenList[currentTrackName] = {
-        offsetStart,
-        offsetEnd: pos,
-        tokenStart,
-        tokenEnd: tokens.length
-    }
-    console.log('trackTokenList', trackTokenList)
-    return trackTokenList
+    trackList[currentTrackName] = lastTrackSource
+    // console.log('parseTrackList', trackList)
+    return trackList
 }
 
 export function compileTrackTokensToJavascript(
-    tokenList: TokenList,
-    tokenTrackList: TrackRanges,
+    trackList: TrackSourceMap,
     eventMode: boolean = false,
     exportStatement: string = DEFAULT_EXPORT_STATEMENT) {
-    const javascriptContent = `${exportStatement}${Object.keys(tokenTrackList).map((trackName) =>
-        formatTrack(trackName, tokenTrackList[trackName], tokenList, eventMode)
+    const javascriptContent = `${exportStatement}${Object.keys(trackList).map((trackName) =>
+        formatTrack(trackName, trackList[trackName], eventMode)
     ).join('\n\n')}`;
     console.log(javascriptContent)
     return javascriptContent;
 }
 
 
-function formatTrack(trackName: string, tokenRange: TrackRange, tokenList: TokenList, eventMode: boolean) {
+function formatTrack(trackName: string, trackSource: string, eventMode: boolean) {
+    const tokenList = sourceToTokens(trackSource);
     const functionNames: { [key: string]: boolean } = {};
     let debugWrapper = (s: string, t: number) => s + '';
     if (eventMode) {
         debugWrapper = (commandString: string, tokenID: number) => `${commands.setCurrentToken}(${tokenID});${commandString}`
         functionNames[commands.setCurrentToken] = true;
     }
-    const partialTokenList = tokenList.slice(tokenRange.tokenStart, tokenRange.tokenEnd);
-    let currenTokenID = tokenRange.tokenStart - 1;
-    const functionContent = partialTokenList
+    let currentTokenID = 0;
+    const functionContent = tokenList
         .map((token) => {
-            currenTokenID++;
+            currentTokenID++;
             if (typeof token === "string")
                 return token;
             return `\t${formatTokenContent(token)};`;
@@ -153,22 +150,22 @@ ${functionContent}
                 const noteArgs = findTokensByType(token.content as TokenList, /^play-arg$/);
                 functionNames[commands.playFrequency] = true;
                 return debugWrapper(`${commands.playFrequency}('${frequencyToken.content}'${noteArgs.length === 0 ? ''
-                    : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`, currenTokenID);
+                    : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`, currentTokenID);
             case 'play-arg':
                 const playArgParamToken = findTokenByType(token.content as TokenList, /^param-/);
                 return formatTokenContent(playArgParamToken);
             case 'play-track-statement':
                 const trackNameToken = findTokenByType(token.content as TokenList, /^play-track-name$/);
                 functionNames[commands.startTrack] = true;
-                return debugWrapper(`${commands.startTrack}(${trackNameToken.content})`, currenTokenID);
+                return debugWrapper(`${commands.startTrack}(${trackNameToken.content})`, currentTokenID);
             case 'wait-statement':
                 const waitValues = tokensToKeys(token.content as TokenList);
                 let numericString = formatNumericString(waitValues['param-numeric'], waitValues['param-factor']);
                 functionNames[commands.wait] = true;
-                return debugWrapper(`await ${commands.wait}(${numericString})`, currenTokenID);
+                return debugWrapper(`await ${commands.wait}(${numericString})`, currentTokenID);
             default:
             case 'unknown':
-                throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${currenTokenID}`);
+                throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${currentTokenID}`);
 
             // return token.content as string;
             // throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${tokenID}`);

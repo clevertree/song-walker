@@ -3,16 +3,18 @@ import {TokenItem, TokenItemOrString, TokenList} from "@songwalker/types";
 // Prism.languages.javascript.constant = /\b[a-zA-Z](?:[a-zA-Z_]|\dx?)*\b/
 
 export const ROOT_TRACK = 'rootTrack'
+
+export const PATTERN_TRACK_START = {
+    pattern: /^\[[a-zA-Z]\w+]$\n?/m,
+    lookbehind: true,
+    // alias: 'selector',
+    inside: {
+        'track-start-name': /[a-zA-Z]\w+/,
+        // punctuation: /[\[\]]/
+    }
+}
 export const LANGUAGE = {
-    'track-start': {
-        pattern: /\[[^\]]+]/m,
-        lookbehind: true,
-        // alias: 'selector',
-        inside: {
-            'track-start-name': /[^\[\]]+/,
-            // punctuation: /[\[\]]/
-        }
-    },
+    'track-start': PATTERN_TRACK_START,
     'play-track-statement': {
         pattern: /@\w+/,
         inside: {
@@ -111,7 +113,7 @@ export const LANGUAGE = {
 }
 
 
-export function sourceToTokens(source: string): TokenList {
+export function sourceToTokens(source: string, language: object = LANGUAGE): TokenList {
     function mapToken(token: string | Token): TokenItemOrString {
         if (typeof token === "string") {
             return token;
@@ -127,7 +129,7 @@ export function sourceToTokens(source: string): TokenList {
         }
     }
 
-    return Prism.tokenize(source, LANGUAGE).map(mapToken);
+    return Prism.tokenize(source, language).map(mapToken);
 }
 
 

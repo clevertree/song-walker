@@ -13,11 +13,8 @@ export type DocumentState = {
     value: string,
     // tokens: TokenList,
     // trackList: TrackRanges,
-    activeEditors: Array<ActiveEditor>,
-}
-
-export type ActiveEditor = {
-    trackName: string,
-    // cursorPosition: number,
+    activeEditors: {
+        [trackName: string]: boolean
+    },
     mode: 'track' | 'full'
 }

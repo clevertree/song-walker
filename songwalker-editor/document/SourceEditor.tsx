@@ -2,17 +2,15 @@
 
 import React, {useCallback, useEffect, useMemo, useRef} from 'react'
 import {useDispatch, useSelector} from "react-redux";
-import {ActiveEditor, RootState} from "../types";
-import {TrackRange} from "@songwalker/types";
+import {RootState} from "../types";
 import styles from "./SourceEditor.module.scss"
 import {EditorNodeManager} from "@songwalker-editor/document/EditorNodeManager";
 import {setDocumentTrackValue} from "@songwalker-editor/document/documentActions";
 
 
 interface SourceEditorProps {
-    trackInitialValue: string,
-    activeEditor: ActiveEditor,
-    trackRange: TrackRange
+    trackName: string,
+    trackValue: string,
 }
 
 export interface EditorState {
@@ -20,47 +18,45 @@ export interface EditorState {
     cursorPosition: number
 }
 
-export default function SourceEditor({trackInitialValue, activeEditor, trackRange}: SourceEditorProps) {
-    console.log('SourceEditor', trackInitialValue, activeEditor, trackRange)
-    const {trackName, mode} = activeEditor;
+export default function SourceEditor({trackName, trackValue}: SourceEditorProps) {
+    // console.log('SourceEditor', trackValue, trackName)
     const dispatch = useDispatch();
     const config = useSelector((state: RootState) => state.config);
-    let updateTimeout: number | null = null;
+    const updateTimeout = useRef(-1); // we can save timer in useRef and pass it to child
 
     const refEditor = useRef<HTMLInputElement>(null);
     const nodeManager = useMemo(() => new EditorNodeManager(refEditor,
-            config,
-            {value: trackInitialValue, cursorPosition: 0}),
+            {value: trackValue, cursorPosition: 0}),
         [trackName])
 
     useEffect(() => {
         const cursorPosition = nodeManager.getLastCursorPosition();
         console.log('cursorPosition', cursorPosition)
-        nodeManager.render(trackInitialValue);
+        nodeManager.render(trackValue);
         if (cursorPosition > 0)
             nodeManager.setCursorPosition(cursorPosition);
-        nodeManager.retainEditorState(0, trackInitialValue)
+        nodeManager.retainEditorState(0, trackValue)
         // setEditorPosition(getEditor(), cursorPosition)
         return () => {
-            updateTimeout && window.clearTimeout(updateTimeout);
+            updateTimeout.current && window.clearTimeout(updateTimeout.current);
             nodeManager.unload();
         }
 
-    }, [nodeManager, trackInitialValue, updateTimeout]);
+    }, [nodeManager, trackValue, updateTimeout]);
 
-    const handleEvent = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => nodeManager.handleEvent(e), [nodeManager])
+    const handleEvent = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => nodeManager.handleEvent(e, config), [nodeManager])
     const handleChangeEvent = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => {
-        nodeManager.handleEvent(e);
+        nodeManager.handleEvent(e, config);
         console.log('handleChangeEvent', e)
-        updateTimeout && window.clearTimeout(updateTimeout)
-        updateTimeout = window.setTimeout(() => {
-            dispatch(setDocumentTrackValue(trackRange, nodeManager.getValue()))
+        updateTimeout.current && window.clearTimeout(updateTimeout.current);
+        updateTimeout.current = window.setTimeout(() => {
+            dispatch(setDocumentTrackValue(trackName, nodeManager.getValue()))
         }, config.editorUpdateTimeout)
-    }, [])
+    }, [config.editorUpdateTimeout, dispatch, nodeManager, trackName])
 
     return (
         <div className={styles.container}>
-            <div className={styles.title}>{trackName}</div>
+            <div className={styles.title}>[{trackName}]</div>
             <div
                 key={trackName}
                 className={styles.editor}

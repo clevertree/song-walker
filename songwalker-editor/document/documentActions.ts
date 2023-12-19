@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {WritableDraft} from "immer/src/types/types-external";
 import {ActiveEditor, DocumentState} from "@songwalker-editor/types";
-import {TrackRange} from "@songwalker/types";
+import {parseTrackList} from "@songwalker/compiler";
 
 const initialState: DocumentState = {
     value: '',
@@ -24,15 +24,16 @@ export const documentActions = createSlice({
             action: {
                 payload: {
                     sourceString: string,
-                    trackRange: TrackRange
+                    trackName: string
                 }
             }
         ) {
-            const {trackRange, sourceString} = action.payload;
-            const {offsetStart, offsetEnd} = trackRange;
+            const {trackName, sourceString} = action.payload;
             const oldValue = state.value;
-            state.value = oldValue.substring(0, offsetStart) + sourceString + oldValue.substring(offsetEnd);
-            console.log('setDocumentTrackValue', action.payload, trackRange, state.value, oldValue.substring(0, offsetStart))
+            const trackList = parseTrackList(state.value);
+            trackList[trackName] = sourceString;
+            state.value = Object.keys(trackList).map(trackName => `[${trackName}]\n${trackList[trackName]}`).join("")
+            console.log('setDocumentTrackValue', action.payload, state.value, oldValue)
         },
         openActiveEditor(
             state: WritableDraft<DocumentState>,
@@ -69,10 +70,10 @@ export const documentActions = createSlice({
 //     })
 // }
 
-export function setDocumentTrackValue(trackRange: TrackRange, sourceString: string) {
+export function setDocumentTrackValue(trackName: string, sourceString: string) {
     return documentActions.actions.setDocumentTrackValue({
         sourceString,
-        trackRange
+        trackName
     })
 }
 

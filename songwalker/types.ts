@@ -16,6 +16,6 @@ export type TrackRange = {
     tokenEnd: number
 }
 
-export type TrackRanges = {
-    [trackName: string]: TrackRange,
+export type TrackSourceMap = {
+    [trackName: string]: string,
 }

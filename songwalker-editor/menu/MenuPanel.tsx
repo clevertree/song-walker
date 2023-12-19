@@ -1,25 +1,39 @@
-import React, {useEffect, useState} from "react";
-import {TrackCallback, TrackRenderer} from "@songwalker/song/walker";
+import React, {useCallback, useEffect, useState} from "react";
 import {useDispatch, useSelector} from "react-redux";
 import styles from "@songwalker-editor/SongEditorComponent.module.scss";
-import {startPlayback, stopPlayback} from "@songwalker-editor/menu/menuActions";
 import {RootState} from "@songwalker-editor/types";
+import {startPlayback, stopPlayback} from "./menuActions";
+import {compileSongToJavascript} from "@songwalker/compiler";
+import {SongHandler, walkSong} from "@songwalker/walker";
 
-export default function MenuPanel({}) {
+function MenuPanel({}) {
     const dispatch = useDispatch();
 
     const isPlaying = useSelector((state: RootState) => state.menu.isPlaying);
-    const [songCallback, setSongCallback] = useState<TrackCallback | null>(null)
-    console.log('isPlaying', isPlaying, songCallback);
+    const documentValue = useSelector((state: RootState) => state.document.value);
+    const [songInstance, setSongInstance] = useState<SongHandler>();
+    const playSong = useCallback(() => {
+        console.log("processing and playing song")
+        const callback = compileToCallback(documentValue)
+
+        const songInstance = walkSong(callback);
+        // songInstance.addEventCallback(logCallback)
+        setSongInstance(songInstance);
+        return songInstance;
+
+    }, [documentValue])
+    console.log('isPlaying', isPlaying, playSong);
     useEffect(() => {
-        if (isPlaying && !songCallback) {
-            console.log("TODO: setSongCallback")
-            const callback: TrackCallback = function (trackRenderer: TrackRenderer) {
+        if (isPlaying) {
+            if (!songInstance) {
+                playSong()
             }
-            console.log('callback', callback)
-            setSongCallback(callback)
+        } else {
+            if (songInstance) {
+                songInstance.stopPlayback
+            }
         }
-    }, [isPlaying, songCallback]);
+    }, [documentValue, isPlaying, playSong, songInstance]);
 
 
     return (
@@ -29,3 +43,17 @@ export default function MenuPanel({}) {
         </div>
     )
 }
+
+function compileToCallback(songSource: string) {
+    const javascriptSource = compileSongToJavascript(songSource, true)
+    const callback = eval(javascriptSource);
+
+    function require(path) {
+        throw new Error("TODO: " + path)
+    }
+
+    console.log('callback', callback)
+    return callback;
+}
+
+export default MenuPanel
