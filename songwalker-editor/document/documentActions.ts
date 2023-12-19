@@ -1,11 +1,12 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {WritableDraft} from "immer/src/types/types-external";
-import {ActiveEditor, DocumentState} from "@songwalker-editor/types";
+import {DocumentState} from "@songwalker-editor/types";
 import {parseTrackList} from "@songwalker/compiler";
 
 const initialState: DocumentState = {
+    mode: "track",
     value: '',
-    activeEditors: []
+    activeEditors: {}
 }
 export const documentActions = createSlice({
     name: 'documentSlice',
@@ -32,17 +33,27 @@ export const documentActions = createSlice({
             const oldValue = state.value;
             const trackList = parseTrackList(state.value);
             trackList[trackName] = sourceString;
-            state.value = Object.keys(trackList).map(trackName => `[${trackName}]\n${trackList[trackName]}`).join("")
+            state.value = Object.keys(trackList).map(trackName => `[${trackName}]\n${trackList[trackName]}`).join("\n")
             console.log('setDocumentTrackValue', action.payload, state.value, oldValue)
         },
         openActiveEditor(
             state: WritableDraft<DocumentState>,
-            action: { payload: ActiveEditor }
+            action: { payload: string }
         ) {
-            if (state.activeEditors.find(editor => editor.trackName === action.payload.trackName)) {
-                console.info("Active editor already open: " + action.payload.trackName)
+            if (state.activeEditors[action.payload]) {
+                console.info("Active editor already open: " + action.payload)
             } else {
-                state.activeEditors.push(action.payload);
+                state.activeEditors[action.payload] = true;
+            }
+        },
+        closeActiveEditor(
+            state: WritableDraft<DocumentState>,
+            action: { payload: string }
+        ) {
+            if (!state.activeEditors[action.payload]) {
+                console.info("Active editor already closed: " + action.payload)
+            } else {
+                state.activeEditors[action.payload] = false;
             }
         },
         // setActiveEditorPosition(
@@ -80,5 +91,6 @@ export function setDocumentTrackValue(trackName: string, sourceString: string) {
 
 export const {
     openActiveEditor,
+    closeActiveEditor,
     setDocumentValue,
 } = documentActions.actions

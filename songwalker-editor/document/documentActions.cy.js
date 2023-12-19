@@ -11,11 +11,10 @@ describe('documentActions', () => {
         })
     })
     it('setDocumentPartialStringValue', () => {
-        store.dispatch(setDocumentValue("C4 1 D4 1 [track1] C4 2 D4:1"))
-        cy.log(store.getState())
-        store.dispatch(setDocumentTrackValue('track1', "F4 1 F4:2"))
-        cy.log(store.getState().document.tokens)
-        cy.log(store.getState().document.trackList)
+        store.dispatch(setDocumentValue("C4 1 D4 1 \n[track1] C4 2 D4:1"))
+        cy.log(store.getState().document.value)
+        store.dispatch(setDocumentTrackValue('track2', "F4 1 F4:2"))
+        cy.log(store.getState().document.value)
     })
 
 

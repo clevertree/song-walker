@@ -10,10 +10,23 @@ import {
 import commands from "./commands";
 import variables from "./variables";
 import {TokenItem, TokenItemOrString, TokenList, TrackSourceMap} from "@songwalker/types";
+import {getRequireCallback, InstrumentBank} from "@songwalker/walker";
+import Instruments from "./instruments/index";
 
 
 // const DEFAULT_EXPORT_STATEMENT = `export default `;
 const DEFAULT_EXPORT_STATEMENT = `module.exports=`;
+
+
+export function compileSongToCallback(songSource: string, instruments: InstrumentBank = Instruments) {
+    const javascriptSource = compileSongToJavascript(songSource, true)
+
+    const require = getRequireCallback(Instruments)
+    const callback = eval(javascriptSource);
+
+    console.log('callback', callback)
+    return callback;
+}
 
 
 export function compileSongToJavascript(
@@ -67,7 +80,6 @@ export function compileTrackTokensToJavascript(
     return javascriptContent;
 }
 
-
 function formatTrack(trackName: string, trackSource: string, eventMode: boolean) {
     const tokenList = sourceToTokens(trackSource);
     const functionNames: { [key: string]: boolean } = {};
@@ -85,13 +97,23 @@ function formatTrack(trackName: string, trackSource: string, eventMode: boolean)
             return `\t${formatTokenContent(token)};`;
         })
         .join('');
-    const functionNameList = Object.values(functionNames).length > 0
-        ? `${Object.keys(functionNames).join(', ')}`
-        : '';
     return `async function ${trackName}(${variables.trackRenderer}) {
-\tconst {${functionNameList}} = ${variables.trackRenderer};
+\tconst {${formatFunctionList()}} = ${variables.trackRenderer};
 ${functionContent}
 }`
+
+    function formatFunctionList() {
+        if (Object.values(functionNames).length === 0)
+            return '';
+        return Object.keys(commands)
+            .filter(functionName => functionNames[commands[functionName]])
+            .map(functionName => {
+                const alias = commands[functionName];
+                if (alias === functionName)
+                    return functionName;
+                return `${functionName + ':' + alias}`
+            }).join(', ')
+    }
 
     function formatTokenContent(token: TokenItemOrString): string {
         if (typeof token === "string")
@@ -148,8 +170,8 @@ ${functionContent}
             case 'play-statement':
                 const frequencyToken = findTokenByType(token.content as TokenList, /^play-frequency$/);
                 const noteArgs = findTokensByType(token.content as TokenList, /^play-arg$/);
-                functionNames[commands.playFrequency] = true;
-                return debugWrapper(`${commands.playFrequency}('${frequencyToken.content}'${noteArgs.length === 0 ? ''
+                functionNames[commands.playNote] = true;
+                return debugWrapper(`${commands.playNote}('${frequencyToken.content}'${noteArgs.length === 0 ? ''
                     : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`, currentTokenID);
             case 'play-arg':
                 const playArgParamToken = findTokenByType(token.content as TokenList, /^param-/);
@@ -199,3 +221,4 @@ ${functionContent}
     }
 
 }
+

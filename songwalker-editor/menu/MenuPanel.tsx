@@ -3,8 +3,8 @@ import {useDispatch, useSelector} from "react-redux";
 import styles from "@songwalker-editor/SongEditorComponent.module.scss";
 import {RootState} from "@songwalker-editor/types";
 import {startPlayback, stopPlayback} from "./menuActions";
-import {compileSongToJavascript} from "@songwalker/compiler";
 import {SongHandler, walkSong} from "@songwalker/walker";
+import {compileSongToCallback} from "@songwalker/compiler";
 
 function MenuPanel({}) {
     const dispatch = useDispatch();
@@ -14,7 +14,7 @@ function MenuPanel({}) {
     const [songInstance, setSongInstance] = useState<SongHandler>();
     const playSong = useCallback(() => {
         console.log("processing and playing song")
-        const callback = compileToCallback(documentValue)
+        const callback = compileSongToCallback(documentValue)
 
         const songInstance = walkSong(callback);
         // songInstance.addEventCallback(logCallback)
@@ -42,18 +42,6 @@ function MenuPanel({}) {
             <button disabled={!isPlaying} onClick={() => dispatch(stopPlayback())}>Stop</button>
         </div>
     )
-}
-
-function compileToCallback(songSource: string) {
-    const javascriptSource = compileSongToJavascript(songSource, true)
-    const callback = eval(javascriptSource);
-
-    function require(path) {
-        throw new Error("TODO: " + path)
-    }
-
-    console.log('callback', callback)
-    return callback;
 }
 
 export default MenuPanel

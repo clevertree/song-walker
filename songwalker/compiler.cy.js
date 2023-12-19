@@ -1,12 +1,13 @@
-import {compileSongToJavascript} from './compiler'
+import {compileSongToJavascript, parseTrackList} from './compiler'
 import {sourceToTokens} from "./tokens";
 
 describe('songLoader', () => {
     it('compiles to javascript', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
-                const {javascriptContent, trackList} = compileSongToJavascript(SONG_SOURCE);
+                const trackList = parseTrackList(SONG_SOURCE)
                 expect(Object.values(trackList).length).to.eq(2);
+                const javascriptContent = compileSongToJavascript(SONG_SOURCE);
                 // expect(Object.values(tokens).length).to.eq(88);
                 const cmdList1 = javascriptContent.split(/\s+/);
                 const cmdList2 = SONG_SOURCE_COMPILED.split(/\s+/);

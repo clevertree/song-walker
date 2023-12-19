@@ -1,11 +1,10 @@
-import {InstrumentInstance, TrackRenderer, walkSong} from "./walker";
-import {registerInstrument} from "./instruments"
+import {InstrumentBank, InstrumentInstance, TrackRenderer, walkSong} from "./walker";
 import constants from "./constants";
 
 describe('songPlayer', () => {
-    beforeEach(() => {
-        registerInstrument('testInstrument', testInstrument)
-    })
+    let instrumentBank: InstrumentBank = {
+        testInstrument
+    }
 
     it('plays sub-tracks', async () => {
         const logCallback = cy.stub();

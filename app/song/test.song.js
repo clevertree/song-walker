@@ -1,7 +1,7 @@
 export default async function rootTrack(t) {
     const {require, loadInstrument, startTrack, wait} = t;
-    t.lead = loadInstrument(require("./instruments/oscillator"), {});
-    t.lead2 = loadInstrument(require("./instruments/oscillator"), {type: 'square'});
+    t.lead = loadInstrument(require("oscillator"), {});
+    t.lead2 = loadInstrument(require("oscillator"), {type: 'square'});
     t.lead.config.type = 'pulse';
     t.lead.config.pulseWidth = 0.5;
     t.lead.config.envelop.mixer = 1;

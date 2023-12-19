@@ -5,7 +5,7 @@ import {TokenItem, TokenItemOrString, TokenList} from "@songwalker/types";
 export const ROOT_TRACK = 'rootTrack'
 
 export const PATTERN_TRACK_START = {
-    pattern: /^\[[a-zA-Z]\w+]$\n?/m,
+    pattern: /\n?^\[[a-zA-Z]\w+]$\n?/m,
     lookbehind: true,
     // alias: 'selector',
     inside: {

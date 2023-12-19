@@ -1,5 +1,5 @@
-lead=loadInstrument("./instruments/oscillator", {});
-lead2=loadInstrument("./instruments/oscillator", {type:'square'})
+lead=loadInstrument("oscillator", {});
+lead2=loadInstrument("oscillator", {type:'square'})
 lead.config.type='pulse';
 lead.config.pulseWidth=0.5;
 lead.config.envelop.mixer=1;

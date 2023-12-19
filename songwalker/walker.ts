@@ -51,6 +51,10 @@ export type NoteEvent = {
 
 export type SongEvent = NoteEvent;
 
+export type InstrumentBank = {
+    [instrumentPath: string]: InstrumentLoader
+}
+
 export interface NoteHandler {
     onended: ((this: any, ev: Event) => any) | null;
 
@@ -221,6 +225,14 @@ export function walkTrack(
     return trackHandler;
 }
 
+
+export function getRequireCallback(instruments: InstrumentBank) {
+    return function require(path: string) {
+        if (instruments[path])
+            return instruments[path];
+        throw new Error("Instrument not found: " + path);
+    }
+}
 
 const UnassignedInstrument: InstrumentInstance = (noteEvent: NoteEvent) => {
     throw new Error(constants.ERR_NO_INSTRUMENT);
