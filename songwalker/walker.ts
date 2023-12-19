@@ -1,5 +1,6 @@
 import {parseFrequencyString} from "./note";
 import constants from "./constants"
+import {compileSongToCallback} from "@songwalker/compiler";
 
 const BUFFER_DURATION = .1;
 // const START_DELAY = .1;
@@ -79,6 +80,11 @@ export type TrackRenderer = {
 
 export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void> | void;
 
+
+export function compileAndWalk(songSource: string) {
+    const callback = compileSongToCallback(songSource)
+    return walkSong(callback);
+}
 
 export function walkSong(
     songCallback: TrackCallback,

@@ -6,6 +6,7 @@ import {parseTrackList} from "@songwalker/compiler";
 const initialState: DocumentState = {
     mode: "track",
     value: '',
+    isPlaying: false,
     activeEditors: {}
 }
 export const documentActions = createSlice({
@@ -56,6 +57,16 @@ export const documentActions = createSlice({
                 state.activeEditors[action.payload] = false;
             }
         },
+        startPlayback(state: WritableDraft<DocumentState>) {
+            if (state.isPlaying)
+                throw new Error("Playback has already started")
+            state.isPlaying = true
+        },
+        stopPlayback(state: WritableDraft<DocumentState>) {
+            if (!state.isPlaying)
+                throw new Error("Playback has already stopped")
+            state.isPlaying = false;
+        },
         // setActiveEditorPosition(
         //     state: WritableDraft<DocumentState>,
         //     action: {
@@ -93,4 +104,6 @@ export const {
     openActiveEditor,
     closeActiveEditor,
     setDocumentValue,
+    startPlayback,
+    stopPlayback
 } = documentActions.actions

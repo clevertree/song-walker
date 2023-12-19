@@ -138,9 +138,11 @@ ${functionContent}
                 const functionNameToken = findTokenByType(functionTokenList, /^function-name$/);
                 const functionNameString = functionNameToken.content as string;
                 const functionAssignResultToVariableToken = findTokenByType(functionTokenList, /^assign-to-variable$/);
+                let functionIsAwait = false;
 
                 switch (functionNameString) {
                     case 'loadInstrument':
+                        functionIsAwait = true;
                         const firstParamToken = findTokenByType(functionTokenList, /^param-/);
                         if (firstParamToken.type === 'param-string') {
                             const pos = functionTokenList.indexOf(firstParamToken);
@@ -155,9 +157,9 @@ ${functionContent}
                         .map((token) => formatTokenContent(token))
                         .join('');
                     functionNames[commands.setVariable] = true;
-                    return `${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${functionParamString})`;
+                    return `${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${functionIsAwait ? 'await ' : ''}${functionParamString})`;
                 } else {
-                    return functionTokenList.map((token) => formatTokenContent(token)).join('')
+                    return (functionIsAwait ? 'await ' : '') + functionTokenList.map((token) => formatTokenContent(token)).join('')
                 }
             case 'variable-statement':
                 const variableTokenList = [...token.content as TokenList];

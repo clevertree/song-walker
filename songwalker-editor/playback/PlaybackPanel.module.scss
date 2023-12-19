@@ -1,0 +1,5 @@
+.playbackPanel {
+  & > button:not(:disabled) {
+    font-weight: bold;
+  }
+}
