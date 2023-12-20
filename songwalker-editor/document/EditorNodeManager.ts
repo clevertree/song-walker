@@ -132,7 +132,7 @@ export class EditorNodeManager {
         const tokenIDElm = this.getNode().childNodes[tokenID] as HTMLElement
         const startTime = (noteEvent.startTime - noteEvent.destination.context.currentTime);
         const endTime = startTime + noteEvent.duration;
-        console.log('handleSongEvent', noteEvent, tokenID, tokenIDElm, startTime, endTime);
+        // console.log('handleSongEvent', noteEvent, tokenID, tokenIDElm, startTime, endTime);
         setTimeout(() => {
             tokenIDElm.setAttribute('active', '')
         }, startTime > 0 ? startTime * 1000 : 0)

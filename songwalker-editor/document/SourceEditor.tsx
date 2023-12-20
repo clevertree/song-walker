@@ -23,9 +23,10 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
     // console.log('SourceEditor', trackValue, trackName)
     const dispatch = useDispatch();
     const config = useSelector((state: RootState) => state.config);
+    const errors = useSelector((state: RootState) => state.document.errors);
     const updateTimeout = useRef(-1); // we can save timer in useRef and pass it to child
     const songHandler = useContext(PlaybackContext)
-
+    console.log('errors', errors)
     const refEditor = useRef<HTMLInputElement>(null);
     const nodeManager = useMemo(() => new EditorNodeManager(refEditor,
             trackName,
@@ -35,8 +36,6 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
     useEffect(() => {
         if (songHandler) {
             songHandler.addEventCallback(trackName, nodeManager.handleSongEvent.bind(nodeManager))
-        } else {
-
         }
     }, [songHandler]);
 
@@ -65,12 +64,16 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
         }, config.editorUpdateTimeout)
     }, [config.editorUpdateTimeout, dispatch, nodeManager, trackName])
 
+    let errorClass = '';
+    for (const error of errors)
+        if (error.trackName === trackName)
+            errorClass = ' ' + styles.editorError
     return (
         <div className={styles.container}>
             <div className={styles.title}>[{trackName}]</div>
             <div
                 key={trackName}
-                className={styles.editor}
+                className={styles.editor + errorClass}
                 ref={refEditor}
                 contentEditable
                 spellCheck={false}

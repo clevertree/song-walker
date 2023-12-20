@@ -4,7 +4,8 @@ import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@songwalker-editor/types";
 import {SongHandler} from "@songwalker/walker";
 import {PlaybackContext} from "./PlaybackContext";
-import {stopPlayback} from "@songwalker-editor/document/documentActions";
+import {addError, stopPlayback} from "@songwalker-editor/document/documentActions";
+import {SongError} from "@songwalker/types";
 
 interface PlaybackProviderProps {
     children: string | React.JSX.Element | React.JSX.Element[]
@@ -19,12 +20,18 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
     useEffect(() => {
         if (isPlaying) {
             if (!playbackManager.isPlaying()) {
-                const songHandler = playbackManager.compileAndPlay(documentValue);
-                setSongHandler(songHandler);
-                songHandler.waitForSongToFinish()
-                    .then(() => {
+                (async () => {
+                    try {
+                        const songHandler = playbackManager.compileAndPlay(documentValue);
+                        setSongHandler(songHandler);
+                        await songHandler.waitForSongToFinish();
+                    } catch (e) {
+                        console.error(e);
+                        dispatch(addError(e as SongError))
+                    } finally {
                         dispatch(stopPlayback())
-                    })
+                    }
+                })();
             }
         } else {
             if (playbackManager.isPlaying()) {

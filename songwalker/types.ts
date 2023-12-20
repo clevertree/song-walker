@@ -19,3 +19,9 @@ export type TrackRange = {
 export type TrackSourceMap = {
     [trackName: string]: string,
 }
+
+export type SongError = {
+    message: string;
+    tokenID: number;
+    trackName: string;
+}

@@ -2,6 +2,7 @@
   padding: 8px;
 }
 
+
 .title {
 
 }
@@ -92,4 +93,8 @@
   param-factor {
     font-weight: bold;
   }
+}
+
+.editorError {
+  border-color: red;
 }

@@ -2,8 +2,11 @@ import {createSlice} from "@reduxjs/toolkit";
 import {WritableDraft} from "immer/src/types/types-external";
 import {DocumentState} from "@songwalker-editor/types";
 import {parseTrackList} from "@songwalker/compiler";
+import {SongError} from "@songwalker/types";
+
 
 const initialState: DocumentState = {
+    errors: [],
     mode: "track",
     value: '',
     isPlaying: false,
@@ -60,12 +63,18 @@ export const documentActions = createSlice({
         startPlayback(state: WritableDraft<DocumentState>) {
             if (state.isPlaying)
                 throw new Error("Playback has already started")
+            state.errors = [];
             state.isPlaying = true
         },
         stopPlayback(state: WritableDraft<DocumentState>) {
             if (!state.isPlaying)
                 throw new Error("Playback has already stopped")
             state.isPlaying = false;
+        },
+        addError(state: WritableDraft<DocumentState>, action: {
+            payload: SongError
+        }) {
+            state.errors.push(action.payload);
         },
         // setActiveEditorPosition(
         //     state: WritableDraft<DocumentState>,
@@ -101,6 +110,7 @@ export function setDocumentTrackValue(trackName: string, sourceString: string) {
 
 
 export const {
+    addError,
     openActiveEditor,
     closeActiveEditor,
     setDocumentValue,

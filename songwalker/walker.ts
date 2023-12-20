@@ -1,6 +1,7 @@
 import {parseFrequencyString} from "./note";
 import constants from "./constants"
 import {compileSongToCallback} from "@songwalker/compiler";
+import {SongError} from "@songwalker/types";
 
 const BUFFER_DURATION = .1;
 // const START_DELAY = .1;
@@ -203,10 +204,10 @@ export function walkTrack(
             trackState.currentTime += durationWithBPM;
             const waitTime = (trackState.currentTime - trackState.destination.context.currentTime) - trackState.bufferDuration;
             if (waitTime > 0) {
-                console.log(`Waiting ${waitTime}s`, trackState.currentTime, trackState.destination.context.currentTime, durationWithBPM);
+                // console.log(`Waiting ${waitTime}s`, trackState.currentTime, trackState.destination.context.currentTime, durationWithBPM);
                 await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
             } else {
-                console.log(`Not Waiting ${waitTime}s`, trackState.currentTime, trackState.destination.context.currentTime, durationWithBPM);
+                // console.log(`Not Waiting ${waitTime}s`, trackState.currentTime, trackState.destination.context.currentTime, durationWithBPM);
 
             }
         },
@@ -218,16 +219,26 @@ export function walkTrack(
     const trackPromise = trackCallback(trackRenderer)
     const trackHandler: TrackHandler = {
         async waitForTrackToFinish(): Promise<void> {
-            await trackPromise;
-            await Promise.all(subTrackHandlers.map(handler => handler.waitForTrackToFinish()))
-            // for (const subTrackHandler of subTrackHandlers) {
-            //     await subTrackHandler.waitForTrackToFinish();
-            // }
-            const waitTime = trackState.destination.context.currentTime - trackState.currentTime;
-            console.log('waitForTrackToFinish', waitTime, trackCallback, subTrackHandlers)
-            if (waitTime > 0) {
-                console.log(`Waiting for track to end ${waitTime}s`);
-                await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+            try {
+                await trackPromise;
+                await Promise.all(subTrackHandlers.map(handler => handler.waitForTrackToFinish()))
+                // for (const subTrackHandler of subTrackHandlers) {
+                //     await subTrackHandler.waitForTrackToFinish();
+                // }
+                const waitTime = trackState.destination.context.currentTime - trackState.currentTime;
+                console.log('waitForTrackToFinish', waitTime, trackCallback, subTrackHandlers)
+                if (waitTime > 0) {
+                    console.log(`Waiting for track to end ${waitTime}s`);
+                    await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+                }
+            } catch (e) {
+                if (typeof (e as SongError).trackName !== "undefined")
+                    throw e;
+                throw {
+                    message: (e as Error).message,
+                    trackName,
+                    tokenID: trackState.currentTokenID
+                };
             }
         },
         getTrackState() {
