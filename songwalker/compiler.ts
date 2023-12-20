@@ -88,10 +88,10 @@ function formatTrack(trackName: string, trackSource: string, eventMode: boolean)
         debugWrapper = (commandString: string, tokenID: number) => `${commands.setCurrentToken}(${tokenID});${commandString}`
         functionNames[commands.setCurrentToken] = true;
     }
-    let currentTokenID = 0;
+    let currentTokenID = -1;
     const functionContent = tokenList
-        .map((token) => {
-            currentTokenID++;
+        .map((token, tokenID) => {
+            currentTokenID = tokenID;
             if (typeof token === "string")
                 return token;
             return `\t${formatTokenContent(token)};`;

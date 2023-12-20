@@ -4,6 +4,7 @@ import {ConfigObject} from "../config/configActions";
 import {sourceToTokens} from "@songwalker/tokens";
 import {insertIntoSelection, mapTokensToDOM, walkDOM} from "@songwalker-editor/domUtils";
 import {EditorState} from "./SourceEditor";
+import {TrackEvent} from "@songwalker/walker";
 
 export class EditorNodeManager {
     private readonly ref: RefObject<HTMLElement>;
@@ -11,9 +12,11 @@ export class EditorNodeManager {
     private saveTimeout: NodeJS.Timeout | undefined;
     private undoTimeout: NodeJS.Timeout | undefined;
     private lastCursorPosition: number;
+    private trackName: string;
 
-    constructor(editorRef: RefObject<HTMLElement>, initialValue: EditorState) {
+    constructor(editorRef: RefObject<HTMLElement>, trackName: string, initialValue: EditorState) {
         this.ref = editorRef;
+        this.trackName = trackName;
         this.undoBuffer = new Undo<EditorState>(initialValue);
         this.lastCursorPosition = 0;
     }
@@ -125,11 +128,24 @@ export class EditorNodeManager {
 
     }
 
+    handleSongEvent(noteEvent: TrackEvent, tokenID: number) {
+        const tokenIDElm = this.getNode().childNodes[tokenID] as HTMLElement
+        const startTime = (noteEvent.startTime - noteEvent.destination.context.currentTime);
+        const endTime = startTime + noteEvent.duration;
+        console.log('handleSongEvent', noteEvent, tokenID, tokenIDElm, startTime, endTime);
+        setTimeout(() => {
+            tokenIDElm.setAttribute('active', '')
+        }, startTime > 0 ? startTime * 1000 : 0)
+        setTimeout(() => {
+            tokenIDElm.removeAttribute('active')
+        }, endTime > 0 ? endTime * 1000 : 0)
+        // if (startTime > 0) {
+    }
 
-    handleEvent(e: React.SyntheticEvent<HTMLDivElement>, config: ConfigObject) {
-        switch (e.type) {
+    handleInputEvent(noteEvent: React.SyntheticEvent<HTMLDivElement>, config: ConfigObject) {
+        switch (noteEvent.type) {
             default:
-                console.log(e.type, e);
+                console.log(noteEvent.type, noteEvent);
                 break;
             case 'focus':
                 this.setCursorPosition(this.lastCursorPosition)
@@ -142,7 +158,7 @@ export class EditorNodeManager {
                 this.startRetainTimeout(config.editorRetainTimeout);
                 break;
             case 'keydown':
-                let ke = e as React.KeyboardEvent<HTMLDivElement>
+                let ke = noteEvent as React.KeyboardEvent<HTMLDivElement>
                 switch (ke.code) {
                     case 'Enter':
                         ke.preventDefault();

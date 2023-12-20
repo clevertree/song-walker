@@ -1,11 +1,12 @@
 "use client"
 
-import React, {useCallback, useEffect, useMemo, useRef} from 'react'
+import React, {useCallback, useContext, useEffect, useMemo, useRef} from 'react'
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "../types";
 import styles from "./SourceEditor.module.scss"
 import {EditorNodeManager} from "@songwalker-editor/document/EditorNodeManager";
 import {setDocumentTrackValue} from "@songwalker-editor/document/documentActions";
+import {PlaybackContext} from "@songwalker-editor/playback/PlaybackContext";
 
 
 interface SourceEditorProps {
@@ -23,11 +24,21 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
     const dispatch = useDispatch();
     const config = useSelector((state: RootState) => state.config);
     const updateTimeout = useRef(-1); // we can save timer in useRef and pass it to child
+    const songHandler = useContext(PlaybackContext)
 
     const refEditor = useRef<HTMLInputElement>(null);
     const nodeManager = useMemo(() => new EditorNodeManager(refEditor,
+            trackName,
             {value: trackValue, cursorPosition: 0}),
         [trackName])
+
+    useEffect(() => {
+        if (songHandler) {
+            songHandler.addEventCallback(trackName, nodeManager.handleSongEvent.bind(nodeManager))
+        } else {
+
+        }
+    }, [songHandler]);
 
     useEffect(() => {
         const cursorPosition = nodeManager.getLastCursorPosition();
@@ -44,9 +55,9 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
 
     }, [nodeManager, trackValue, updateTimeout]);
 
-    const handleEvent = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => nodeManager.handleEvent(e, config), [nodeManager])
+    const handleEvent = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => nodeManager.handleInputEvent(e, config), [nodeManager])
     const handleChangeEvent = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => {
-        nodeManager.handleEvent(e, config);
+        nodeManager.handleInputEvent(e, config);
         console.log('handleChangeEvent', e)
         updateTimeout.current && window.clearTimeout(updateTimeout.current);
         updateTimeout.current = window.setTimeout(() => {

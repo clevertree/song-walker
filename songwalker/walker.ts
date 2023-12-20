@@ -8,15 +8,17 @@ const DEFAULT_BPM = 60;
 const DEFAULT_NOTE_DURATION = 1;
 const DEFAULT_NOTE_VELOCITY = 1;
 
-export type SongEventHandler = (songEvent: SongEvent, tokenID: number) => void;
+export type TrackEventHandler = (trackEvent: TrackEvent, tokenID: number) => void;
 export type SongState = {
     isPlaying: boolean,
-    eventHandlers: SongEventHandler[],
+    trackEventHandlers: {
+        [trackName: string]: TrackEventHandler[]
+    },
     // playFrequency: (trackState: TrackState, frequency: string, duration: number, ...args: any[]) => void;
 };
 
 export type SongHandler = {
-    addEventCallback: (callback: SongEventHandler) => void,
+    addEventCallback: (trackName: string, callback: TrackEventHandler) => void,
     waitForSongToFinish: () => Promise<void>
     stopPlayback: () => void,
     getRootTrackState: () => TrackState
@@ -50,7 +52,7 @@ export type NoteEvent = {
     handler?: NoteHandler
 }
 
-export type SongEvent = NoteEvent;
+export type TrackEvent = NoteEvent;
 
 export type InstrumentBank = {
     [instrumentPath: string]: InstrumentLoader
@@ -102,7 +104,7 @@ export function walkSong(
         bufferDuration: BUFFER_DURATION
     }
     const songState: SongState = {
-        eventHandlers: [],
+        trackEventHandlers: {},
         isPlaying: true
     }
     const songHandler: SongHandler = {
@@ -112,8 +114,10 @@ export function walkSong(
         async waitForSongToFinish(): Promise<void> {
             await trackHandler.waitForTrackToFinish();
         },
-        addEventCallback: function (callback: SongEventHandler) {
-            songState.eventHandlers.push(callback)
+        addEventCallback: function (trackName: string, callback: TrackEventHandler) {
+            if (!songState.trackEventHandlers[trackName])
+                songState.trackEventHandlers[trackName] = [];
+            songState.trackEventHandlers[trackName].push(callback)
         },
         getRootTrackState: function () {
             return trackState;
@@ -128,7 +132,9 @@ export function walkTrack(
     trackCallback: TrackCallback,
     trackState: TrackState,
     songState: SongState) {
+    const trackName = trackCallback.name;
     const subTrackHandlers: TrackHandler[] = [];
+    const eventHandlers = songState.trackEventHandlers[trackName] || [];
     const trackRenderer: TrackRenderer = {
         trackState,
         async loadInstrument(instrumentLoader: InstrumentLoader, config: object | undefined): Promise<InstrumentInstance> {
@@ -163,7 +169,7 @@ export function walkTrack(
             //     duration = parseDurationString(duration, trackBPM);
             // console.log("noteEvent", noteEvent)
             noteEvent.handler = trackState.instrument(noteEvent);
-            for (const eventHandler of songState.eventHandlers) {
+            for (const eventHandler of eventHandlers) {
                 eventHandler(noteEvent, trackState.currentTokenID)
             }
             return noteEvent;

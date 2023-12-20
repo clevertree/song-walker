@@ -8,7 +8,7 @@ import MenuPanel from "./menu/MenuPanel";
 import createStore from "./store";
 import {ActiveEditors} from "@songwalker-editor/document/ActiveEditors";
 import {setDocumentValue} from "@songwalker-editor/document/documentActions";
-import PlaybackPanel from "@songwalker-editor/playback/PlaybackPanel";
+import {PlaybackProvider} from "@songwalker-editor/playback/PlaybackProvider";
 
 interface SongEditorComponentProps {
     initialValue: string,
@@ -25,13 +25,14 @@ export default function SongEditorComponent(props: SongEditorComponentProps) {
     console.log('SongEditorComponent', props, store);
     return (
         <Provider store={store}>
-            <div
-                className={styles.container + (className ? ' ' + className : '')}
-            >
-                <MenuPanel/>
-                <PlaybackPanel/>
-                <ActiveEditors/>
-            </div>
+            <PlaybackProvider>
+                <div
+                    className={styles.container + (className ? ' ' + className : '')}
+                >
+                    <MenuPanel/>
+                    <ActiveEditors/>
+                </div>
+            </PlaybackProvider>
         </Provider>)
 }
 
