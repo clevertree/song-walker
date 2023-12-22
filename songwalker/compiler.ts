@@ -21,7 +21,7 @@ const DEFAULT_EXPORT_STATEMENT = `module.exports=`;
 export function compileSongToCallback(songSource: string, instruments: InstrumentBank = Instruments) {
     const javascriptSource = compileSongToJavascript(songSource, true)
 
-    const require = getRequireCallback(Instruments)
+    const require = getRequireCallback(instruments)
     const callback = eval(javascriptSource);
 
     console.log('callback', callback)
@@ -83,9 +83,13 @@ export function compileTrackTokensToJavascript(
 function formatTrack(trackName: string, trackSource: string, eventMode: boolean) {
     const tokenList = sourceToTokens(trackSource);
     const functionNames: { [key: string]: boolean } = {};
-    let debugWrapper = (s: string, t: number) => s + '';
+    let debugMapper = (s: string, t: number) => s + '';
     if (eventMode) {
-        debugWrapper = (commandString: string, tokenID: number) => `${commands.setCurrentToken}(${tokenID});${commandString}`
+        debugMapper = (commandString: string, tokenID: number) => {
+            if (commandString.trim() === '')
+                return commandString;
+            return `${commands.setCurrentToken}(${tokenID});${commandString}`
+        }
         functionNames[commands.setCurrentToken] = true;
     }
     let currentTokenID = -1;
@@ -96,6 +100,7 @@ function formatTrack(trackName: string, trackSource: string, eventMode: boolean)
                 return token;
             return `\t${formatTokenContent(token)};`;
         })
+        .map(debugMapper)
         .join('');
     return `async function ${trackName}(${variables.trackRenderer}) {
 \tconst {${formatFunctionList()}} = ${variables.trackRenderer};
@@ -173,20 +178,20 @@ ${functionContent}
                 const frequencyToken = findTokenByType(token.content as TokenList, /^play-frequency$/);
                 const noteArgs = findTokensByType(token.content as TokenList, /^play-arg$/);
                 functionNames[commands.playNote] = true;
-                return debugWrapper(`${commands.playNote}('${frequencyToken.content}'${noteArgs.length === 0 ? ''
-                    : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`, currentTokenID);
+                return `${commands.playNote}('${frequencyToken.content}'${noteArgs.length === 0 ? ''
+                    : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`;
             case 'play-arg':
                 const playArgParamToken = findTokenByType(token.content as TokenList, /^param-/);
                 return formatTokenContent(playArgParamToken);
             case 'play-track-statement':
                 const trackNameToken = findTokenByType(token.content as TokenList, /^play-track-name$/);
                 functionNames[commands.startTrack] = true;
-                return debugWrapper(`${commands.startTrack}(${trackNameToken.content})`, currentTokenID);
+                return `${commands.startTrack}(${trackNameToken.content})`;
             case 'wait-statement':
                 const waitValues = tokensToKeys(token.content as TokenList);
                 let numericString = formatNumericString(waitValues['param-numeric'], waitValues['param-factor']);
                 functionNames[commands.wait] = true;
-                return debugWrapper(`await ${commands.wait}(${numericString})`, currentTokenID);
+                return `await ${commands.wait}(${numericString})`;
             default:
             case 'unknown':
                 throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${currentTokenID}`);

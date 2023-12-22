@@ -67,8 +67,8 @@ export const documentActions = createSlice({
             state.isPlaying = true
         },
         stopPlayback(state: WritableDraft<DocumentState>) {
-            if (!state.isPlaying)
-                throw new Error("Playback has already stopped")
+            // if (!state.isPlaying)
+            //     throw new Error("Playback has already stopped")
             state.isPlaying = false;
         },
         addError(state: WritableDraft<DocumentState>, action: {
@@ -109,8 +109,16 @@ export function setDocumentTrackValue(trackName: string, sourceString: string) {
 }
 
 
+export function addError(error: SongError) {
+    return documentActions.actions.addError({
+        message: error.message,
+        trackName: error.trackName,
+        tokenID: error.tokenID
+    })
+}
+
+
 export const {
-    addError,
     openActiveEditor,
     closeActiveEditor,
     setDocumentValue,

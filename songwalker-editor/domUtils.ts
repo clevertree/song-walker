@@ -57,24 +57,24 @@ export function mapTokensToDOM(tokenList: TokenList, container: HTMLElement) {
         const oldNode = childNodes[elmID++];
         // console.log('token', token, oldNode);
         if (typeof token === "string") {
-            if (token.trim().length > 0) {
-                let newNode: HTMLElement = <HTMLElement>oldNode;
-                if (!newNode || newNode.nodeName !== 'UNKNOWN') {
-                    newNode = document.createElement('unknown');
-                } else {
-                    // console.info("Reusing", oldNode);
-                }
-                newNode.innerText = token;
-                return newNode
+            // if (token.trim().length > 0) {
+            //     let newNode: HTMLElement = <HTMLElement>oldNode;
+            //     if (!newNode || newNode.nodeName !== 'UNKNOWN') {
+            //         newNode = document.createElement('token-unknown');
+            //     } else {
+            //         // console.info("Reusing", oldNode);
+            //     }
+            //     newNode.innerText = token;
+            //     return newNode
+            // } else {
+            if (oldNode && oldNode.nodeType === 3) {
+                oldNode.textContent = token;
+                // console.info("Reusing", oldNode);
+                return oldNode;
             } else {
-                if (oldNode && oldNode.nodeType === 3) {
-                    oldNode.textContent = token;
-                    // console.info("Reusing", oldNode);
-                    return oldNode;
-                } else {
-                    return document.createTextNode(token);
-                }
+                return document.createTextNode(token);
             }
+            // }
         } else {
             let newNode: HTMLElement = <HTMLElement>oldNode;
             if (!newNode || newNode.nodeName.toLowerCase() !== token.type) {

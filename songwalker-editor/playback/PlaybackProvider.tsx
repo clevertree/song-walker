@@ -1,8 +1,7 @@
-import React, {useEffect, useMemo, useState} from "react";
+import React, {useEffect, useMemo} from "react";
 import {PlaybackManager} from "@songwalker-editor/playback/PlaybackManager";
 import {useDispatch, useSelector} from "react-redux";
 import {RootState} from "@songwalker-editor/types";
-import {SongHandler} from "@songwalker/walker";
 import {PlaybackContext} from "./PlaybackContext";
 import {addError, stopPlayback} from "@songwalker-editor/document/documentActions";
 import {SongError} from "@songwalker/types";
@@ -16,14 +15,16 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
     const playbackManager = useMemo<PlaybackManager>(() => new PlaybackManager(), [])
     const isPlaying = useSelector((state: RootState) => state.document.isPlaying);
     const documentValue = useSelector((state: RootState) => state.document.value);
-    const [songHandler, setSongHandler] = useState<SongHandler | null>(null)
+    // const [songHandler, setSongHandler] = useState<SongHandler | null>(null)
     useEffect(() => {
+        console.log('isPlaying', isPlaying)
         if (isPlaying) {
             if (!playbackManager.isPlaying()) {
                 (async () => {
                     try {
-                        const songHandler = playbackManager.compileAndPlay(documentValue);
-                        setSongHandler(songHandler);
+                        const songHandler = playbackManager.compile(documentValue);
+                        // setSongHandler(songHandler);
+                        songHandler.startPlayback();
                         await songHandler.waitForSongToFinish();
                     } catch (e) {
                         console.error(e);
@@ -38,9 +39,9 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
                 playbackManager.stopAllPlayback()
             }
         }
-    }, [documentValue, isPlaying, playbackManager]);
+    }, [dispatch, documentValue, isPlaying, playbackManager]);
 
-    return <PlaybackContext.Provider value={songHandler}>
+    return <PlaybackContext.Provider value={playbackManager}>
         {props.children}
     </PlaybackContext.Provider>
 }

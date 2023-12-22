@@ -25,7 +25,7 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
     const config = useSelector((state: RootState) => state.config);
     const errors = useSelector((state: RootState) => state.document.errors);
     const updateTimeout = useRef(-1); // we can save timer in useRef and pass it to child
-    const songHandler = useContext(PlaybackContext)
+    const playbackManager = useContext(PlaybackContext)
     console.log('errors', errors)
     const refEditor = useRef<HTMLInputElement>(null);
     const nodeManager = useMemo(() => new EditorNodeManager(refEditor,
@@ -34,10 +34,8 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
         [trackName])
 
     useEffect(() => {
-        if (songHandler) {
-            songHandler.addEventCallback(trackName, nodeManager.handleSongEvent.bind(nodeManager))
-        }
-    }, [songHandler]);
+        playbackManager.addTrackEventHandler(trackName, nodeManager.handleSongEvent.bind(nodeManager))
+    }, [playbackManager]);
 
     useEffect(() => {
         const cursorPosition = nodeManager.getLastCursorPosition();

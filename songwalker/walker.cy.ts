@@ -1,4 +1,4 @@
-import {InstrumentBank, InstrumentInstance, TrackRenderer, walkSong} from "./walker";
+import {getSongPlayer, InstrumentBank, InstrumentInstance, TrackRenderer} from "./walker";
 import constants from "./constants";
 
 describe('songPlayer', () => {
@@ -8,8 +8,9 @@ describe('songPlayer', () => {
 
     it('plays sub-tracks', async () => {
         const logCallback = cy.stub();
-        const songInstance = walkSong(testSong);
-        songInstance.addEventCallback(logCallback)
+        const songInstance = getSongPlayer(testSong, {
+            handleTrackEvent: logCallback
+        });
         await songInstance.waitForSongToFinish();
         const status = songInstance.getRootTrackState();
         // @ts-ignore
@@ -20,7 +21,7 @@ describe('songPlayer', () => {
     })
 
     it('playing a song without an instrument throws an error ', async () => {
-        const songInstance = walkSong(testSongNoInstrument);
+        const songInstance = getSongPlayer(testSongNoInstrument);
         try {
             await songInstance.waitForSongToFinish();
             // noinspection ExceptionCaughtLocallyJS

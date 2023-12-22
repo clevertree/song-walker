@@ -107,6 +107,7 @@ export const LANGUAGE = {
             'param-factor': /[BTDt]/,
         }
     },
+    'token-unknown': /\S+/
     // punctuation: /;/
     // 'newline': REGEXP_NEWLINE,
     // 'play-statement': REGEXP_PLAY_STATEMENT,

@@ -13,21 +13,34 @@
   white-space: pre;
   padding: .2em;
   color: #AAA;
+  overflow: hidden;
 
   //operator,
   //delimiter,
   //punctuation {
   //}
-
-  [active] {
-    font-style: italic;
-    //text-decoration: underline;
-    font-weight: bold;
+  & > :not([active]) {
+    padding: 0 2px;
+    transition: all 1s
   }
 
-  unknown-token {
-    color: #ab1b00;
+  & > [active] {
+    //font-style: italic;
+    //text-decoration: underline;
+    //font-weight: bold;
+    //transition: background-color;
+    background-color: #050;
+    border-radius: 12px;
+    padding: 2px 8px;
+    margin: -2px -6px;
+  }
 
+  token-unknown {
+    color: #939393;
+
+    &[active] {
+      color: #ab1b00;
+    }
   }
 
   & > *:hover {
@@ -36,12 +49,12 @@
 
 
   wait-statement {
-    margin-right: 4px;
+    //margin-right: 4px;
     color: #F5E960;
   }
 
   play-statement {
-    margin-right: 4px;
+    //margin-right: 4px;
     color: #00FF09;
 
     & > play-frequency {
@@ -50,7 +63,7 @@
   }
 
   play-track-statement {
-    margin-right: 4px;
+    //margin-right: 4px;
     color: #00FF09;
     font-weight: bold;
   }

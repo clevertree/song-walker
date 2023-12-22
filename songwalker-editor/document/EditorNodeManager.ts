@@ -4,7 +4,7 @@ import {ConfigObject} from "../config/configActions";
 import {sourceToTokens} from "@songwalker/tokens";
 import {insertIntoSelection, mapTokensToDOM, walkDOM} from "@songwalker-editor/domUtils";
 import {EditorState} from "./SourceEditor";
-import {TrackEvent} from "@songwalker/walker";
+import {SongTrackEvent} from "@songwalker/types";
 
 export class EditorNodeManager {
     private readonly ref: RefObject<HTMLElement>;
@@ -128,17 +128,13 @@ export class EditorNodeManager {
 
     }
 
-    handleSongEvent(noteEvent: TrackEvent, tokenID: number) {
+    async handleSongEvent(trackEvent: SongTrackEvent, tokenID: number) {
         const tokenIDElm = this.getNode().childNodes[tokenID] as HTMLElement
-        const startTime = (noteEvent.startTime - noteEvent.destination.context.currentTime);
-        const endTime = startTime + noteEvent.duration;
-        // console.log('handleSongEvent', noteEvent, tokenID, tokenIDElm, startTime, endTime);
-        setTimeout(() => {
-            tokenIDElm.setAttribute('active', '')
-        }, startTime > 0 ? startTime * 1000 : 0)
-        setTimeout(() => {
-            tokenIDElm.removeAttribute('active')
-        }, endTime > 0 ? endTime * 1000 : 0)
+        // console.log('handleSongEvent', trackEvent, tokenID)
+        await trackEvent.waitForEventStart()
+        tokenIDElm.setAttribute('active', '')
+        await trackEvent.waitForEventEnd()
+        tokenIDElm.removeAttribute('active')
         // if (startTime > 0) {
     }
 

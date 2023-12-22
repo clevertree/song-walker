@@ -1,5 +1,5 @@
 import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/envelope";
-import {InstrumentInstance, NoteEvent} from "@songwalker/walker";
+import {InstrumentInstance, PlayNoteEvent} from "@songwalker/walker";
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 const DEFAULT_PULSE_WIDTH = 0;
@@ -18,7 +18,7 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig 
 
     // TODO?
     // return function(eventName, ...args) {
-    return function (noteEvent: NoteEvent) {
+    return function (noteEvent: PlayNoteEvent) {
         const {frequency, startTime, duration, velocity} = noteEvent;
         // const gainNode = audioContext.createGain(); //to get smooth rise/fall
         const endTime = startTime + duration;

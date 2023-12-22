@@ -1,5 +1,5 @@
 import {createContext} from "react";
-import {SongHandler} from "@songwalker/walker";
+import {PlaybackManager} from "@songwalker-editor/playback/PlaybackManager";
 
-export const PlaybackContext = createContext<SongHandler | null>(null)
+export const PlaybackContext = createContext<PlaybackManager>(new PlaybackManager())
 

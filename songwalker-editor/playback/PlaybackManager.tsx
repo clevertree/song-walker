@@ -1,40 +1,42 @@
-import {compileAndWalk, SongHandler, TrackCallback, walkSong} from "@songwalker/walker";
+import {compileToSongPlayer,} from "@songwalker/walker";
+import {HandlesTrackEvents, SongHandler, SongTrackEvent, TrackEventHandler} from "@songwalker/types";
 
-export class PlaybackManager {
-    private activeSongs: Array<SongHandler> = [];
+export class PlaybackManager implements HandlesTrackEvents {
 
-    constructor() {
-
-    }
+    private activeSong: SongHandler | null = null;
+    private trackEventHandlers: {
+        [trackName: string]: Array<TrackEventHandler>
+    } = {};
 
     isPlaying() {
-        return this.activeSongs.length > 0;
+        return !!this.activeSong;
     }
 
     stopAllPlayback() {
-        for (const activeSong of this.activeSongs) {
-            activeSong.stopPlayback();
+        if (!this.activeSong)
+            throw new Error("Song is not playing");
+        this.activeSong.stopPlayback();
+        this.activeSong = null;
+    }
+
+    compile(songSource: string) {
+        return this.activeSong = compileToSongPlayer(songSource, this);
+    }
+
+    addTrackEventHandler(trackName: string, callback: TrackEventHandler) {
+        if (!this.trackEventHandlers[trackName])
+            this.trackEventHandlers[trackName] = [];
+        this.trackEventHandlers[trackName].push(callback)
+    }
+
+    handleTrackEvent(trackName: string, trackEvent: SongTrackEvent, tokenID: number): void {
+        const eventHandlers = this.trackEventHandlers[trackName];
+        if (eventHandlers) {
+            for (const eventHandler of eventHandlers) {
+                eventHandler(trackEvent, tokenID)
+            }
         }
-        this.activeSongs = [];
     }
-
-    compileAndPlay(songSource: string) {
-        const activeSong = compileAndWalk(songSource);
-        this.activeSongs.push(activeSong)
-        activeSong.waitForSongToFinish().then(() => {
-            const pos = this.activeSongs.indexOf(activeSong);
-            if (pos === -1)
-                throw new Error("Active song not found");
-            this.activeSongs.splice(pos, 1);
-            console.log("Removing song", this.activeSongs)
-        })
-        return activeSong;
-    }
-
-    walkSong(songCallback: TrackCallback) {
-        this.activeSongs.push(walkSong(songCallback))
-
-    }
-
 
 }
+
