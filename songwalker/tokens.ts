@@ -13,15 +13,15 @@ export const PATTERN_TRACK_START = {
         // punctuation: /[\[\]]/
     }
 }
+const PATTERN_DURATION = {
+    pattern: /\d*[\/.]?\d{1,2}([BTDt])?;?/,
+    inside: {
+        'param-numeric': /\d*[\/.]?\d+/,
+        'param-factor': /[BTDt]/,
+    }
+};
 export const LANGUAGE = {
     'track-start': PATTERN_TRACK_START,
-    'play-track-statement': {
-        pattern: /@\w+/,
-        inside: {
-            'play-track-identifier': /^@/,
-            'play-track-name': /\w+/
-        }
-    },
     // 'import': {
     //     pattern: /import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/,
     //     inside: Prism.languages.javascript
@@ -41,13 +41,7 @@ export const LANGUAGE = {
                 greedy: true
             },
             'param-variable': /\b[a-zA-Z_]\w*\b/,
-            'param-duration': {
-                pattern: /\d*[\/.]?\d{1,2}([BTDt])?/,
-                inside: {
-                    'param-numeric': /\d*[\/.]?\d+/,
-                    'param-factor': /[BTDt]/,
-                }
-            },
+            'param-duration': PATTERN_DURATION,
             // 'punctuation': /[{}[\];(),.:]/
         }
     },
@@ -65,13 +59,7 @@ export const LANGUAGE = {
             },
 
             'param-variable': /\b[a-zA-Z_]\w*\b/,
-            'param-duration': {
-                pattern: /\d*[\/.]?\d{1,2}([BTDt])?/,
-                inside: {
-                    'param-numeric': /\d*[\/.]?\d+/,
-                    'param-factor': /[BTDt]/,
-                }
-            },
+            'param-duration': PATTERN_DURATION,
             // 'param-numeric': /\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,
             // 'punctuation': /[={}[\];(),.:]/
             //     }
@@ -79,34 +67,22 @@ export const LANGUAGE = {
             // punctuation: /;/
         }
     },
-    'play-statement': {
-        pattern: /([A-G][#qb]{0,2}\d)(:[^:;\s]*)*;?/,
+    'play-track-statement': {
+        pattern: /@\w+/,
         inside: {
-            'play-frequency': /[A-G][#qb]{0,2}\d/,
-            'play-arg': {
-                pattern: /:[^:;\s]+/,
-                inside: {
-                    'param-duration': {
-                        pattern: /\d*[\/.]?\d{1,2}([BTDt])?/,
-                        inside: {
-                            'param-numeric': /\d*[\/.]?\d+/,
-                            'param-factor': /[BTDt]/,
-                        }
-                    },
-                    'param-string': /[^:;]+/,
-                    // delimiter: /:/
-                },
-            },
+            'play-track-identifier': /^@/,
+            'play-track-name': /\w+/
+        }
+    },
+    'play-statement': {
+        pattern: /[a-zA-Z]\w*(:[^:;\s]*)*;?/,
+        inside: {
+            'play-note': /^\w+/,
+            'play-arg': /:\w*/,
             // punctuation: /;/
         },
     },
-    'wait-statement': {
-        pattern: /\d*[\/.]?\d{1,2}([BTDt])?;?/,
-        inside: {
-            'param-numeric': /\d*[\/.]?\d+/,
-            'param-factor': /[BTDt]/,
-        }
-    },
+    'wait-statement': PATTERN_DURATION,
     'token-unknown': /\S+/
     // punctuation: /;/
     // 'newline': REGEXP_NEWLINE,

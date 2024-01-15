@@ -1,28 +1,41 @@
-import {getSongPlayer, InstrumentBank, InstrumentInstance, TrackRenderer} from "./walker";
+import {getSongPlayer} from "./walker";
 import constants from "./constants";
+import {InstrumentInstance, TrackRenderer} from "@songwalker/types";
 
 describe('songPlayer', () => {
-    let instrumentBank: InstrumentBank = {
-        testInstrument
-    }
-
     it('plays sub-tracks', async () => {
         const logCallback = cy.stub();
         const songInstance = getSongPlayer(testSong, {
             handleTrackEvent: logCallback
         });
+        songInstance.startPlayback();
         await songInstance.waitForSongToFinish();
         const status = songInstance.getRootTrackState();
-        // @ts-ignore
-        expect(status.instrument.callCount).to.eq(16)
-        expect(logCallback.callCount).to.eq(16)
+        expect(logCallback.callCount).to.eq(37)
         expect(status.position).to.eq(4)
         expect(status.currentTime).to.eq(2.25)
     })
 
+    it('plays percussion track', async () => {
+        const logCallback = cy.stub();
+        const songInstance = getSongPlayer(testTrackPercussion, {
+            handleTrackEvent: logCallback
+        });
+        songInstance.startPlayback();
+        await songInstance.waitForSongToFinish();
+        const status = songInstance.getRootTrackState();
+        expect(logCallback.callCount).to.eq(23)
+        console.log(logCallback);
+        expect(status.position).to.eq(8)
+        expect(status.currentTime).to.eq(2)
+    })
+
     it('playing a song without an instrument throws an error ', async () => {
-        const songInstance = getSongPlayer(testSongNoInstrument);
+        const songInstance = getSongPlayer(testSongNoInstrument, {
+            handleTrackEvent: cy.stub()
+        });
         try {
+            songInstance.startPlayback();
             await songInstance.waitForSongToFinish();
             // noinspection ExceptionCaughtLocallyJS
             throw new Error("Song finished without error")
@@ -33,14 +46,10 @@ describe('songPlayer', () => {
     })
 })
 
-function testInstrument(config: object): InstrumentInstance {
-    return cy.stub()
-}
-
 
 async function testSong(trackRenderer: TrackRenderer) {
     const {wait: w, loadInstrument} = trackRenderer;
-    await loadInstrument(testInstrument)
+    await loadInstrument(testMelodicInstrument)
     trackRenderer.setVariable('beatsPerMinute', 160)
     trackRenderer.startTrack(testTrack)
     await w(2);
@@ -84,4 +93,57 @@ async function testTrack(trackRenderer: TrackRenderer) {
     n("D5", 1 / 4);
     await w(1 / 4);
     // n("C5", 1 / 4);
+}
+
+
+function testMelodicInstrument(config: object): InstrumentInstance {
+    return function (noteEvent) {
+        const {frequency, value} = noteEvent;
+        if (frequency === null)
+            throw new Error("Invalid melodic string: " + value)
+        return {
+            onended: cy.stub(),
+            stop: cy.stub(),
+        }
+    }
+}
+
+function testPercussionInstrument(config: object): InstrumentInstance {
+    return function (noteEvent) {
+        const {frequency, value} = noteEvent;
+        if (frequency !== null)
+            throw new Error("Invalid percussive string: " + value)
+        return {
+            onended: cy.stub(),
+            stop: cy.stub(),
+        }
+    }
+}
+
+async function testTrackPercussion(trackRenderer: TrackRenderer) {
+    const {playNote: n, wait: w, setVariable: v, loadInstrument} = trackRenderer;
+    await loadInstrument(testPercussionInstrument)
+    v('beatsPerMinute', 240)
+    v('durationDivisor', 16)
+    n("kick");
+    n("hat");
+    await w(1);
+    n("hat");
+    await w(1);
+    n("snare");
+    n("hat");
+    await w(1);
+    n("hat");
+    await w(1);
+    n("kick");
+    n("hat");
+    await w(1);
+    n("kick");
+    n("hat");
+    await w(1);
+    n("snare");
+    n("hat");
+    await w(1);
+    n("hat");
+    await w(1);
 }

@@ -25,23 +25,26 @@ const DEFAULT_FREQUENCY_A4 = 432;
 //     return noteLength || DEFAULT_VELOCITY;
 // }
 //
-// function isFrequencyString(noteString) {
-//     return /^[A-G][#qb]{0,2}\d?$/.test(noteString);
-// }
+
+const REGEX_FREQ = /^([A-G][#qb]{0,2})(\d)?$/
+
+export function matchFrequencyString(noteString: string) {
+    return noteString.match(REGEX_FREQ);
+}
 
 export function parseFrequencyString(noteString: string) {
-    const {frequency} = parseFrequencyParts(noteString);
+    const match = matchFrequencyString(noteString);
+    if (!match)
+        return null;
+    const [, note, octaveString] = match;
+    const octave: number = parseInt(octaveString);
+    // if (isNaN(octave))
+    //     throw new Error("Invalid octave value: " + noteString);
+    const {frequency} = parseFrequencyParts(note, octave);
     return frequency;
 }
 
-export function parseFrequencyParts(noteString: string) {
-    if (!noteString)
-        throw new Error("Frequency is null");
-
-    const note = noteString.slice(0, -1);
-    const octave = parseInt(noteString.slice(-1));
-    if (isNaN(octave))
-        throw new Error("Invalid octave value: " + noteString);
+export function parseFrequencyParts(note: string, octave: number) {
     if (typeof LIST_NOTE_NAMES[note] === "undefined")
         throw new Error("Unrecognized Note: " + note);
     let keyNumber: number = LIST_NOTE_NAMES[note];

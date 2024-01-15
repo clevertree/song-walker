@@ -10,18 +10,17 @@ import {
 import commands from "./commands";
 import variables from "./variables";
 import {TokenItem, TokenItemOrString, TokenList, TrackSourceMap} from "@songwalker/types";
-import {getRequireCallback, InstrumentBank} from "@songwalker/walker";
-import Instruments from "./instruments/index";
-
+// import {getRequireCallback, InstrumentBank} from "@songwalker/walker";
+// import Instruments from "../instruments/";
 
 // const DEFAULT_EXPORT_STATEMENT = `export default `;
 const DEFAULT_EXPORT_STATEMENT = `module.exports=`;
 
 
-export function compileSongToCallback(songSource: string, instruments: InstrumentBank = Instruments) {
+export function compileSongToCallback(songSource: string) { // instruments: InstrumentBank = Instruments
     const javascriptSource = compileSongToJavascript(songSource, true)
 
-    const require = getRequireCallback(instruments)
+    // const require = getRequireCallback(instruments)
     const callback = eval(javascriptSource);
 
     console.log('callback', callback)
@@ -145,15 +144,15 @@ ${functionContent}
                 const functionAssignResultToVariableToken = findTokenByType(functionTokenList, /^assign-to-variable$/);
                 let functionIsAwait = false;
 
-                switch (functionNameString) {
-                    case 'loadInstrument':
-                        functionIsAwait = true;
-                        const firstParamToken = findTokenByType(functionTokenList, /^param-/);
-                        if (firstParamToken.type === 'param-string') {
-                            const pos = functionTokenList.indexOf(firstParamToken);
-                            functionTokenList.splice(pos, 1, `require(${firstParamToken.content})`)
-                        }
-                }
+                // switch (functionNameString) {
+                //     case 'loadInstrument':
+                //         functionIsAwait = true;
+                //         const firstParamToken = findTokenByType(functionTokenList, /^param-/);
+                //         if (firstParamToken.type === 'param-string') {
+                //             const pos = functionTokenList.indexOf(firstParamToken);
+                //             functionTokenList.splice(pos, 1, `require(${firstParamToken.content})`)
+                //         }
+                // }
                 functionNames[functionNameString] = true;
                 if (functionAssignResultToVariableToken) {
                     const functionTokenPos = functionTokenList.indexOf(functionNameToken);

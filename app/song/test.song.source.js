@@ -9,25 +9,36 @@ instrument=lead2
 
 [track1]
 
+durationDivisor=16
 noteDuration=1/6
-C5 1/4
-C4 1/4
-G4 1/4
-Eb4 1/4
-Eb5 1/4
-F5 1/4
-Eb5 1/4
-D5 1/4
-C5 1/4
-C4 1/4
-G4 1/4
-Eb4 1/4
-D5 1/4
-C4 1/4
-Bb4 1/4
+C5 1
+C4 1
+G4 1
+Eb4 1
+Eb5 1
+F5 1
+Eb5 1
+D5 1
+C5 1
+C4 1
+G4 1
+Eb4 1
+D5 1
+C4 1
+Bb4 1
 
 [beat1]
-
+durationDivisor=16
+velocityDivisor=10
+hat     kick    2
+hat:3           2
+hat     snare   2
+hat:3           2
+hat     kick    2
+hat:3   kick:6  2
+hat     snare   2
+hat:3           1
+hat:3           1
 
 
 `

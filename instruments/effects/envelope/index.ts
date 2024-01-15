@@ -1,16 +1,24 @@
-import {NoteEvent} from "@songwalker/song/walker";
+import {PlayNoteEvent} from "@songwalker/walker";
+import {InstrumentPreset} from "@songwalker/types";
 
 const DEFAULT_VELOCITY = 1;
 
 export type EnvelopeEffectConfig = {
     mixer?: number,
-    attack?: number
+    attack?: number,
+    // hold?: number,
+    // decay?: number,
+    // sustain?: number,
+    release?: number
 }
+
+export type EnvelopeEffectPreset = InstrumentPreset<EnvelopeEffectConfig>
+
 export default function EnvelopeEffect(config: EnvelopeEffectConfig = {}) {
     console.log('EnvelopeEffect', config, config.mixer);
     // const destination = audioCtx.destination;
     // let activeOscillators = [];
-    return function (noteEvent: NoteEvent) {
+    return function (noteEvent: PlayNoteEvent) {
         const {destination, startTime, duration, velocity} = noteEvent;
         let amplitude = config.mixer || 1;
         if (velocity !== null)

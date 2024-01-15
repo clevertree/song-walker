@@ -1,4 +1,4 @@
-import {InstrumentInstance} from "@songwalker/walker";
+import {NoteHandler, PlayNoteEvent} from "@songwalker/walker";
 
 export type TokenItem = {
     type: string,
@@ -61,7 +61,58 @@ export type TrackState = {
     // promise: Promise<void> | null
 }
 
+export type TrackRenderer = {
+    trackState: TrackState,
+    playNote: (noteString: string, duration?: number, velocity?: number) => void;
+    loadInstrument: (instrumentPath: string, config?: object) => Promise<InstrumentInstance>;
+    loadPreset: (presetPath: string, config?: object) => Promise<InstrumentInstance>;
+    setVariable: (variablePath: string, variableValue: any) => void;
+    // getVariable: (variablePath: string) => any;
+    startTrack: (trackCallback: TrackCallback) => void;
+    wait: (duration: number) => Promise<void>;
+    setCurrentToken: (tokenID: number) => void;
+    // setCurrentInstrument: (instrument:Instrument) => void
+    // promise: Promise<void> | null
+}
+
+export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void> | void;
+
 export interface SongTrackEvent {
     waitForEventStart: () => Promise<void>,
     waitForEventEnd: () => Promise<void>,
 }
+
+
+// Instrument
+
+export type InstrumentInstance = (noteEvent: PlayNoteEvent) => NoteHandler;
+
+export type InstrumentLoader = (config: object) => Promise<InstrumentInstance> | InstrumentInstance
+
+export type PresetList = {
+    [presetName: string]: () => InstrumentPreset<any>
+}
+export type PresetBankList = {
+    [presetName: string]: PresetBank
+}
+
+export type PresetBank = {
+    title: string,
+    getPreset(presetPath: string): InstrumentPreset<any>
+}
+
+
+export type InstrumentPreset<IConfig> = [string, IConfig]
+
+export type InstrumentBank = {
+    getInstrumentLoader(instrumentPath: string): InstrumentLoader
+}
+
+export type InstrumentList = {
+    [instrumentName: string]: InstrumentLoader
+}
+//
+// export type InstrumentPreset<IConfig> = {
+//     instrument: string,
+//     config: IConfig
+// }

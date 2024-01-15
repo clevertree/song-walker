@@ -3,13 +3,22 @@ import constants from "./constants"
 import {compileSongToCallback} from "@songwalker/compiler";
 import {
     HandlesTrackEvents,
+    InstrumentInstance,
+    InstrumentLoader,
+    InstrumentPreset,
     SongError,
     SongHandler,
     SongState,
     SongTrackEvent,
+    TrackCallback,
     TrackHandler,
+    TrackRenderer,
     TrackState
 } from "@songwalker/types";
+import is from "@sindresorhus/is";
+import InstrumentLibrary from "@/instruments";
+import PresetLibrary from "@/samples";
+import undefined = is.undefined;
 
 const BUFFER_DURATION = .1;
 // const START_DELAY = .1;
@@ -47,14 +56,20 @@ export class DurationEvent implements SongTrackEvent {
 }
 
 export class PlayNoteEvent extends DurationEvent {
-    frequency: number;
+    value: string;
+    frequency: number | null;
     velocity: number;
     handler?: NoteHandler;
 
-    constructor(destination: AudioDestinationNode, frequency: number, startTime: number, duration: number, velocity: number) {
+    constructor(destination: AudioDestinationNode, value: string, startTime: number, duration: number, velocity: number) {
         super(destination, startTime, duration)
-        this.frequency = frequency;
+        this.value = value;
+        this.frequency = null;
         this.velocity = velocity;
+    }
+
+    parseFrequency() {
+        return this.frequency || (this.frequency = parseFrequencyString(this.value));
     }
 }
 
@@ -110,33 +125,11 @@ export class StartTrackEvent implements SongTrackEvent {
 }
 
 
-export type InstrumentBank = {
-    [instrumentPath: string]: InstrumentLoader
-}
-
 export interface NoteHandler {
     onended: ((this: any, ev: Event) => any) | null;
 
     stop(when?: number): void;
 }
-
-export type InstrumentInstance = (noteEvent: PlayNoteEvent) => NoteHandler;
-
-export type InstrumentLoader = (config: object) => Promise<InstrumentInstance> | InstrumentInstance
-export type TrackRenderer = {
-    trackState: TrackState,
-    playNote: (frequencyString: string, duration?: number, velocity?: number) => void;
-    loadInstrument: (instrumentLoader: InstrumentLoader, config?: object) => Promise<InstrumentInstance>;
-    setVariable: (variablePath: string, variableValue: any) => void;
-    // getVariable: (variablePath: string) => any;
-    startTrack: (trackCallback: TrackCallback) => void;
-    wait: (duration: number) => Promise<void>;
-    setCurrentToken: (tokenID: number) => void;
-    // setCurrentInstrument: (instrument:Instrument) => void
-    // promise: Promise<void> | null
-}
-
-export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void> | void;
 
 
 export function compileToSongPlayer(songSource: string, trackEventHandler: HandlesTrackEvents) {
@@ -206,32 +199,31 @@ export function walkTrack(
 
     const trackRenderer: TrackRenderer = {
         trackState,
-        async loadInstrument(instrumentLoader: InstrumentLoader, config: object | undefined): Promise<InstrumentInstance> {
+
+        async loadPreset(presetPath: string, config: object | undefined): Promise<InstrumentInstance> {
+            const [instrumentPath, instrumentConfig]: InstrumentPreset<any> = PresetLibrary.getPreset(presetPath)
+            if (typeof config === "object")
+                Object.assign(instrumentConfig, config);
+            return trackRenderer.loadInstrument(instrumentPath, instrumentConfig);
+        },
+        async loadInstrument(instrumentPath: string, config: object | undefined): Promise<InstrumentInstance> {
+            const instrumentLoader: InstrumentLoader = InstrumentLibrary.getInstrumentLoader(instrumentPath)
             if (!songState.isPlaying)
                 throw Error("Playback has ended");
             const promise = instrumentLoader(config || {});
             trackState.instrument = await promise;
             return trackState.instrument;
         },
-        playNote(frequencyString: string, duration?: number, velocity?: number): void {
+        playNote(noteString: string, velocity: number = trackState.noteVelocity, duration: number = trackState.noteDuration): void {
             if (!songState.isPlaying)
                 return;
-            if (typeof duration === 'undefined') {
-                duration = trackState.noteDuration;
-                // } else {
-                //     trackState.noteDuration = duration;
-            }
-            if (typeof velocity === 'undefined') {
-                velocity = trackState.noteVelocity;
-                // } else {
-                //     trackState.noteVelocity = velocity;
-            }
             const startTime = trackState.currentTime; //  + trackState.position;
             const durationWithBPM = duration * (60 / trackState.beatsPerMinute)
-            const frequency = parseFrequencyString(frequencyString);
+            // TODO: parse named notes / beats
             const noteEvent = new PlayNoteEvent(
                 trackState.destination,
-                frequency,
+                noteString,
+                // frequency,
                 startTime,
                 durationWithBPM,
                 velocity
@@ -275,7 +267,7 @@ export function walkTrack(
         },
         setCurrentToken(tokenID: number) {
             trackState.currentTokenID = tokenID
-        },
+        }
     }
 
     const trackPromise = trackCallback(trackRenderer)
@@ -314,13 +306,13 @@ export function walkTrack(
 }
 
 
-export function getRequireCallback(instruments: InstrumentBank) {
-    return function require(path: string) {
-        if (instruments[path])
-            return instruments[path];
-        throw new Error("Instrument not found: " + path);
-    }
-}
+// export function getRequireCallback(instruments: InstrumentBank) {
+//     return function require(path: string) {
+//         if (instruments[path])
+//             return instruments[path];
+//         throw new Error("Instrument not found: " + path);
+//     }
+// }
 
 const UnassignedInstrument: InstrumentInstance = (noteEvent: PlayNoteEvent) => {
     throw new Error(constants.ERR_NO_INSTRUMENT);
