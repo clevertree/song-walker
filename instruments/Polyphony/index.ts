@@ -2,25 +2,22 @@ import {NoteHandler, PlayNoteEvent} from "@songwalker/walker";
 import {InstrumentInstance, InstrumentPreset} from "@songwalker/types";
 import {parseFrequencyString} from "@songwalker/note";
 import InstrumentLibrary from "@/instruments";
-import is from "@sindresorhus/is";
-import undefined = is.undefined;
 
 
-export interface PolyphonyInstrumentConfig<TConfig> {
-    title: string,
-    voices: Array<VoiceConfiguration<TConfig>>
+export interface PolyphonyInstrumentConfig {
+    title?: string,
+    voices: Array<VoiceConfiguration>
 }
 
-export interface VoiceConfiguration<TConfig> {
+export interface VoiceConfiguration {
     alias?: string
     keyRangeLow?: string,
     keyRangeHigh?: string,
-    preset: InstrumentPreset<TConfig>
+    preset: InstrumentPreset
 }
 
-export type PolyphonyInstrumentPreset<TConfig> = InstrumentPreset<PolyphonyInstrumentConfig<TConfig>>
 
-export default async function PolyphonyInstrument(config: PolyphonyInstrumentConfig<object>): Promise<InstrumentInstance> {
+export default async function PolyphonyInstrument(config: PolyphonyInstrumentConfig, context: BaseAudioContext): Promise<InstrumentInstance> {
     console.log('PolyphonyInstrument', config, config.title);
     // let activePolyphonys = [];
 
@@ -29,7 +26,7 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
     for (const voice of config.voices) {
         const [instrumentPath, voiceConfig] = voice.preset;
         const voiceLoader = InstrumentLibrary.getInstrumentLoader(instrumentPath)
-        const voiceInstance = await voiceLoader(voiceConfig);
+        const voiceInstance = await voiceLoader(voiceConfig, context);
         if (voice.alias)
             aliases[voice.alias] = voiceInstance;
         voices.push({

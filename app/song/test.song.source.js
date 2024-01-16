@@ -1,11 +1,12 @@
 const songSource = `
-lead=loadInstrument("oscillator", {'type': 'sine'})
-lead2=loadInstrument("oscillator", {'type':'triangle'})
+lead=loadPreset("FluidR3/AcousticGrandPiano")
+osc=loadInstrument("Oscillator", {'type':'square'})
+perc=loadPreset("FluidR3/DrumKitRoom1")
 
 instrument=lead
-@track1 3/8 
-instrument=lead2
-@track1 5/8T
+@track1
+instrument=perc
+@beat1
 
 [track1]
 

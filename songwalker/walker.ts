@@ -203,16 +203,17 @@ export function walkTrack(
         trackState,
 
         async loadPreset(presetPath: string, config: object | undefined): Promise<InstrumentInstance> {
-            const [instrumentPath, instrumentConfig]: InstrumentPreset<any> = PresetLibrary.getPreset(presetPath)
+            const [instrumentPath, instrumentConfig]: InstrumentPreset = PresetLibrary.getPreset(presetPath)
             if (typeof config === "object")
                 Object.assign(instrumentConfig, config);
             return trackRenderer.loadInstrument(instrumentPath, instrumentConfig);
         },
-        async loadInstrument(instrumentPath: string | InstrumentLoader, config: object | undefined): Promise<InstrumentInstance> {
+        async loadInstrument(instrumentPath: string | InstrumentLoader, config: object = {}): Promise<InstrumentInstance> {
             const instrumentLoader: InstrumentLoader = typeof instrumentPath === 'string' ? InstrumentLibrary.getInstrumentLoader(instrumentPath) : instrumentPath;
             if (!songState.isPlaying)
                 throw Error("Playback has ended");
-            const promise = instrumentLoader(config || {});
+            const context = trackState.destination.context;
+            const promise = instrumentLoader(config, context);
             trackState.instrument = await promise;
             return trackState.instrument;
         },

@@ -1,5 +1,5 @@
 lead=loadPreset("FluidR3/AcousticGrandPiano")
-lead2=loadInstrument("oscillator", {'type':'square'})
+lead2=loadInstrument("Oscillator", {'type':'square'})
 perc=loadPreset("FluidR3/DrumKitRoom1")
 
 

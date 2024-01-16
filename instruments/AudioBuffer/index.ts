@@ -1,40 +1,50 @@
 import {PlayNoteEvent} from "@songwalker/walker";
-import {InstrumentInstance, InstrumentPreset} from "@songwalker/types";
+import {InstrumentInstance} from "@songwalker/types";
 import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/Envelope";
 
 
 export interface AudioBufferInstrumentConfig {
     title?: string,
-    url: string,
+    src: string | ArrayBuffer,
     loopStart?: number,
     loopEnd?: number,
     detune?: number,
     envelope?: EnvelopeEffectConfig
 }
 
-export type AudioBufferInstrumentPreset = InstrumentPreset<AudioBufferInstrumentConfig>
 
-export default function AudioBufferInstrument(config: AudioBufferInstrumentConfig): InstrumentInstance {
-    console.log('AudioBufferInstrument', config, config.title);
+export default async function AudioBufferInstrument(config: AudioBufferInstrumentConfig, context: BaseAudioContext): Promise<InstrumentInstance> {
+    const {envelope, detune, title, src} = config;
+    console.log('AudioBufferInstrument', config, title);
     // let activeAudioBuffers = [];
-    let createEnvelope = EnvelopeEffect(config.envelope)
+    let createEnvelope = EnvelopeEffect(envelope)
+    let arrayBuffer: ArrayBuffer;
+    if (typeof src === "string") {
+        const response = await fetch(src);
+        arrayBuffer = await response.arrayBuffer();
+    } else {
+        arrayBuffer = src;
+    }
+    const audioBuffer = await context.decodeAudioData(arrayBuffer);
 
     // TODO?
     // return function(eventName, ...args) {
     return function (noteEvent: PlayNoteEvent) {
-        const {value, startTime, duration, velocity} = noteEvent;
+        const {startTime, duration} = noteEvent;
         const endTime = startTime + duration;
         const velocityGainNode = createEnvelope(noteEvent);
 
         // Audio Buffer
-        const audioBuffer = velocityGainNode.context.createBufferSource();
+        const bufferNode = velocityGainNode.context.createBufferSource();
+        bufferNode.buffer = audioBuffer;
 
-        if (typeof config.detune !== "undefined")
-            audioBuffer.detune.setValueAtTime(config.detune, startTime); // value in cents
-        audioBuffer.start(startTime);
-        audioBuffer.stop(endTime);
+        if (typeof detune !== "undefined")
+            bufferNode.detune.setValueAtTime(detune, startTime); // value in cents
+        bufferNode.connect(velocityGainNode);
+        bufferNode.start(startTime);
+        bufferNode.stop(endTime);
 
         // TODO: implement noteOff / release
-        return audioBuffer;
+        return bufferNode;
     }
 }

@@ -1,17 +1,17 @@
 import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/Envelope";
 import {PlayNoteEvent} from "@songwalker/walker";
-import {InstrumentInstance} from "@songwalker/types";
+import {InstrumentConfig, InstrumentInstance} from "@songwalker/types";
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
-export interface OscillatorInstrumentConfig {
+export interface OscillatorInstrumentConfig extends InstrumentConfig {
     type?: string,
     envelope?: EnvelopeEffectConfig
     detune?: number,
     pulseWidth?: number,
 }
 
-export default function OscillatorInstrument(config: OscillatorInstrumentConfig = {}): InstrumentInstance {
+export default function OscillatorInstrument(config: OscillatorInstrumentConfig): InstrumentInstance {
     console.log('OscillatorInstrument', config, config.type);
     // let activeOscillators = [];
     let createEnvelope = EnvelopeEffect(config.envelope)

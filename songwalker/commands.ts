@@ -1,5 +1,6 @@
 const commands: { [commandName: string]: string } = {
     loadInstrument: 'loadInstrument',
+    loadPreset: 'loadPreset',
     playNote: 'playNote',
     setVariable: 'setVariable',
     setCurrentToken: '_',

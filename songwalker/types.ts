@@ -85,12 +85,16 @@ export interface SongTrackEvent {
 
 // Instrument
 
+// export interface InstrumentConfig {
+//     // destination: AudioNode
+// }
+
 export type InstrumentInstance = (noteEvent: PlayNoteEvent) => NoteHandler;
 
-export type InstrumentLoader = (config: object) => Promise<InstrumentInstance> | InstrumentInstance
+export type InstrumentLoader = (config: object, context: BaseAudioContext) => Promise<InstrumentInstance> | InstrumentInstance
 
 export type PresetList = {
-    [presetName: string]: () => InstrumentPreset<any>
+    [presetName: string]: () => InstrumentPreset
 }
 export type PresetBankList = {
     [presetName: string]: PresetBank
@@ -98,19 +102,19 @@ export type PresetBankList = {
 
 export type PresetBank = {
     title: string,
-    getPreset(presetPath: string): InstrumentPreset<any>
+    getPreset(presetPath: string): InstrumentPreset
 }
 
 
-export type InstrumentPreset<IConfig> = [instrumentName: string, instrumentConfig: IConfig]
+export type InstrumentPreset = [instrumentName: string, instrumentConfig: object]
 
 export type InstrumentBank = {
     getInstrumentLoader(instrumentPath: string): InstrumentLoader
 }
 
-export type InstrumentList = {
-    [instrumentName: string]: InstrumentLoader
-}
+// export type InstrumentList = {
+//     [instrumentName: string]: InstrumentLoader
+// }
 //
 // export type InstrumentPreset<IConfig> = {
 //     instrument: string,
