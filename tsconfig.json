@@ -32,6 +32,12 @@
       "@songwalker-editor/*": [
         "./songwalker-editor/*"
       ],
+      "@instruments/*": [
+        "./instruments/*"
+      ],
+      "@samples/*": [
+        "./samples/*"
+      ],
       "@/*": [
         "./*"
       ]

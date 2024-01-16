@@ -1,5 +1,5 @@
 import {InstrumentBank, InstrumentList, InstrumentLoader} from "@songwalker/types";
-import OscillatorInstrument from "@/instruments/oscillator";
+import OscillatorInstrument from "Oscillator";
 
 const instrumentList: InstrumentList = {
     'oscillator': OscillatorInstrument
@@ -12,5 +12,11 @@ const InstrumentLibrary: InstrumentBank = {
             throw new Error("Instrument not found: " + instrumentPath);
         return instrumentLoader;
     }
+
 }
+
 export default InstrumentLibrary;
+
+export function registerInstrument(instrumentName: string, instrumentLoader: InstrumentLoader) {
+    instrumentList[instrumentName] = instrumentLoader;
+}

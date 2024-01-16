@@ -31,6 +31,26 @@ describe('songLoader', () => {
     })
 
 
+    it('play statement compiles to tokens', () => {
+        const SONG_SOURCE = `C5:1/4D`
+        const compiledSource = sourceToTokens(SONG_SOURCE);
+        expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
+            [{
+                "type": "play-statement",
+                "content": [{"type": "play-note", "content": "C5"}, {
+                    "type": "play-arg",
+                    "content": [{
+                        "type": "param-duration",
+                        "content": [":", {"type": "param-numeric", "content": "1/4"}, {
+                            "type": "param-factor",
+                            "content": "D"
+                        }]
+                    }]
+                }]
+            }]
+        ))
+    })
+
     it('wait statement compiles to tokens', () => {
         const SONG_SOURCE = `1/4T;`
         const compiledSource = sourceToTokens(SONG_SOURCE);

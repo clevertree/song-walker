@@ -174,14 +174,14 @@ ${functionContent}
             case 'track-start':
                 throw new Error("Shouldn't happen");
             case 'play-statement':
-                const frequencyToken = findTokenByType(token.content as TokenList, /^play-frequency$/);
+                const frequencyToken = findTokenByType(token.content as TokenList, /^play-note$/);
                 const noteArgs = findTokensByType(token.content as TokenList, /^play-arg$/);
                 functionNames[commands.playNote] = true;
                 return `${commands.playNote}('${frequencyToken.content}'${noteArgs.length === 0 ? ''
                     : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`;
             case 'play-arg':
-                const playArgParamToken = findTokenByType(token.content as TokenList, /^param-/);
-                return formatTokenContent(playArgParamToken);
+                const playArgParamToken = findTokensByType(token.content as TokenList, /^param-/);
+                return playArgParamToken.length > 0 ? formatTokenContent(playArgParamToken[0]) : 'null';
             case 'play-track-statement':
                 const trackNameToken = findTokenByType(token.content as TokenList, /^play-track-name$/);
                 functionNames[commands.startTrack] = true;

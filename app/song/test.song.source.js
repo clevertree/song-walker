@@ -5,7 +5,7 @@ lead2=loadInstrument("oscillator", {'type':'triangle'})
 instrument=lead
 @track1 3/8 
 instrument=lead2
-@track1 5/8 
+@track1 5/8T
 
 [track1]
 

@@ -98,9 +98,10 @@ async function testTrack(trackRenderer: TrackRenderer) {
 
 function testMelodicInstrument(config: object): InstrumentInstance {
     return function (noteEvent) {
-        const {frequency, value} = noteEvent;
-        if (frequency === null)
+        const {value} = noteEvent;
+        if (!noteEvent.hasFrequency())
             throw new Error("Invalid melodic string: " + value)
+        noteEvent.parseFrequency();
         return {
             onended: cy.stub(),
             stop: cy.stub(),
@@ -110,8 +111,8 @@ function testMelodicInstrument(config: object): InstrumentInstance {
 
 function testPercussionInstrument(config: object): InstrumentInstance {
     return function (noteEvent) {
-        const {frequency, value} = noteEvent;
-        if (frequency !== null)
+        const {value} = noteEvent;
+        if (noteEvent.hasFrequency())
             throw new Error("Invalid percussive string: " + value)
         return {
             onended: cy.stub(),

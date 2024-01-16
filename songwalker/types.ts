@@ -64,7 +64,7 @@ export type TrackState = {
 export type TrackRenderer = {
     trackState: TrackState,
     playNote: (noteString: string, duration?: number, velocity?: number) => void;
-    loadInstrument: (instrumentPath: string, config?: object) => Promise<InstrumentInstance>;
+    loadInstrument: (instrumentPath: string | InstrumentLoader, config?: object) => Promise<InstrumentInstance>;
     loadPreset: (presetPath: string, config?: object) => Promise<InstrumentInstance>;
     setVariable: (variablePath: string, variableValue: any) => void;
     // getVariable: (variablePath: string) => any;
@@ -102,7 +102,7 @@ export type PresetBank = {
 }
 
 
-export type InstrumentPreset<IConfig> = [string, IConfig]
+export type InstrumentPreset<IConfig> = [instrumentName: string, instrumentConfig: IConfig]
 
 export type InstrumentBank = {
     getInstrumentLoader(instrumentPath: string): InstrumentLoader

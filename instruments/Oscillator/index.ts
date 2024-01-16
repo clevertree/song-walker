@@ -1,4 +1,4 @@
-import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/envelope";
+import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/Envelope";
 import {PlayNoteEvent} from "@songwalker/walker";
 import {InstrumentInstance} from "@songwalker/types";
 
@@ -19,14 +19,15 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig 
     // TODO?
     // return function(eventName, ...args) {
     return function (noteEvent: PlayNoteEvent) {
-        const {frequency, value, startTime, duration, velocity} = noteEvent;
+        const {value, startTime, duration} = noteEvent;
+        const frequency = noteEvent.parseFrequency()
         // const gainNode = audioContext.createGain(); //to get smooth rise/fall
         const endTime = startTime + duration;
 
         // Envelope
-        const envelopGainNode = createEnvelope(noteEvent);
+        const velocityGainNode = createEnvelope(noteEvent);
 
-        const oscillator = createOscillator(config.type || DEFAULT_OSCILLATOR_TYPE, envelopGainNode);
+        const oscillator = createOscillator(config.type || DEFAULT_OSCILLATOR_TYPE, velocityGainNode);
         if (frequency === null)
             throw new Error("Invalid note string: " + value)
         oscillator.frequency.value = frequency;

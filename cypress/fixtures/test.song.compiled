@@ -1,7 +1,7 @@
 module.exports=async function rootTrack(trackRenderer) {
 	const {loadInstrument, setVariable, startTrack, trackState, wait} = trackRenderer;
-	setVariable('lead', loadInstrument(require("oscillator"), {wait: (1/8)*1.5}));
-	setVariable('lead2', loadInstrument(require("oscillator"), {'type':'square'}));
+	setVariable('lead', loadInstrument("oscillator", {wait: (1/8)*1.5}));
+	setVariable('lead2', loadInstrument("oscillator", {'type':'square'}));
 
 	setVariable('currentInstrument', trackState.lead2);
 	setVariable('waitTime', (1/4)/1.5);
@@ -12,7 +12,6 @@ module.exports=async function rootTrack(trackRenderer) {
 	startTrack(track1); 	await wait(3/8);
 	setVariable('currentInstrument', trackState.lead2);
 	startTrack(track1); 	await wait(5/8); 	await wait((3)/1.5);
-
 
 }
 

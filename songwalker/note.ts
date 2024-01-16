@@ -35,7 +35,7 @@ export function matchFrequencyString(noteString: string) {
 export function parseFrequencyString(noteString: string) {
     const match = matchFrequencyString(noteString);
     if (!match)
-        return null;
+        throw new Error("Unrecognized frequency: " + noteString);
     const [, note, octaveString] = match;
     const octave: number = parseInt(octaveString);
     // if (isNaN(octave))

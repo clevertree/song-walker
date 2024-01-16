@@ -14,7 +14,7 @@ export const PATTERN_TRACK_START = {
     }
 }
 const PATTERN_DURATION = {
-    pattern: /\d*[\/.]?\d{1,2}([BTDt])?;?/,
+    pattern: /\d*[\/.]?\d{1,2}[BTDt]?;?/,
     inside: {
         'param-numeric': /\d*[\/.]?\d+/,
         'param-factor': /[BTDt]/,
@@ -53,11 +53,11 @@ export const LANGUAGE = {
             // "javascript-statement": {
             //     pattern: /[\w'.]+/,
             //     inside: {
-            'param-string': {
-                pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
-                greedy: true
-            },
-
+            // 'param-string': {
+            //     pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+            //     greedy: true
+            // },
+            'param-string': /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
             'param-variable': /\b[a-zA-Z_]\w*\b/,
             'param-duration': PATTERN_DURATION,
             // 'param-numeric': /\b0x[\da-f]+\b|(?:\b\d+(?:\.\d*)?|\B\.\d+)(?:e[+-]?\d+)?/i,
@@ -75,10 +75,22 @@ export const LANGUAGE = {
         }
     },
     'play-statement': {
-        pattern: /[a-zA-Z]\w*(:[^:;\s]*)*;?/,
+        pattern: /\b[a-zA-Z]\w*(:[^:;\s]*)*;?/,
         inside: {
-            'play-note': /^\w+/,
-            'play-arg': /:\w*/,
+            'play-note': /^[a-zA-Z]\w*/,
+            'play-arg': {
+                pattern: /:[^:;\s]*/,
+                inside: {
+                    'param-duration': {
+                        pattern: /^:\d*[\/.]?\d{1,2}[BTDt]?$/,
+                        inside: {
+                            'param-numeric': /\d*[\/.]?\d+/,
+                            'param-factor': /[BTDt]/,
+                        }
+                    },
+                    'param-string': /[^:]+/,
+                }
+            },
             // punctuation: /;/
         },
     },

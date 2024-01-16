@@ -1,4 +1,4 @@
-import {parseFrequencyString} from "./note";
+import {matchFrequencyString, parseFrequencyString} from "./note";
 import constants from "./constants"
 import {compileSongToCallback} from "@songwalker/compiler";
 import {
@@ -57,19 +57,21 @@ export class DurationEvent implements SongTrackEvent {
 
 export class PlayNoteEvent extends DurationEvent {
     value: string;
-    frequency: number | null;
     velocity: number;
     handler?: NoteHandler;
 
     constructor(destination: AudioDestinationNode, value: string, startTime: number, duration: number, velocity: number) {
         super(destination, startTime, duration)
         this.value = value;
-        this.frequency = null;
         this.velocity = velocity;
     }
 
     parseFrequency() {
-        return this.frequency || (this.frequency = parseFrequencyString(this.value));
+        return parseFrequencyString(this.value);
+    }
+
+    hasFrequency() {
+        return matchFrequencyString(this.value) || false;
     }
 }
 
@@ -126,7 +128,7 @@ export class StartTrackEvent implements SongTrackEvent {
 
 
 export interface NoteHandler {
-    onended: ((this: any, ev: Event) => any) | null;
+    onended: ((ev: Event) => any) | null;
 
     stop(when?: number): void;
 }
@@ -206,8 +208,8 @@ export function walkTrack(
                 Object.assign(instrumentConfig, config);
             return trackRenderer.loadInstrument(instrumentPath, instrumentConfig);
         },
-        async loadInstrument(instrumentPath: string, config: object | undefined): Promise<InstrumentInstance> {
-            const instrumentLoader: InstrumentLoader = InstrumentLibrary.getInstrumentLoader(instrumentPath)
+        async loadInstrument(instrumentPath: string | InstrumentLoader, config: object | undefined): Promise<InstrumentInstance> {
+            const instrumentLoader: InstrumentLoader = typeof instrumentPath === 'string' ? InstrumentLibrary.getInstrumentLoader(instrumentPath) : instrumentPath;
             if (!songState.isPlaying)
                 throw Error("Playback has ended");
             const promise = instrumentLoader(config || {});
