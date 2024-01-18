@@ -31,17 +31,16 @@ Bb4 1
 [beat1]
 durationDivisor=16
 velocityDivisor=10
-hat     kick    2
-hat:3           2
-hat     snare   2
-hat:3           2
-hat     kick    2
-hat:3   kick:6  2
-hat     snare   2
-hat:3           1
-hat:3           1
+chh     abd     2
+chh:3           2
+chh     as      2
+chh:3           2
+chh     abd     2
+chh:3   abd:6   2
+chh     as      z2
+chh:3           1
+chh:3           1
 
 
 `
 export default songSource
-

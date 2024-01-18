@@ -26,7 +26,6 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
     const errors = useSelector((state: RootState) => state.document.errors);
     const updateTimeout = useRef(-1); // we can save timer in useRef and pass it to child
     const playbackManager = useContext(PlaybackContext)
-    console.log('errors', errors)
     const refEditor = useRef<HTMLInputElement>(null);
     const nodeManager = useMemo(() => new EditorNodeManager(refEditor,
             trackName,
@@ -39,7 +38,7 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
 
     useEffect(() => {
         const cursorPosition = nodeManager.getLastCursorPosition();
-        console.log('cursorPosition', cursorPosition)
+        // console.log('cursorPosition', cursorPosition)
         nodeManager.render(trackValue);
         if (cursorPosition > 0)
             nodeManager.setCursorPosition(cursorPosition);
@@ -63,9 +62,12 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
     }, [config.editorUpdateTimeout, dispatch, nodeManager, trackName])
 
     let errorClass = '';
+    let errorMessages = [];
     for (const error of errors)
-        if (error.trackName === trackName)
-            errorClass = ' ' + styles.editorError
+        if (error.trackName === trackName) {
+            errorClass = ' ' + styles.errorBorder
+            errorMessages.push(`(${error.tokenID}) ${error.message}`)
+        }
     return (
         <div className={styles.container}>
             <div className={styles.title}>[{trackName}]</div>
@@ -81,6 +83,7 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
                 onFocus={handleEvent}
                 // onMouseUp={getCursorPosition}
             />
+            {errorMessages.map(message => <div key={message} className={styles.errorMessage}>{message}</div>)}
         </div>
     )
 }

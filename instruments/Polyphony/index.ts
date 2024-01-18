@@ -1,23 +1,23 @@
 import {NoteHandler, PlayNoteEvent} from "@songwalker/walker";
-import {InstrumentInstance, InstrumentPreset} from "@songwalker/types";
+import {InstrumentInstance} from "@songwalker/types";
 import {parseFrequencyString} from "@songwalker/note";
 import InstrumentLibrary from "@/instruments";
 
 
-export interface PolyphonyInstrumentConfig {
+export interface PolyphonyInstrumentConfig<TConfig> {
     title?: string,
-    voices: Array<VoiceConfiguration>
+    voices: Array<VoiceConfiguration<TConfig>>
 }
 
-export interface VoiceConfiguration {
+export interface VoiceConfiguration<TConfig> {
     alias?: string
     keyRangeLow?: string,
     keyRangeHigh?: string,
-    preset: InstrumentPreset
+    preset: [instrumentName: string, instrumentConfig: TConfig]
 }
 
 
-export default async function PolyphonyInstrument(config: PolyphonyInstrumentConfig, context: BaseAudioContext): Promise<InstrumentInstance> {
+export default async function PolyphonyInstrument(config: PolyphonyInstrumentConfig<any>, context: BaseAudioContext): Promise<InstrumentInstance> {
     console.log('PolyphonyInstrument', config, config.title);
     // let activePolyphonys = [];
 

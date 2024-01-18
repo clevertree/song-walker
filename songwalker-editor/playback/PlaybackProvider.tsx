@@ -17,7 +17,7 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
     const documentValue = useSelector((state: RootState) => state.document.value);
     // const [songHandler, setSongHandler] = useState<SongHandler | null>(null)
     useEffect(() => {
-        console.log('isPlaying', isPlaying)
+        // console.log('isPlaying', isPlaying)
         if (isPlaying) {
             if (!playbackManager.isPlaying()) {
                 (async () => {
@@ -27,7 +27,7 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
                         songHandler.startPlayback();
                         await songHandler.waitForSongToFinish();
                     } catch (e) {
-                        console.error(e);
+                        // console.error(e);
                         dispatch(addError(e as SongError))
                     } finally {
                         dispatch(stopPlayback())

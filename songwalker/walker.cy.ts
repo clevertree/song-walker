@@ -1,5 +1,5 @@
 import {getSongPlayer} from "./walker";
-import constants from "./constants";
+import {ERRORS} from "./constants";
 import {InstrumentInstance, TrackRenderer} from "@songwalker/types";
 
 describe('songPlayer', () => {
@@ -41,7 +41,7 @@ describe('songPlayer', () => {
             throw new Error("Song finished without error")
         } catch (e) {
             // @ts-ignore
-            expect(e.message).to.eq(constants.ERR_NO_INSTRUMENT)
+            expect(e.message).to.eq(ERRORS.ERR_NO_INSTRUMENT)
         }
     })
 })

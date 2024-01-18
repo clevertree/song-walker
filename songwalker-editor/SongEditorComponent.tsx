@@ -22,7 +22,6 @@ export default function SongEditorComponent(props: SongEditorComponentProps) {
         store.dispatch(setDocumentValue(initialValue))
         return store;
     }, [initialValue])
-    console.log('SongEditorComponent', props, store);
     return (
         <Provider store={store}>
             <PlaybackProvider>

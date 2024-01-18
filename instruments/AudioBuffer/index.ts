@@ -15,12 +15,14 @@ export interface AudioBufferInstrumentConfig {
 
 export default async function AudioBufferInstrument(config: AudioBufferInstrumentConfig, context: BaseAudioContext): Promise<InstrumentInstance> {
     const {envelope, detune, title, src} = config;
-    console.log('AudioBufferInstrument', config, title);
+    // console.log('AudioBufferInstrument', config, title);
     // let activeAudioBuffers = [];
     let createEnvelope = EnvelopeEffect(envelope)
     let arrayBuffer: ArrayBuffer;
     if (typeof src === "string") {
         const response = await fetch(src);
+        if (response.status !== 200)
+            throw new Error(`Failed to fetch audio file (${response.status} ${response.statusText}): ${src}`);
         arrayBuffer = await response.arrayBuffer();
     } else {
         arrayBuffer = src;

@@ -144,15 +144,16 @@ ${functionContent}
                 const functionAssignResultToVariableToken = findTokenByType(functionTokenList, /^assign-to-variable$/);
                 let functionIsAwait = false;
 
-                // switch (functionNameString) {
-                //     case 'loadInstrument':
-                //         functionIsAwait = true;
-                //         const firstParamToken = findTokenByType(functionTokenList, /^param-/);
-                //         if (firstParamToken.type === 'param-string') {
-                //             const pos = functionTokenList.indexOf(firstParamToken);
-                //             functionTokenList.splice(pos, 1, `require(${firstParamToken.content})`)
-                //         }
-                // }
+                switch (functionNameString) {
+                    case 'loadPreset':
+                    case 'loadInstrument':
+                        functionIsAwait = true;
+                    // const firstParamToken = findTokenByType(functionTokenList, /^param-/);
+                    // if (firstParamToken.type === 'param-string') {
+                    //     const pos = functionTokenList.indexOf(firstParamToken);
+                    //     functionTokenList.splice(pos, 1, `require(${firstParamToken.content})`)
+                    // }
+                }
                 functionNames[functionNameString] = true;
                 if (functionAssignResultToVariableToken) {
                     const functionTokenPos = functionTokenList.indexOf(functionNameToken);

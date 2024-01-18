@@ -15,7 +15,7 @@ export type EnvelopeEffectConfig = {
 export type EnvelopeEffectPreset = InstrumentPreset<EnvelopeEffectConfig>
 
 export default function EnvelopeEffect(config: EnvelopeEffectConfig = {}) {
-    console.log('EnvelopeEffect', config, config.mixer);
+    // console.log('EnvelopeEffect', config, config.mixer);
     // const destination = audioCtx.destination;
     // let activeOscillators = [];
     return function (noteEvent: PlayNoteEvent) {

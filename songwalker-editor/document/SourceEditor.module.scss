@@ -108,6 +108,11 @@
   }
 }
 
-.editorError {
+.errorBorder {
   border-color: red;
+}
+
+.errorMessage {
+  color: red;
+  font-size: smaller;
 }

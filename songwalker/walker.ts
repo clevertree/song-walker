@@ -1,5 +1,5 @@
 import {matchFrequencyString, parseFrequencyString} from "./note";
-import constants from "./constants"
+import {ERRORS} from "./constants"
 import {compileSongToCallback} from "@songwalker/compiler";
 import {
     HandlesTrackEvents,
@@ -15,10 +15,8 @@ import {
     TrackRenderer,
     TrackState
 } from "@songwalker/types";
-import is from "@sindresorhus/is";
 import InstrumentLibrary from "@/instruments";
 import PresetLibrary from "@/samples";
-import undefined = is.undefined;
 
 const BUFFER_DURATION = .1;
 // const START_DELAY = .1;
@@ -233,6 +231,8 @@ export function walkTrack(
             )        // if (typeof duration === "string")
             //     duration = parseDurationString(duration, trackBPM);
             // console.log("noteEvent", noteEvent)
+            if (typeof trackState.instrument !== "function")
+                throw new Error(`Instrument not set for track ${trackName}: ${JSON.stringify(trackState)}`)
             noteEvent.handler = trackState.instrument(noteEvent);
             handleTrackEvent(noteEvent);
         },
@@ -291,6 +291,7 @@ export function walkTrack(
             } catch (e) {
                 if (typeof (e as SongError).trackName !== "undefined")
                     throw e;
+                console.error(e);
                 throw {
                     message: (e as Error).message,
                     trackName,
@@ -318,5 +319,5 @@ export function walkTrack(
 // }
 
 const UnassignedInstrument: InstrumentInstance = (noteEvent: PlayNoteEvent) => {
-    throw new Error(constants.ERR_NO_INSTRUMENT);
+    throw new Error(ERRORS.ERR_NO_INSTRUMENT);
 }

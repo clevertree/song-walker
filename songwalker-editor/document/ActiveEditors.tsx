@@ -9,7 +9,7 @@ export function ActiveEditors() {
     const {value, activeEditors} = useSelector((state: RootState) => state.document);
     const trackList = useMemo<TrackSourceMap>(() => {
         const trackList = parseTrackList(value);
-        console.log("ActiveEditors parsing tokens", trackList);
+        // console.log("ActiveEditors parsing tokens", trackList);
         return trackList
     }, [value])
 
