@@ -216,7 +216,10 @@ export function walkTrack(
         trackState,
 
         async loadPreset(presetPath: string, config: object | undefined): Promise<InstrumentInstance> {
-            const [instrumentPath, instrumentConfig]: InstrumentPreset = PresetLibrary.getPreset(presetPath)
+            const {
+                instrument: instrumentPath,
+                config: instrumentConfig
+            }: InstrumentPreset = PresetLibrary.getPreset(presetPath)
             if (typeof config === "object")
                 Object.assign(instrumentConfig, config);
             return trackRenderer.loadInstrument(instrumentPath, instrumentConfig);

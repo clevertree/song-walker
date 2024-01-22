@@ -1,5 +1,5 @@
 import {NoteHandler, PlayNoteEvent} from "@songwalker/walker";
-import {InstrumentInstance} from "@songwalker/types";
+import {InstrumentInstance, InstrumentPreset} from "@songwalker/types";
 import {parseFrequencyString} from "@songwalker/note";
 import InstrumentLibrary from "@/instruments";
 
@@ -13,7 +13,7 @@ export interface VoiceConfiguration<TConfig> {
     alias?: string
     keyRangeLow?: string,
     keyRangeHigh?: string,
-    preset: [instrumentName: string, instrumentConfig: TConfig]
+    preset: InstrumentPreset<TConfig>
 }
 
 
@@ -24,7 +24,7 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
     const aliases: { [key: string]: InstrumentInstance } = {}
     const voices: { keyRangeLow: number; keyRangeHigh: number; voiceInstance: InstrumentInstance; }[] = [];
     for (const voice of config.voices) {
-        const [instrumentPath, voiceConfig] = voice.preset;
+        const {instrument: instrumentPath, config: voiceConfig} = voice.preset;
         const voiceLoader = InstrumentLibrary.getInstrumentLoader(instrumentPath)
         const voiceInstance = await voiceLoader(voiceConfig, context);
         if (voice.alias)
