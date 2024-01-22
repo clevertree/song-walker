@@ -9,7 +9,7 @@ instrument=perc
 @beat1
 
 [track1]
-durationDefault=1/6
+durationDefault=1/4
 C5 /2
 C4 /2
 G4 /2

@@ -41,7 +41,9 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
         const noteHandlers: NoteHandler[] = [];
         let noteCount = 0;
         const noteHandler: NoteHandler = {
-            onended: null, // TODO clean up
+            addEventListener(type: string, listener: (evt: Event) => void, options?: boolean | AddEventListenerOptions) {
+                for (const noteHandler of noteHandlers) noteHandler.addEventListener(type, listener, options);
+            },
             stop(when?: number) {
                 for (const noteHandler of noteHandlers) noteHandler.stop(when);
             },
@@ -50,16 +52,10 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
         function playVoice(voiceInstance: InstrumentInstance) {
             const noteHandler = voiceInstance(noteEvent);
             noteHandlers.push(noteHandler)
-            noteHandler.onended = (e) => {
-                if (noteCount-- === 0) {
-                    noteHandler.onended && noteHandler.onended(e)
-                }
-            }
         }
 
         if (aliases[noteEvent.value]) {
-            const voiceInstance = aliases[noteEvent.value];
-            playVoice(voiceInstance);
+            return aliases[noteEvent.value](noteEvent);
             // if alias is found, execute directly
         } else {
             if (noteEvent.hasFrequency()) {

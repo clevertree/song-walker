@@ -17,8 +17,6 @@ import {
 } from "@songwalker/types";
 import InstrumentLibrary from "@/instruments";
 import PresetLibrary from "@/samples";
-import is from "@sindresorhus/is";
-import undefined = is.undefined;
 
 const BUFFER_DURATION = .1;
 // const START_DELAY = .1;
@@ -85,7 +83,7 @@ export class PlayNoteEvent implements SongTrackEvent {
 
     setHandler(noteHandler: NoteHandler) {
         this.handlerPromise = new Promise((resolve) => {
-            noteHandler.addEventListener('ended', resolve);
+            noteHandler.addEventListener('ended', e => resolve());
         })
     }
 }
@@ -143,7 +141,7 @@ export class StartTrackEvent implements SongTrackEvent {
 
 
 export interface NoteHandler {
-    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
+    addEventListener(type: string, listener: (evt: Event) => void, options?: boolean | AddEventListenerOptions): void;
 
     stop(when?: number): void;
 }
@@ -261,7 +259,7 @@ export function walkTrack(
                 velocity
             )        // if (typeof duration === "string")
             //     duration = parseDurationString(duration, trackBPM);
-            console.log("noteEvent", noteEvent)
+            // console.log("noteEvent", noteEvent)
             if (typeof trackState.instrument !== "function")
                 throw new Error(`Instrument not set for track ${trackName}: ${JSON.stringify(trackState)}`)
             noteEvent.setHandler(trackState.instrument(noteEvent));

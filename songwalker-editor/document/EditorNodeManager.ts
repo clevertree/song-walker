@@ -57,7 +57,7 @@ export class EditorNodeManager {
 
     render(trackValueString: string) {
         const tokenList = sourceToTokens(trackValueString);
-        console.log('render', trackValueString, tokenList)
+        // console.log('render', trackValueString, tokenList)
         mapTokensToDOM(tokenList, this.getNode())
         if (this.getValue() !== trackValueString)
             console.error(`Rendering value mismatch: \n`, JSON.stringify(this.getValue()), ` !== \n`, JSON.stringify(trackValueString));
@@ -92,7 +92,9 @@ export class EditorNodeManager {
             }
         })
         if (!result)
+            // @ts-ignore
             throw new Error("focusNode not found in editor: " + (focusNode.outerHTML || focusNode));
+
 
         this.lastCursorPosition = editorPosition;
         return editorPosition;

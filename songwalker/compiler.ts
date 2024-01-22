@@ -74,7 +74,7 @@ export function compileTrackTokensToJavascript(
     const javascriptContent = `${exportStatement}${Object.keys(trackList).map((trackName) =>
         formatTrack(trackName, trackList[trackName], eventMode)
     ).join('\n\n')}`;
-    console.log(javascriptContent)
+    // console.log(javascriptContent)
     return javascriptContent;
 }
 
