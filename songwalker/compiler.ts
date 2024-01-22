@@ -13,8 +13,8 @@ import {TokenItem, TokenItemOrString, TokenList, TrackSourceMap} from "@songwalk
 // import Instruments from "../instruments/";
 
 // const DEFAULT_EXPORT_STATEMENT = `export default `;
-const DEFAULT_EXPORT_STATEMENT = `module.exports=`;
-
+// const DEFAULT_EXPORT_STATEMENT = `module.exports=`;
+const EXPORT_TEMPLATE = (sourceCode: string) => `(() => {return ${sourceCode}})()`
 
 export function compileSongToCallback(songSource: string) { // instruments: InstrumentBank = Instruments
     const javascriptSource = compileSongToJavascript(songSource, true)
@@ -29,11 +29,10 @@ export function compileSongToCallback(songSource: string) { // instruments: Inst
 
 export function compileSongToJavascript(
     songSource: string,
-    eventMode: boolean = false,
-    exportStatement: string = DEFAULT_EXPORT_STATEMENT) {
+    eventMode: boolean = false) {
     // const tokens = sourceToTokens(songSource)
     const trackList = parseTrackList(songSource)
-    const javascriptContent = compileTrackTokensToJavascript(trackList, eventMode, exportStatement);
+    const javascriptContent = compileTrackTokensToJavascript(trackList, eventMode);
     return javascriptContent;
 }
 
@@ -69,12 +68,11 @@ export function parseTrackList(songSource: string): TrackSourceMap {
 
 export function compileTrackTokensToJavascript(
     trackList: TrackSourceMap,
-    eventMode: boolean = false,
-    exportStatement: string = DEFAULT_EXPORT_STATEMENT) {
-    const javascriptContent = `${exportStatement}${Object.keys(trackList).map((trackName) =>
+    eventMode: boolean = false) {
+    const javascriptContent = EXPORT_TEMPLATE(`${Object.keys(trackList).map((trackName) =>
         formatTrack(trackName, trackList[trackName], eventMode)
-    ).join('\n\n')}`;
-    // console.log(javascriptContent)
+    ).join('\n\n')}`);
+    console.log(javascriptContent)
     return javascriptContent;
 }
 
