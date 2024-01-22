@@ -12,7 +12,7 @@ export interface OscillatorInstrumentConfig extends InstrumentConfig {
 }
 
 export default function OscillatorInstrument(config: OscillatorInstrumentConfig): InstrumentInstance {
-    console.log('OscillatorInstrument', config, config.type);
+    // console.log('OscillatorInstrument', config, config.type);
     // let activeOscillators = [];
     let createEnvelope = EnvelopeEffect(config.envelope)
 

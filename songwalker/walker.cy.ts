@@ -125,7 +125,6 @@ async function testTrackPercussion(trackRenderer: TrackRenderer) {
     const {playNote: n, wait: w, setVariable: v, loadInstrument} = trackRenderer;
     await loadInstrument(testPercussionInstrument)
     v('beatsPerMinute', 240)
-    v('durationDivisor', 16)
     n("kick");
     n("hat");
     await w(1);

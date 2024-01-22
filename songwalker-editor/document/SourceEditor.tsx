@@ -27,14 +27,14 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
     const updateTimeout = useRef(-1); // we can save timer in useRef and pass it to child
     const playbackManager = useContext(PlaybackContext)
     const refEditor = useRef<HTMLInputElement>(null);
-    const nodeManager = useMemo(() => new EditorNodeManager(refEditor,
+    const nodeManager = useMemo(() => {
+        const nodeManager = new EditorNodeManager(refEditor,
             trackName,
-            {value: trackValue, cursorPosition: 0}),
-        [trackName])
-
-    useEffect(() => {
+            {value: trackValue, cursorPosition: 0})
         playbackManager.addTrackEventHandler(trackName, nodeManager.handleSongEvent.bind(nodeManager))
-    }, [playbackManager]);
+        return nodeManager;
+    }, [trackName])
+
 
     useEffect(() => {
         const cursorPosition = nodeManager.getLastCursorPosition();
@@ -54,7 +54,7 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
     const handleEvent = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => nodeManager.handleInputEvent(e, config), [nodeManager])
     const handleChangeEvent = useCallback((e: React.SyntheticEvent<HTMLDivElement>) => {
         nodeManager.handleInputEvent(e, config);
-        console.log('handleChangeEvent', e)
+        // console.log('handleChangeEvent', e)
         updateTimeout.current && window.clearTimeout(updateTimeout.current);
         updateTimeout.current = window.setTimeout(() => {
             dispatch(setDocumentTrackValue(trackName, nodeManager.getValue()))
@@ -81,6 +81,7 @@ export default function SourceEditor({trackName, trackValue}: SourceEditorProps)
                 onKeyUp={handleEvent}
                 onInput={handleChangeEvent}
                 onFocus={handleEvent}
+                onMouseDown={handleEvent}
                 // onMouseUp={getCursorPosition}
             />
             {errorMessages.map(message => <div key={message} className={styles.errorMessage}>{message}</div>)}

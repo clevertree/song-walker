@@ -7,8 +7,7 @@ import {
     tokensToKeys
 } from "./tokens";
 
-import commands from "./commands";
-import variables from "./variables";
+import {COMMANDS, VARIABLES} from "./constants";
 import {TokenItem, TokenItemOrString, TokenList, TrackSourceMap} from "@songwalker/types";
 // import {getRequireCallback, InstrumentBank} from "@songwalker/walker";
 // import Instruments from "../instruments/";
@@ -23,7 +22,7 @@ export function compileSongToCallback(songSource: string) { // instruments: Inst
     // const require = getRequireCallback(instruments)
     const callback = eval(javascriptSource);
 
-    console.log('callback', callback)
+    // console.log('callback', callback)
     return callback;
 }
 
@@ -87,9 +86,9 @@ function formatTrack(trackName: string, trackSource: string, eventMode: boolean)
         debugMapper = (commandString: string, tokenID: number) => {
             if (commandString.trim() === '')
                 return commandString;
-            return `${commands.setCurrentToken}(${tokenID});${commandString}`
+            return `${COMMANDS.setCurrentToken}(${tokenID});${commandString}`
         }
-        functionNames[commands.setCurrentToken] = true;
+        functionNames[COMMANDS.setCurrentToken] = true;
     }
     let currentTokenID = -1;
     const functionContent = tokenList
@@ -101,18 +100,18 @@ function formatTrack(trackName: string, trackSource: string, eventMode: boolean)
         })
         .map(debugMapper)
         .join('');
-    return `async function ${trackName}(${variables.trackRenderer}) {
-\tconst {${formatFunctionList()}} = ${variables.trackRenderer};
+    return `async function ${trackName}(${VARIABLES.trackRenderer}) {
+\tconst {${formatFunctionList()}} = ${VARIABLES.trackRenderer};
 ${functionContent}
 }`
 
     function formatFunctionList() {
         if (Object.values(functionNames).length === 0)
             return '';
-        return Object.keys(commands)
-            .filter(functionName => functionNames[commands[functionName]])
+        return Object.keys(COMMANDS)
+            .filter(functionName => functionNames[COMMANDS[functionName]])
             .map(functionName => {
-                const alias = commands[functionName];
+                const alias = COMMANDS[functionName];
                 if (alias === functionName)
                     return functionName;
                 return `${functionName + ':' + alias}`
@@ -161,8 +160,8 @@ ${functionContent}
                         .filter(token => typeof token === "string" || token.content !== ';')
                         .map((token) => formatTokenContent(token))
                         .join('');
-                    functionNames[commands.setVariable] = true;
-                    return `${commands.setVariable}('${functionAssignResultToVariableToken.content}', ${functionIsAwait ? 'await ' : ''}${functionParamString})`;
+                    functionNames[COMMANDS.setVariable] = true;
+                    return `${COMMANDS.setVariable}('${functionAssignResultToVariableToken.content}', ${functionIsAwait ? 'await ' : ''}${functionParamString})`;
                 } else {
                     return (functionIsAwait ? 'await ' : '') + functionTokenList.map((token) => formatTokenContent(token)).join('')
                 }
@@ -170,28 +169,28 @@ ${functionContent}
                 const variableTokenList = [...token.content as TokenList];
                 const variableNameToken = findTokenByType(variableTokenList, /^assign-to-variable$/);
                 const variableValueToken = findTokenByType(variableTokenList, /^param-/);
-                functionNames[commands.setVariable] = true;
-                return `${commands.setVariable}('${variableNameToken.content}', ${formatTokenContent(variableValueToken)})`;
+                functionNames[COMMANDS.setVariable] = true;
+                return `${COMMANDS.setVariable}('${variableNameToken.content}', ${formatTokenContent(variableValueToken)})`;
             case 'track-start':
                 throw new Error("Shouldn't happen");
             case 'play-statement':
                 const frequencyToken = findTokenByType(token.content as TokenList, /^play-note$/);
                 const noteArgs = findTokensByType(token.content as TokenList, /^play-arg$/);
-                functionNames[commands.playNote] = true;
-                return `${commands.playNote}('${frequencyToken.content}'${noteArgs.length === 0 ? ''
+                functionNames[COMMANDS.playNote] = true;
+                return `${COMMANDS.playNote}('${frequencyToken.content}'${noteArgs.length === 0 ? ''
                     : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`;
             case 'play-arg':
                 const playArgParamToken = findTokensByType(token.content as TokenList, /^param-/);
                 return playArgParamToken.length > 0 ? formatTokenContent(playArgParamToken[0]) : 'null';
             case 'play-track-statement':
                 const trackNameToken = findTokenByType(token.content as TokenList, /^play-track-name$/);
-                functionNames[commands.startTrack] = true;
-                return `${commands.startTrack}(${trackNameToken.content})`;
+                functionNames[COMMANDS.startTrack] = true;
+                return `${COMMANDS.startTrack}(${trackNameToken.content})`;
             case 'wait-statement':
                 const waitValues = tokensToKeys(token.content as TokenList);
                 let numericString = formatNumericString(waitValues['param-numeric'], waitValues['param-factor']);
-                functionNames[commands.wait] = true;
-                return `await ${commands.wait}(${numericString})`;
+                functionNames[COMMANDS.wait] = true;
+                return `await ${COMMANDS.wait}(${numericString})`;
             default:
             case 'unknown':
                 throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${currentTokenID}`);
@@ -202,6 +201,8 @@ ${functionContent}
     }
 
     function formatNumericString(numericString: string, factorString: string) {
+        if (numericString.startsWith('/') && numericString.length > 1)
+            numericString = `1${numericString}`;
         switch (factorString) {
             default:
             case 'B':
@@ -223,8 +224,8 @@ ${functionContent}
     }
 
     function formatVariableTokenContent(token: TokenItem) {
-        functionNames[commands.trackState] = true;
-        return `${commands.trackState}.${token.content}`
+        functionNames[COMMANDS.trackState] = true;
+        return `${COMMANDS.trackState}.${token.content}`
     }
 
 }

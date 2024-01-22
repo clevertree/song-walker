@@ -38,7 +38,7 @@ export const documentActions = createSlice({
             const trackList = parseTrackList(state.value);
             trackList[trackName] = sourceString;
             state.value = Object.keys(trackList).map(trackName => `[${trackName}]\n${trackList[trackName]}`).join("\n")
-            console.log('setDocumentTrackValue', action.payload, state.value, oldValue)
+            // console.log('setDocumentTrackValue', action.payload, state.value, oldValue)
         },
         openActiveEditor(
             state: WritableDraft<DocumentState>,

@@ -18,7 +18,7 @@ export interface VoiceConfiguration<TConfig> {
 
 
 export default async function PolyphonyInstrument(config: PolyphonyInstrumentConfig<any>, context: BaseAudioContext): Promise<InstrumentInstance> {
-    console.log('PolyphonyInstrument', config, config.title);
+    // console.log('PolyphonyInstrument', config, config.title);
     // let activePolyphonys = [];
 
     const aliases: { [key: string]: InstrumentInstance } = {}
@@ -41,7 +41,7 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
         const noteHandlers: NoteHandler[] = [];
         let noteCount = 0;
         const noteHandler: NoteHandler = {
-            onended: null,
+            onended: null, // TODO clean up
             stop(when?: number) {
                 for (const noteHandler of noteHandlers) noteHandler.stop(when);
             },

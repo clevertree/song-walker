@@ -17,10 +17,12 @@ import {
 } from "@songwalker/types";
 import InstrumentLibrary from "@/instruments";
 import PresetLibrary from "@/samples";
+import is from "@sindresorhus/is";
+import undefined = is.undefined;
 
 const BUFFER_DURATION = .1;
 // const START_DELAY = .1;
-const DEFAULT_BPM = 60;
+const DEFAULT_BPM = 120;
 const DEFAULT_NOTE_DURATION = 1;
 const DEFAULT_NOTE_VELOCITY = 1;
 
@@ -37,29 +39,26 @@ export class DurationEvent implements SongTrackEvent {
     }
 
     async waitForEventStart() {
-        let delayUntilStart = this.startTime - this.destination.context.currentTime;
-        if (delayUntilStart > 0)
-            await new Promise((resolve) => {
-                setTimeout(resolve, delayUntilStart > 0 ? delayUntilStart * 1000 : 0)
-            })
+        await wait((this.startTime - this.destination.context.currentTime) * 1000)
     }
 
     async waitForEventEnd() {
-        let delayUntilEnd = this.startTime - this.destination.context.currentTime + this.duration;
-        if (delayUntilEnd > 0)
-            await new Promise((resolve) => {
-                setTimeout(resolve, delayUntilEnd > 0 ? delayUntilEnd * 1000 : 0)
-            })
+        await wait((this.startTime - this.destination.context.currentTime + this.duration) * 1000)
     }
 }
 
-export class PlayNoteEvent extends DurationEvent {
+export class PlayNoteEvent implements SongTrackEvent {
+    destination: AudioDestinationNode;
+    startTime: number;
+    duration: number | undefined;
     value: string;
-    velocity: number;
-    handler?: NoteHandler;
+    velocity: number | undefined;
+    handlerPromise?: Promise<void>;
 
-    constructor(destination: AudioDestinationNode, value: string, startTime: number, duration: number, velocity: number) {
-        super(destination, startTime, duration)
+    constructor(destination: AudioDestinationNode, value: string, startTime: number, duration?: number, velocity?: number) {
+        this.destination = destination;
+        this.startTime = startTime;
+        this.duration = duration;
         this.value = value;
         this.velocity = velocity;
     }
@@ -70,6 +69,24 @@ export class PlayNoteEvent extends DurationEvent {
 
     hasFrequency() {
         return matchFrequencyString(this.value) || false;
+    }
+
+    async waitForEventStart() {
+        await wait((this.startTime - this.destination.context.currentTime) * 1000)
+    }
+
+    async waitForEventEnd() {
+        if (this.duration) {
+            await wait((this.startTime - this.destination.context.currentTime + this.duration) * 1000)
+        } else {
+            await this.handlerPromise;
+        }
+    }
+
+    setHandler(noteHandler: NoteHandler) {
+        this.handlerPromise = new Promise((resolve) => {
+            noteHandler.addEventListener('ended', resolve);
+        })
     }
 }
 
@@ -126,7 +143,7 @@ export class StartTrackEvent implements SongTrackEvent {
 
 
 export interface NoteHandler {
-    onended: ((ev: Event) => any) | null;
+    addEventListener(type: string, listener: EventListenerOrEventListenerObject, options?: boolean | AddEventListenerOptions): void;
 
     stop(when?: number): void;
 }
@@ -143,7 +160,7 @@ export function getSongPlayer(
     trackEventHandler: HandlesTrackEvents
 ) {
     const audioContext = new AudioContext();
-    let trackState = {
+    let trackState: TrackState = {
         destination: audioContext.destination,
         instrument: UnassignedInstrument,
         // startTime: audioContext.currentTime,
@@ -207,19 +224,33 @@ export function walkTrack(
             return trackRenderer.loadInstrument(instrumentPath, instrumentConfig);
         },
         async loadInstrument(instrumentPath: string | InstrumentLoader, config: object = {}): Promise<InstrumentInstance> {
-            const instrumentLoader: InstrumentLoader = typeof instrumentPath === 'string' ? InstrumentLibrary.getInstrumentLoader(instrumentPath) : instrumentPath;
             if (!songState.isPlaying)
                 throw Error("Playback has ended");
             const context = trackState.destination.context;
+            const startTime = context.currentTime;
+            const instrumentLoader: InstrumentLoader = typeof instrumentPath === 'string' ? InstrumentLibrary.getInstrumentLoader(instrumentPath) : instrumentPath;
             const promise = instrumentLoader(config, context);
             trackState.instrument = await promise;
+            const duration = context.currentTime - startTime;
+            if (duration) {
+                console.log(`Adding ${duration}ms to song current time`)
+                trackState.currentTime += duration;
+            }
             return trackState.instrument;
         },
-        playNote(noteString: string, velocity: number = trackState.noteVelocity, duration: number = trackState.noteDuration): void {
+        playNote(noteString: string, velocity?: number, duration?: number): void {
             if (!songState.isPlaying)
                 return;
+            // if (trackState.durationDivisor)
+            //     duration /= trackState.durationDivisor;
+            if (typeof velocity !== "undefined" && trackState.velocityDivisor)
+                velocity = velocity / trackState.velocityDivisor;
             const startTime = trackState.currentTime; //  + trackState.position;
-            const durationWithBPM = duration * (60 / trackState.beatsPerMinute)
+            let durationWithBPM;
+            if (typeof duration === "undefined" && trackState.durationDefault)
+                duration = trackState.durationDefault;
+            if (typeof duration !== "undefined")
+                durationWithBPM = duration * (60 / trackState.beatsPerMinute)
             // TODO: parse named notes / beats
             const noteEvent = new PlayNoteEvent(
                 trackState.destination,
@@ -230,10 +261,10 @@ export function walkTrack(
                 velocity
             )        // if (typeof duration === "string")
             //     duration = parseDurationString(duration, trackBPM);
-            // console.log("noteEvent", noteEvent)
+            console.log("noteEvent", noteEvent)
             if (typeof trackState.instrument !== "function")
                 throw new Error(`Instrument not set for track ${trackName}: ${JSON.stringify(trackState)}`)
-            noteEvent.handler = trackState.instrument(noteEvent);
+            noteEvent.setHandler(trackState.instrument(noteEvent));
             handleTrackEvent(noteEvent);
         },
         setVariable(variablePath: string, variableValue: any): void {
@@ -253,6 +284,8 @@ export function walkTrack(
         async wait(duration: number): Promise<void> {
             if (!songState.isPlaying)
                 return;
+            // if (trackState.durationDivisor)
+            //     duration /= trackState.durationDivisor;
             const durationWithBPM = duration * (60 / trackState.beatsPerMinute)
             const currentTime = trackState.currentTime;
             const waitTime = ((currentTime + durationWithBPM) - trackState.destination.context.currentTime) - trackState.bufferDuration;
@@ -283,9 +316,9 @@ export function walkTrack(
                 //     await subTrackHandler.waitForTrackToFinish();
                 // }
                 const waitTime = ((trackState.currentTime) - trackState.destination.context.currentTime);
-                console.log('waitForTrackToFinish', waitTime, trackState.destination.context.currentTime, trackState.currentTime)
+                // console.log('waitForTrackToFinish', waitTime, trackState.destination.context.currentTime, trackState.currentTime)
                 if (waitTime > 0) {
-                    console.log(`Waiting for track to end ${waitTime}s`);
+                    // console.log(`Waiting for track to end ${waitTime}s`);
                     await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
                 }
             } catch (e) {
@@ -309,6 +342,17 @@ export function walkTrack(
     return trackHandler;
 }
 
+
+export async function wait(delayMS: number) {
+    if (delayMS > 0)
+        await new Promise((resolve) => {
+            setTimeout(resolve, delayMS)
+        })
+}
+
+function calcDurationWithBPM(duration: number, beatsPerMinute: number) {
+    return duration * (60 / beatsPerMinute);
+}
 
 // export function getRequireCallback(instruments: InstrumentBank) {
 //     return function require(path: string) {

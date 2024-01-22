@@ -1,5 +1,4 @@
 import {PlayNoteEvent} from "@songwalker/walker";
-import {InstrumentPreset} from "@songwalker/types";
 
 const DEFAULT_VELOCITY = 1;
 
@@ -12,7 +11,7 @@ export type EnvelopeEffectConfig = {
     release?: number
 }
 
-export type EnvelopeEffectPreset = InstrumentPreset<EnvelopeEffectConfig>
+// export type EnvelopeEffectPreset = InstrumentPreset<EnvelopeEffectConfig>
 
 export default function EnvelopeEffect(config: EnvelopeEffectConfig = {}) {
     // console.log('EnvelopeEffect', config, config.mixer);
@@ -21,7 +20,7 @@ export default function EnvelopeEffect(config: EnvelopeEffectConfig = {}) {
     return function (noteEvent: PlayNoteEvent) {
         const {destination, startTime, duration, velocity} = noteEvent;
         let amplitude = config.mixer || 1;
-        if (velocity !== null)
+        if (velocity)
             amplitude *= velocity;
         let source = destination.context.createGain();
         source.connect(destination);

@@ -53,10 +53,13 @@ export type TrackState = {
     // startTime: number,
     currentTime: number,
     position: number,
-    noteDuration: number,
-    noteVelocity: number,
+    // noteDuration: number,
+    // noteVelocity: number,
     beatsPerMinute: number,
     bufferDuration: number,
+    // durationDivisor?: number,
+    durationDefault?: number,
+    velocityDivisor?: number,
     [key: string]: any
     // promise: Promise<void> | null
 }

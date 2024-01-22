@@ -3,8 +3,9 @@
   font-family: monospace;
   font-size: 1.2em;
   display: flex;
+  flex-wrap: wrap;
   background-color: #000;
-  
+
   -webkit-user-select: none; /* Safari */
   -ms-user-select: none; /* IE 10 and IE 11 */
   user-select: none; /* Standard syntax */

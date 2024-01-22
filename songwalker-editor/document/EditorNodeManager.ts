@@ -13,6 +13,7 @@ export class EditorNodeManager {
     private undoTimeout: NodeJS.Timeout | undefined;
     private lastCursorPosition: number;
     private trackName: string;
+    private lastCursorNode: HTMLElement | undefined;
 
     constructor(editorRef: RefObject<HTMLElement>, trackName: string, initialValue: EditorState) {
         this.ref = editorRef;
@@ -50,15 +51,16 @@ export class EditorNodeManager {
     }
 
     getValue() {
-        return this.getNode().innerText;
+        // console.log('getValue', value, value === this.getNode().innerText);
+        return Array.prototype.map.call(this.getNode().childNodes, child => child.innerText || child.textContent).join('');
     }
 
     render(trackValueString: string) {
         const tokenList = sourceToTokens(trackValueString);
-        // console.log('render', trackValueString, tokenList)
+        console.log('render', trackValueString, tokenList)
         mapTokensToDOM(tokenList, this.getNode())
         if (this.getValue() !== trackValueString)
-            throw new Error("Rendering value mismatch");
+            console.error(`Rendering value mismatch: \n`, JSON.stringify(this.getValue()), ` !== \n`, JSON.stringify(trackValueString));
     }
 
 
@@ -78,7 +80,9 @@ export class EditorNodeManager {
         const {focusNode, focusOffset} = selection;
         let editorPosition = -1;
         const editorNode = this.getNode()
-        if (!editorNode.contains(focusNode))
+        if (editorNode === focusNode)
+            return this.lastCursorPosition;
+        if (!focusNode || !editorNode.contains(focusNode))
             throw new Error("Focus node not in editor")
 
         const result = walkDOM(editorNode, (childNode, offset) => {
@@ -88,19 +92,41 @@ export class EditorNodeManager {
             }
         })
         if (!result)
-            throw new Error("focusNode not found in editor");
-        // console.log('getEditorPosition', editorPosition);
+            throw new Error("focusNode not found in editor: " + (focusNode.outerHTML || focusNode));
+
         this.lastCursorPosition = editorPosition;
         return editorPosition;
     }
 
+    getFocusNode() {
+        const selection: Selection | null = window.getSelection();
+        if (!selection)
+            throw new Error("Invalid selection")
+        const {focusNode} = selection;
+        const editorNode = this.getNode();
+        if (!focusNode || !editorNode.contains(focusNode))
+            throw new Error("Focus node not in editor")
+        return findEditorNode(focusNode, editorNode);
+    }
+
+    setCursorNode(cursorNode: HTMLElement) {
+        if (this.lastCursorNode)
+            this.lastCursorNode.removeAttribute('cursor')
+        if (cursorNode.nodeType === Node.TEXT_NODE) {
+            this.lastCursorNode = undefined;
+        } else {
+            this.lastCursorNode = cursorNode;
+            cursorNode.setAttribute('cursor', '')
+        }
+    }
 
     setCursorPosition(cursorPosition: number) {
         if (cursorPosition < 0 || isNaN(cursorPosition))
             throw new Error("Invalid editor position: " + cursorPosition)
 
 
-        const result = walkDOM(this.getNode(), (childNode, offset) => {
+        let editorNode = this.getNode();
+        const result = walkDOM(editorNode, (childNode, offset) => {
             if (childNode.nodeType !== Node.TEXT_NODE)
                 return false;
             if (childNode.nodeValue === null)
@@ -120,6 +146,7 @@ export class EditorNodeManager {
                 sel.addRange(range)
                 // console.log('setEditorPosition', cursorPosition, focusOffset, childNode, sel, range);
                 // console.log('setEditorPosition', offset, editorPosition, childNode, focusOffset);
+                // this.setCursorNode(findEditorNode(childNode, editorNode))
                 return true;
             }
         })
@@ -143,14 +170,23 @@ export class EditorNodeManager {
             default:
                 console.log(noteEvent.type, noteEvent);
                 break;
-            case 'focus':
-                this.setCursorPosition(this.lastCursorPosition)
+            case 'click':
+                console.log(noteEvent.type, noteEvent);
+                let cursorNode = findEditorNode(noteEvent.target as Node, this.getNode());
+                if (cursorNode)
+                    this.setCursorNode(cursorNode);
                 break;
+            // case 'focus':
+            // this.setCursorPosition(this.lastCursorPosition)
+            // break;
             case 'input':
                 this.refreshNode()
                 break;
             case 'keyup':
-                this.getCursorPosition()
+                this.getCursorPosition();
+                const focusNode = this.getFocusNode();
+                if (focusNode)
+                    this.setCursorNode(focusNode)
                 this.startRetainTimeout(config.editorRetainTimeout);
                 break;
             case 'keydown':
@@ -192,4 +228,13 @@ export class EditorNodeManager {
                 break;
         }
     }
+}
+
+function findEditorNode(childNode: Node, editorNode: HTMLElement) {
+    while (childNode.parentNode !== editorNode) {
+        if (!childNode.parentNode)
+            return null;
+        childNode = childNode.parentNode as Node;
+    }
+    return childNode as HTMLElement;
 }

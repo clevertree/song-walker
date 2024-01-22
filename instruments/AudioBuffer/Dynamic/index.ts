@@ -10,7 +10,7 @@ export interface AudioBufferDynamicInstrumentConfig extends AudioBufferInstrumen
 
 
 export default async function AudioBufferDynamicInstrument(config: AudioBufferDynamicInstrumentConfig, context: BaseAudioContext): Promise<InstrumentInstance> {
-    console.log('AudioBufferDynamicInstrument', config, config.title);
+    // console.log('AudioBufferDynamicInstrument', config, config.title);
     const audioBufferInstrument = await AudioBufferInstrument(config, context);
 
     let frequencyRoot = getFrequencyRoot(config.frequencyRoot)

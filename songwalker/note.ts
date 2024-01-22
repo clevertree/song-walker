@@ -1,31 +1,5 @@
 const DEFAULT_FREQUENCY_A4 = 432;
 
-// const REGEX_DURATION = /^(\d*[\/.]{0,1}\d+)([BTDt])?$/;
-
-// function isDurationString(noteLengthString) {
-//     return REGEX_DURATION.test(noteLengthString)
-// }
-
-// function parseDurationString(noteLength, bpm = 60) {
-//     const [, valueString, factorString] = noteLength.match(REGEX_DURATION);
-//     let value = parseFloat(valueString);
-//     switch (factorString) {
-//         // TODO: support ticks?
-//         case 'T':
-//             value /= 1.5;
-//             break;
-//         case 'D':
-//             value *= 1.5;
-//             break;
-//     }
-//     return value * (60 / bpm);
-// }
-
-// function parseVelocityString(noteLength) {
-//     return noteLength || DEFAULT_VELOCITY;
-// }
-//
-
 const REGEX_FREQ = /^([A-G][#qb]{0,2})(\d)?$/
 
 export function matchFrequencyString(noteString: string) {

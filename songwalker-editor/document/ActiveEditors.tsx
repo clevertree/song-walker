@@ -14,7 +14,7 @@ export function ActiveEditors() {
     }, [value])
 
     return (
-        <div>
+        <>
             {Object.keys(trackList).map(trackName => {
                     if (activeEditors.hasOwnProperty(trackName) && !activeEditors[trackName])
                         return null;
@@ -25,6 +25,6 @@ export function ActiveEditors() {
                                          trackValue={trackInitialValue}/>
                 }
             )}
-        </div>
+        </>
     )
 }

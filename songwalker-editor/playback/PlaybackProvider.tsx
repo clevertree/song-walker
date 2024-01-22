@@ -27,7 +27,7 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
                         songHandler.startPlayback();
                         await songHandler.waitForSongToFinish();
                     } catch (e) {
-                        // console.error(e);
+                        console.error(e);
                         dispatch(addError(e as SongError))
                     } finally {
                         dispatch(stopPlayback())

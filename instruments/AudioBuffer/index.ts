@@ -5,7 +5,7 @@ import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/Envelope";
 
 export interface AudioBufferInstrumentConfig {
     title?: string,
-    src: string | ArrayBuffer,
+    src: string | AudioBuffer,
     loopStart?: number,
     loopEnd?: number,
     detune?: number,
@@ -18,35 +18,48 @@ export default async function AudioBufferInstrument(config: AudioBufferInstrumen
     // console.log('AudioBufferInstrument', config, title);
     // let activeAudioBuffers = [];
     let createEnvelope = EnvelopeEffect(envelope)
-    let arrayBuffer: ArrayBuffer;
+    let audioBuffer: AudioBuffer;
     if (typeof src === "string") {
-        const response = await fetch(src);
-        if (response.status !== 200)
-            throw new Error(`Failed to fetch audio file (${response.status} ${response.statusText}): ${src}`);
-        arrayBuffer = await response.arrayBuffer();
+        audioBuffer = await getCachedAudioBuffer(src, context);
     } else {
-        arrayBuffer = src;
+        audioBuffer = src;
     }
-    const audioBuffer = await context.decodeAudioData(arrayBuffer);
 
-    // TODO?
-    // return function(eventName, ...args) {
     return function (noteEvent: PlayNoteEvent) {
-        const {startTime, duration} = noteEvent;
-        const endTime = startTime + duration;
-        const velocityGainNode = createEnvelope(noteEvent);
+        const {startTime, duration, velocity, destination} = noteEvent;
+        let gainNode: AudioNode = destination;
+        if (velocity) {
+            gainNode = createEnvelope(noteEvent);
+        }
 
         // Audio Buffer
-        const bufferNode = velocityGainNode.context.createBufferSource();
+        const bufferNode = destination.context.createBufferSource();
         bufferNode.buffer = audioBuffer;
 
         if (typeof detune !== "undefined")
             bufferNode.detune.setValueAtTime(detune, startTime); // value in cents
-        bufferNode.connect(velocityGainNode);
+        bufferNode.connect(gainNode);
         bufferNode.start(startTime);
-        bufferNode.stop(endTime);
-
+        if (duration) {
+            const endTime = startTime + duration;
+            bufferNode.stop(endTime);
+        }
         // TODO: implement noteOff / release
         return bufferNode;
     }
+}
+
+let cache = new Map<string, AudioBuffer>();
+
+
+async function getCachedAudioBuffer(src: string, context: BaseAudioContext): Promise<AudioBuffer> {
+    if (cache.has(src))
+        return cache.get(src) as AudioBuffer;
+    const response = await fetch(src);
+    if (response.status !== 200)
+        throw new Error(`Failed to fetch audio file (${response.status} ${response.statusText}): ${src}`);
+    const arrayBuffer = await response.arrayBuffer();
+    const audioBuffer = await context.decodeAudioData(arrayBuffer);
+    cache.set(src, audioBuffer);
+    return audioBuffer;
 }

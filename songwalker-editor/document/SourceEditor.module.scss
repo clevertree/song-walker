@@ -19,20 +19,26 @@
   //delimiter,
   //punctuation {
   //}
-  & > :not([active]) {
+  & > * {
     //padding: 0 2px;
-    transition: all 1s
+    transition: background-color 1s, max-width 1s;
   }
+
 
   & > [active] {
     //font-style: italic;
     //text-decoration: underline;
     //font-weight: bold;
     //transition: background-color;
+    transition: background-color 0s;
     background-color: #050;
     border-radius: 12px;
     padding: 2px 8px;
     margin: -2px -8px;
+  }
+
+  & > :not([cursor]) {
+
   }
 
   //token-unknown {
@@ -43,6 +49,7 @@
   //  }
   //}
 
+  & > [cursor],
   & > *:hover {
     font-weight: bold;
   }
@@ -51,6 +58,7 @@
   wait-statement {
     //margin-right: 4px;
     color: #F5E960;
+    float: right;
   }
 
   play-statement {
@@ -73,11 +81,18 @@
     font-weight: bold;
   }
 
-  //
-  //function-statement {
-  //  color: #8367C7;
-  //
-  //}
+  variable-statement,
+  function-statement {
+    max-width: 100vw;
+    display: inline-block;
+  }
+
+  &:not(:focus) > variable-statement,
+  &:not(:focus) > function-statement {
+    max-width: 10rem;
+    overflow-x: clip;
+    text-overflow: ellipsis;
+  }
 
   function-name {
     color: #b571ff;
