@@ -1,10 +1,10 @@
 import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/Envelope";
 import {PlayNoteEvent} from "@songwalker/walker";
-import {InstrumentConfig, InstrumentInstance} from "@songwalker/types";
+import {InstrumentInstance} from "@songwalker/types";
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
-export interface OscillatorInstrumentConfig extends InstrumentConfig {
+export interface OscillatorInstrumentConfig {
     type?: string,
     envelope?: EnvelopeEffectConfig
     detune?: number,
@@ -22,7 +22,6 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
         const {value, startTime, duration} = noteEvent;
         const frequency = noteEvent.parseFrequency()
         // const gainNode = audioContext.createGain(); //to get smooth rise/fall
-        const endTime = startTime + duration;
 
         // Envelope
         const velocityGainNode = createEnvelope(noteEvent);
@@ -34,7 +33,10 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
         if (typeof config.detune !== "undefined")
             oscillator.detune.setValueAtTime(config.detune, startTime); // value in cents
         oscillator.start(startTime);
-        oscillator.stop(endTime);
+        if (duration) {
+            const endTime = startTime + duration;
+            oscillator.stop(endTime);
+        }
         return oscillator
     }
 

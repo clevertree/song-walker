@@ -103,7 +103,7 @@ function testMelodicInstrument(config: object): InstrumentInstance {
             throw new Error("Invalid melodic string: " + value)
         noteEvent.parseFrequency();
         return {
-            onended: cy.stub(),
+            addEventListener: cy.stub(),
             stop: cy.stub(),
         }
     }
@@ -115,7 +115,7 @@ function testPercussionInstrument(config: object): InstrumentInstance {
         if (noteEvent.hasFrequency())
             throw new Error("Invalid percussive string: " + value)
         return {
-            onended: cy.stub(),
+            addEventListener: cy.stub(),
             stop: cy.stub(),
         }
     }
