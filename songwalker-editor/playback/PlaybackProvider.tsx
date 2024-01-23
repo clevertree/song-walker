@@ -15,15 +15,13 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
     const playbackManager = useMemo<PlaybackManager>(() => new PlaybackManager(), [])
     const isPlaying = useSelector((state: RootState) => state.document.isPlaying);
     const documentValue = useSelector((state: RootState) => state.document.value);
-    // const [songHandler, setSongHandler] = useState<SongHandler | null>(null)
+
     useEffect(() => {
-        // console.log('isPlaying', isPlaying)
         if (isPlaying) {
             if (!playbackManager.isPlaying()) {
                 (async () => {
                     try {
-                        const songHandler = playbackManager.compile(documentValue);
-                        // setSongHandler(songHandler);
+                        const songHandler = playbackManager.loadSong(documentValue);
                         songHandler.startPlayback();
                         await songHandler.waitForSongToFinish();
                     } catch (e) {
@@ -37,6 +35,8 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
         } else {
             if (playbackManager.isPlaying()) {
                 playbackManager.stopAllPlayback()
+            } else {
+                console.log('isPlaying', isPlaying, playbackManager)
             }
         }
     }, [dispatch, documentValue, isPlaying, playbackManager]);

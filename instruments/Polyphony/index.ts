@@ -37,9 +37,9 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
     }
 
 
-    return function (noteEvent: PlayNoteEvent) {
+    return function playPolyphonyNote(noteEvent: PlayNoteEvent) {
         const noteHandlers: NoteHandler[] = [];
-        let noteCount = 0;
+        // let noteCount = 0;
         const noteHandler: NoteHandler = {
             addEventListener(type: string, listener: (evt: Event) => void, options?: boolean | AddEventListenerOptions) {
                 for (const noteHandler of noteHandlers) noteHandler.addEventListener(type, listener, options);
@@ -49,10 +49,6 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
             },
         }
 
-        function playVoice(voiceInstance: InstrumentInstance) {
-            const noteHandler = voiceInstance(noteEvent);
-            noteHandlers.push(noteHandler)
-        }
 
         if (aliases[noteEvent.value]) {
             return aliases[noteEvent.value](noteEvent);
@@ -67,7 +63,8 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
                     } else if (keyRangeHigh && keyRangeHigh < frequency) {
                         continue;
                     }
-                    playVoice(voiceInstance);
+                    const noteHandler = voiceInstance(noteEvent);
+                    noteHandlers.push(noteHandler)
                 }
             } else {
                 throw new Error("Unrecognized note or frequency: " + noteEvent.value)

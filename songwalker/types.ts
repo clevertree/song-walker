@@ -34,11 +34,12 @@ export interface HandlesTrackEvents {
 }
 
 export type SongHandler = {
-    startPlayback: () => void,
-    stopPlayback: () => void,
+    isPlaying(): boolean,
+    startPlayback(): TrackHandler,
+    stopPlayback(): void,
     // addEventCallback: (trackName: string, callback: TrackEventHandler) => void,
     waitForSongToFinish: () => Promise<void>
-    getRootTrackState: () => TrackState
+    // getRootTrackState: () => TrackState
 }
 
 export type TrackHandler = {

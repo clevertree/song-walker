@@ -1,16 +1,16 @@
-import {getSongPlayer} from "./walker";
+import {SongPlayer} from "./walker";
 import {ERRORS} from "./constants";
 import {InstrumentInstance, TrackRenderer} from "@songwalker/types";
 
 describe('songPlayer', () => {
     it('plays sub-tracks', async () => {
         const logCallback = cy.stub();
-        const songInstance = getSongPlayer(testSong, {
+        const songInstance = new SongPlayer(testSong, {
             handleTrackEvent: logCallback
         });
-        songInstance.startPlayback();
+        const trackHandler = songInstance.startPlayback();
         await songInstance.waitForSongToFinish();
-        const status = songInstance.getRootTrackState();
+        const status = trackHandler.getTrackState();
         expect(logCallback.callCount).to.eq(37)
         expect(status.position).to.eq(4)
         expect(status.currentTime).to.eq(2.25)
@@ -18,12 +18,12 @@ describe('songPlayer', () => {
 
     it('plays percussion track', async () => {
         const logCallback = cy.stub();
-        const songInstance = getSongPlayer(testTrackPercussion, {
+        const songInstance = new SongPlayer(testTrackPercussion, {
             handleTrackEvent: logCallback
         });
-        songInstance.startPlayback();
+        const trackHandler = songInstance.startPlayback();
         await songInstance.waitForSongToFinish();
-        const status = songInstance.getRootTrackState();
+        const status = trackHandler.getTrackState();
         expect(logCallback.callCount).to.eq(23)
         console.log(logCallback);
         expect(status.position).to.eq(8)
@@ -31,7 +31,7 @@ describe('songPlayer', () => {
     })
 
     it('playing a song without an instrument throws an error ', async () => {
-        const songInstance = getSongPlayer(testSongNoInstrument, {
+        const songInstance = new SongPlayer(testSongNoInstrument, {
             handleTrackEvent: cy.stub()
         });
         try {

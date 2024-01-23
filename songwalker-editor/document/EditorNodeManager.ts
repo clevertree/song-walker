@@ -5,6 +5,7 @@ import {sourceToTokens} from "@songwalker/tokens";
 import {insertIntoSelection, mapTokensToDOM, walkDOM} from "@songwalker-editor/domUtils";
 import {EditorState} from "./SourceEditor";
 import {SongTrackEvent} from "@songwalker/types";
+import {addMIDIEventListener, removeMIDIEventListener} from "@songwalker-editor/midi/MIDIInterface";
 
 export class EditorNodeManager {
     private readonly ref: RefObject<HTMLElement>;
@@ -14,12 +15,14 @@ export class EditorNodeManager {
     private lastCursorPosition: number;
     private trackName: string;
     private lastCursorNode: HTMLElement | undefined;
+    private midiEventListener: ((ev: MIDIMessageEvent) => any) | undefined;
 
     constructor(editorRef: RefObject<HTMLElement>, trackName: string, initialValue: EditorState) {
         this.ref = editorRef;
         this.trackName = trackName;
         this.undoBuffer = new Undo<EditorState>(initialValue);
         this.lastCursorPosition = 0;
+
     }
 
     getLastCursorPosition() {
@@ -178,7 +181,15 @@ export class EditorNodeManager {
                 if (cursorNode)
                     this.setCursorNode(cursorNode);
                 break;
-            // case 'focus':
+            case 'focus':
+                this.midiEventListener = (e: MIDIMessageEvent) => console.log("MIDI", e.data, e.timeStamp, this.trackName);
+                addMIDIEventListener(this.midiEventListener)
+                break;
+            case 'blur':
+                if (this.midiEventListener)
+                    removeMIDIEventListener(this.midiEventListener)
+                break;
+
             // this.setCursorPosition(this.lastCursorPosition)
             // break;
             case 'input':

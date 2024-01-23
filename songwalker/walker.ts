@@ -1,6 +1,5 @@
 import {matchFrequencyString, parseFrequencyString} from "./note";
 import {ERRORS} from "./constants"
-import {compileSongToCallback} from "@songwalker/compiler";
 import {
     HandlesTrackEvents,
     InstrumentInstance,
@@ -8,7 +7,6 @@ import {
     InstrumentPreset,
     SongError,
     SongHandler,
-    SongState,
     SongTrackEvent,
     TrackCallback,
     TrackHandler,
@@ -147,55 +145,58 @@ export interface NoteHandler {
 }
 
 
-export function compileToSongPlayer(songSource: string, trackEventHandler: HandlesTrackEvents) {
-    const callback = compileSongToCallback(songSource)
-    return getSongPlayer(callback, trackEventHandler);
-}
+// export function compileToSongPlayer(songSource: string, trackEventHandler: HandlesTrackEvents) {
+//     const callback = compileSongToCallback(songSource)
+//     return new SongPlayer(callback, trackEventHandler);
+// }
 
+export class SongPlayer implements SongHandler {
+    private callback: TrackCallback;
+    private trackEventHandler: HandlesTrackEvents;
+    private trackHandler: TrackHandler | undefined;
+    private _isPlaying: boolean;
 
-export function getSongPlayer(
-    songCallback: TrackCallback,
-    trackEventHandler: HandlesTrackEvents
-) {
-    const audioContext = new AudioContext();
-    let trackState: TrackState = {
-        destination: audioContext.destination,
-        instrument: UnassignedInstrument,
-        // startTime: audioContext.currentTime,
-        currentTime: audioContext.currentTime,
-        position: 0,
-        noteDuration: DEFAULT_NOTE_DURATION,
-        noteVelocity: DEFAULT_NOTE_VELOCITY,
-        beatsPerMinute: DEFAULT_BPM,
-        bufferDuration: BUFFER_DURATION
+    constructor(
+        songCallback: TrackCallback,
+        trackEventHandler: HandlesTrackEvents
+    ) {
+        this.callback = songCallback;
+        this.trackEventHandler = trackEventHandler;
+        this._isPlaying = false;
     }
-    const songState: SongState = {
-        isPlaying: true
+
+    isPlaying(): boolean {
+        return this._isPlaying;
     }
-    let trackHandler: TrackHandler;
-    const songHandler: SongHandler = {
-        startPlayback() {
-            trackHandler = walkTrack(songCallback, trackState, songState, trackEventHandler);
-            return trackHandler
-        },
-        stopPlayback(): void {
-            songState.isPlaying = false;
-        },
-        async waitForSongToFinish(): Promise<void> {
-            if (!trackHandler)
-                throw new Error("Song has not been started yet");
-            await trackHandler.waitForTrackToFinish();
-        },
-        // addEventCallback: function (trackName: string, callback: TrackEventHandler) {
-        //     if (!songState.trackEventHandlers[trackName])
-        //         songState.trackEventHandlers[trackName] = [];
-        //     songState.trackEventHandlers[trackName].push(callback)
-        // },
-        getRootTrackState: function () {
-            return trackState;
+
+    startPlayback(): TrackHandler {
+        const audioContext = new AudioContext();
+        const trackState = {
+            destination: audioContext.destination,
+            instrument: UnassignedInstrument,
+            // startTime: audioContext.currentTime,
+            currentTime: audioContext.currentTime,
+            position: 0,
+            noteDuration: DEFAULT_NOTE_DURATION,
+            noteVelocity: DEFAULT_NOTE_VELOCITY,
+            beatsPerMinute: DEFAULT_BPM,
+            bufferDuration: BUFFER_DURATION
         }
+        this._isPlaying = true;
+        this.trackHandler = walkTrack(this.callback, trackState, this, this.trackEventHandler);
+        return this.trackHandler
     }
-    return songHandler
+
+    stopPlayback() {
+        this._isPlaying = false;
+    };
+
+    async waitForSongToFinish() {
+        if (!this.trackHandler)
+            throw new Error("Song has not been started yet");
+        await this.trackHandler.waitForTrackToFinish();
+        this.trackHandler = undefined;
+    }
 }
 
 
@@ -203,7 +204,7 @@ export function getSongPlayer(
 export function walkTrack(
     trackCallback: TrackCallback,
     trackState: TrackState,
-    songState: SongState,
+    songHandler: SongHandler,
     trackEventHandler: HandlesTrackEvents) {
     const trackName = trackCallback.name;
     const subTrackHandlers: TrackHandler[] = [];
@@ -225,13 +226,12 @@ export function walkTrack(
             return trackRenderer.loadInstrument(instrumentPath, instrumentConfig);
         },
         async loadInstrument(instrumentPath: string | InstrumentLoader, config: object = {}): Promise<InstrumentInstance> {
-            if (!songState.isPlaying)
+            if (!songHandler.isPlaying())
                 throw Error("Playback has ended");
             const context = trackState.destination.context;
             const startTime = context.currentTime;
             const instrumentLoader: InstrumentLoader = typeof instrumentPath === 'string' ? InstrumentLibrary.getInstrumentLoader(instrumentPath) : instrumentPath;
-            const promise = instrumentLoader(config, context);
-            trackState.instrument = await promise;
+            trackState.instrument = await instrumentLoader(config, context);
             const duration = context.currentTime - startTime;
             if (duration) {
                 console.log(`Adding ${duration}ms to song current time`)
@@ -240,13 +240,17 @@ export function walkTrack(
             return trackState.instrument;
         },
         playNote(noteString: string, velocity?: number, duration?: number): void {
-            if (!songState.isPlaying)
+            if (!songHandler.isPlaying())
                 return;
             // if (trackState.durationDivisor)
             //     duration /= trackState.durationDivisor;
             if (typeof velocity !== "undefined" && trackState.velocityDivisor)
                 velocity = velocity / trackState.velocityDivisor;
             const startTime = trackState.currentTime; //  + trackState.position;
+            if (startTime < trackState.destination.context.currentTime) {
+                console.warn("skipping note that occurs in the past: ", noteString, startTime, '<', trackState.destination.context.currentTime)
+                return
+            }
             let durationWithBPM;
             if (typeof duration === "undefined" && trackState.durationDefault)
                 duration = trackState.durationDefault;
@@ -262,10 +266,11 @@ export function walkTrack(
                 velocity
             )        // if (typeof duration === "string")
             //     duration = parseDurationString(duration, trackBPM);
-            // console.log("noteEvent", noteEvent)
+            console.log("noteEvent", noteEvent, songHandler)
             if (typeof trackState.instrument !== "function")
                 throw new Error(`Instrument not set for track ${trackName}: ${JSON.stringify(trackState)}`)
-            noteEvent.setHandler(trackState.instrument(noteEvent));
+            const noteHandler = trackState.instrument(noteEvent);
+            noteEvent.setHandler(noteHandler);
             handleTrackEvent(noteEvent);
         },
         setVariable(variablePath: string, variableValue: any): void {
@@ -278,12 +283,12 @@ export function walkTrack(
                 ...trackState,
                 position: 0,
             }
-            const subTrackHandler = walkTrack(trackCallback, subTrackState, songState, trackEventHandler)
+            const subTrackHandler = walkTrack(trackCallback, subTrackState, songHandler, trackEventHandler)
             subTrackHandlers.push(subTrackHandler);
             handleTrackEvent(new StartTrackEvent(subTrackHandler));
         },
         async wait(duration: number): Promise<void> {
-            if (!songState.isPlaying)
+            if (!songHandler.isPlaying())
                 return;
             // if (trackState.durationDivisor)
             //     duration /= trackState.durationDivisor;
@@ -363,6 +368,6 @@ function calcDurationWithBPM(duration: number, beatsPerMinute: number) {
 //     }
 // }
 
-const UnassignedInstrument: InstrumentInstance = (noteEvent: PlayNoteEvent) => {
+export const UnassignedInstrument: InstrumentInstance = (noteEvent: PlayNoteEvent) => {
     throw new Error(ERRORS.ERR_NO_INSTRUMENT);
 }

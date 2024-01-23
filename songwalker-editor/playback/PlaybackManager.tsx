@@ -1,5 +1,7 @@
-import {compileToSongPlayer,} from "@songwalker/walker";
+import {SongPlayer,} from "@songwalker/walker";
 import {HandlesTrackEvents, SongHandler, SongTrackEvent, TrackEventHandler} from "@songwalker/types";
+import {compileSongToCallback} from "@songwalker/compiler";
+import {loadSongAssets} from "@songwalker/songLoader";
 
 export class PlaybackManager implements HandlesTrackEvents {
 
@@ -9,8 +11,9 @@ export class PlaybackManager implements HandlesTrackEvents {
     } = {};
 
     isPlaying() {
-        return !!this.activeSong;
+        return this.activeSong && this.activeSong.isPlaying();
     }
+
 
     stopAllPlayback() {
         if (!this.activeSong)
@@ -19,9 +22,13 @@ export class PlaybackManager implements HandlesTrackEvents {
         this.activeSong = null;
     }
 
-    compile(songSource: string) {
-        return this.activeSong = compileToSongPlayer(songSource, this);
+    loadSong(songSource: string) {
+        const callback = compileSongToCallback(songSource)
+        this.activeSong = new SongPlayer(callback, this);
+        loadSongAssets(callback);
+        return this.activeSong;
     }
+
 
     addTrackEventHandler(trackName: string, callback: TrackEventHandler) {
         if (!this.trackEventHandlers[trackName])
