@@ -23,6 +23,7 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
     useEffect(() => {
         const callback = compileSongToCallback(documentValue)
         loadSongAssets(callback);
+        // TODO: show loading of assets
     });
 
     useEffect(() => {
@@ -48,8 +49,6 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
             if (songPlayer) {
                 songPlayer.stopPlayback()
                 setSongPlayer(undefined);
-            } else {
-                console.log(`shouldn't happen`, isPlaying, playbackManager)
             }
         }
     }, [dispatch, documentValue, isPlaying, playbackManager]);

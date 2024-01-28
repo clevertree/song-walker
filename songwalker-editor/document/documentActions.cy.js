@@ -16,8 +16,6 @@ describe('documentActions', () => {
         store.dispatch(setDocumentTrackValue('track2', "F4 1 F4:2"))
         cy.log(store.getState().document.value)
     })
-
-
 })
 
 

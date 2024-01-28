@@ -1,7 +1,7 @@
-import {NoteHandler, PlayNoteEvent} from "@songwalker/walker";
-import {InstrumentInstance, InstrumentPreset} from "@songwalker/types";
+import {InstrumentInstance, InstrumentPreset, NoteHandler} from "@songwalker/types";
 import {parseFrequencyString} from "@songwalker/note";
-import InstrumentLibrary from "@/instruments";
+import InstrumentLibrary from "../library";
+import {PlayNoteEvent} from "@songwalker/events";
 
 
 export interface PolyphonyInstrumentConfig<TConfig> {
@@ -17,24 +17,27 @@ export interface VoiceConfiguration<TConfig> {
 }
 
 
-export default async function PolyphonyInstrument(config: PolyphonyInstrumentConfig<any>, context: BaseAudioContext): Promise<InstrumentInstance> {
+export default async function PolyphonyInstrument(config: PolyphonyInstrumentConfig<any>): Promise<InstrumentInstance> {
     // console.log('PolyphonyInstrument', config, config.title);
     // let activePolyphonys = [];
 
     const aliases: { [key: string]: InstrumentInstance } = {}
     const voices: { keyRangeLow: number; keyRangeHigh: number; voiceInstance: InstrumentInstance; }[] = [];
-    for (const voice of config.voices) {
+    await Promise.all(config.voices.map(voice => {
         const {instrument: instrumentPath, config: voiceConfig} = voice.preset;
         const voiceLoader = InstrumentLibrary.getInstrumentLoader(instrumentPath)
-        const voiceInstance = await voiceLoader(voiceConfig, context);
-        if (voice.alias)
-            aliases[voice.alias] = voiceInstance;
-        voices.push({
-            keyRangeLow: parseFrequency(voice.keyRangeLow),
-            keyRangeHigh: parseFrequency(voice.keyRangeHigh),
-            voiceInstance
+        return new Promise<void>(async (resolve) => {
+            const voiceInstance = await voiceLoader(voiceConfig);
+            if (voice.alias)
+                aliases[voice.alias] = voiceInstance;
+            voices.push({
+                keyRangeLow: parseFrequency(voice.keyRangeLow),
+                keyRangeHigh: parseFrequency(voice.keyRangeHigh),
+                voiceInstance
+            })
+            resolve();
         })
-    }
+    }));
 
 
     return function playPolyphonyNote(noteEvent: PlayNoteEvent) {

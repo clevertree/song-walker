@@ -1,4 +1,4 @@
-import {NoteHandler, PlayNoteEvent} from "@songwalker/walker";
+import {PlayNoteEvent} from "@songwalker/events";
 
 export type TokenItem = {
     type: string,
@@ -49,10 +49,11 @@ export type TrackHandler = {
 }
 
 export type TrackState = {
-    destination: AudioDestinationNode,
+    context: AudioContext,
+    destination?: AudioDestinationNode,
     instrument: InstrumentInstance,
     // startTime: number,
-    currentTime: number,
+    startTime: number,
     position: number,
     // noteDuration: number,
     // noteVelocity: number,
@@ -93,9 +94,15 @@ export interface SongTrackEvent {
 //     // destination: AudioNode
 // }
 
+export interface NoteHandler {
+    addEventListener(type: string, listener: (evt: Event) => void, options?: boolean | AddEventListenerOptions): void;
+
+    stop(when?: number): void;
+}
+
 export type InstrumentInstance = (noteEvent: PlayNoteEvent) => NoteHandler;
 
-export type InstrumentLoader = (config: object, context: BaseAudioContext) => Promise<InstrumentInstance> | InstrumentInstance
+export type InstrumentLoader = (config: object) => Promise<InstrumentInstance> | InstrumentInstance
 
 // export type PresetList = {
 //     [presetName: string]: (relativeURL: string) => InstrumentPreset

@@ -1,7 +1,7 @@
-import {PlayNoteEvent} from "@songwalker/walker";
 import {InstrumentInstance} from "@songwalker/types";
-import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "@instruments/AudioBuffer";
+import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "../index";
 import {parseFrequencyString} from "@songwalker/note";
+import {PlayNoteEvent} from "@songwalker/events";
 
 
 export interface AudioBufferDynamicInstrumentConfig extends AudioBufferInstrumentConfig {
@@ -9,9 +9,9 @@ export interface AudioBufferDynamicInstrumentConfig extends AudioBufferInstrumen
 }
 
 
-export default async function AudioBufferDynamicInstrument(config: AudioBufferDynamicInstrumentConfig, context: BaseAudioContext): Promise<InstrumentInstance> {
+export default async function AudioBufferDynamicInstrument(config: AudioBufferDynamicInstrumentConfig): Promise<InstrumentInstance> {
     // console.log('AudioBufferDynamicInstrument', config, config.title);
-    const audioBufferInstrument = await AudioBufferInstrument(config, context);
+    const audioBufferInstrument = await AudioBufferInstrument(config);
 
     let frequencyRoot = getFrequencyRoot(config.frequencyRoot)
 

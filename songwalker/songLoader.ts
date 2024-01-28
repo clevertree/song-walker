@@ -6,17 +6,17 @@ import {
     TrackRenderer,
     TrackState
 } from "@songwalker/types";
-import {UnassignedInstrument} from "@songwalker/walker";
 import PresetLibrary from "@/samples";
-import InstrumentLibrary from "@/instruments";
+import InstrumentLibrary from "./instruments/library";
 
 export function loadSongAssets(
     songCallback: TrackCallback
 ) {
-    const audioContext = new AudioContext();
+    // const audioContext = new AudioContext();
     const trackState = {
-        destination: audioContext.destination,
-        instrument: UnassignedInstrument,
+        // context: audioContext,
+        // destination: audioContext.destination,
+        // instrument: UnassignedInstrument,
     } as TrackState;
     loadTrackAssets(songCallback, trackState);
 }
@@ -39,8 +39,7 @@ export function loadTrackAssets(
         },
         async loadInstrument(instrumentPath: string | InstrumentLoader, config: object = {}): Promise<InstrumentInstance> {
             const instrumentLoader: InstrumentLoader = typeof instrumentPath === 'string' ? InstrumentLibrary.getInstrumentLoader(instrumentPath) : instrumentPath;
-            const audioContext = trackState.destination.context;
-            trackState.instrument = await instrumentLoader(config, audioContext);
+            trackState.instrument = await instrumentLoader(config);
             return trackState.instrument;
         },
         playNote(noteString: string, velocity?: number, duration?: number): void {

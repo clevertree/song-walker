@@ -1,6 +1,6 @@
-import {PlayNoteEvent} from "@songwalker/walker";
 import {InstrumentInstance} from "@songwalker/types";
 import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/Envelope";
+import {PlayNoteEvent} from "@songwalker/events";
 
 
 export interface AudioBufferInstrumentConfig {
@@ -13,14 +13,14 @@ export interface AudioBufferInstrumentConfig {
 }
 
 
-export default async function AudioBufferInstrument(config: AudioBufferInstrumentConfig, context: BaseAudioContext): Promise<InstrumentInstance> {
+export default async function AudioBufferInstrument(config: AudioBufferInstrumentConfig): Promise<InstrumentInstance> {
     const {envelope, detune, title, src} = config;
     // console.log('AudioBufferInstrument', config, title);
     // let activeAudioBuffers = [];
     let createEnvelope = EnvelopeEffect(envelope)
     let audioBuffer: AudioBuffer;
     if (typeof src === "string") {
-        audioBuffer = await getCachedAudioBuffer(src, context);
+        audioBuffer = await getCachedAudioBuffer(src);
     } else {
         audioBuffer = src;
     }
@@ -51,15 +51,18 @@ export default async function AudioBufferInstrument(config: AudioBufferInstrumen
 
 let cache = new Map<string, AudioBuffer>();
 
+let loaderContext: BaseAudioContext;
 
-async function getCachedAudioBuffer(src: string, context: BaseAudioContext): Promise<AudioBuffer> {
+async function getCachedAudioBuffer(src: string): Promise<AudioBuffer> {
     if (cache.has(src))
         return cache.get(src) as AudioBuffer;
+    if (typeof loaderContext === "undefined")
+        loaderContext = new AudioContext();
     const response = await fetch(src);
     if (response.status !== 200)
         throw new Error(`Failed to fetch audio file (${response.status} ${response.statusText}): ${src}`);
     const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await context.decodeAudioData(arrayBuffer);
+    const audioBuffer = await loaderContext.decodeAudioData(arrayBuffer);
     cache.set(src, audioBuffer);
     return audioBuffer;
 }

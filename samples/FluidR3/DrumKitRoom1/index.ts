@@ -1,5 +1,5 @@
-import {PolyphonyInstrumentConfig} from "@instruments/Polyphony";
-import {AudioBufferInstrumentConfig} from "@instruments/AudioBuffer";
+import {PolyphonyInstrumentConfig} from "@songwalker/instruments/Polyphony";
+import {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBuffer";
 import {ALIASES, getPercussionInfo} from "@songwalker/constants/percussion";
 import {InstrumentPreset, PresetBank} from "@songwalker/types";
 
@@ -32,7 +32,7 @@ const DrumKitRoom1: PresetBank = {
     },
 
     * listPresets(presetPath: string): Generator<InstrumentPreset> {
-        return DrumKitRoom1.getPreset(presetPath);
+        yield DrumKitRoom1.getPreset(presetPath);
     }
 
 }

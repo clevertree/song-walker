@@ -1,6 +1,6 @@
 import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/Envelope";
-import {PlayNoteEvent} from "@songwalker/walker";
 import {InstrumentInstance} from "@songwalker/types";
+import {PlayNoteEvent} from "@songwalker/events";
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 

@@ -1,6 +1,6 @@
-import {AudioBufferDynamicInstrumentConfig} from "@instruments/AudioBuffer/Dynamic";
-import {PolyphonyInstrumentConfig, VoiceConfiguration} from "@instruments/Polyphony";
-import {EnvelopeEffectConfig} from "@instruments/effects/Envelope";
+import {AudioBufferDynamicInstrumentConfig} from "@songwalker/instruments/AudioBuffer/Dynamic";
+import {PolyphonyInstrumentConfig, VoiceConfiguration} from "@songwalker/instruments/Polyphony";
+import {EnvelopeEffectConfig} from "@songwalker/instruments/effects/Envelope";
 import {InstrumentPreset, PresetBank} from "@songwalker/types";
 
 const relativeURL = `${process.env.NEXT_PUBLIC_SAMPLE_URL}FluidR3/AcousticGrandPiano/`;
@@ -63,7 +63,7 @@ const AcousticGrandPiano: PresetBank = {
         }
     },
     * listPresets(presetPath: string): Generator<InstrumentPreset> {
-        return AcousticGrandPiano.getPreset(presetPath);
+        yield AcousticGrandPiano.getPreset(presetPath);
     }
 
 }

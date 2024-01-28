@@ -1,9 +1,9 @@
 import Preset from "./";
 
-describe(Preset.name, () => {
+describe(Preset.title, () => {
     it('compiles', async () => {
-        const kit = Preset();
-        // @ts-ignore
-        cy.log(kit);
+        const instrumentPreset = Preset.getPreset('');
+        expect(instrumentPreset).to.be.an('object');
+        cy.log(instrumentPreset);
     })
 })

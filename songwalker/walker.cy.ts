@@ -11,9 +11,9 @@ describe('songPlayer', () => {
         const trackHandler = songInstance.startPlayback();
         await songInstance.waitForSongToFinish();
         const status = trackHandler.getTrackState();
-        expect(logCallback.callCount).to.eq(37)
+        expect(logCallback.callCount).to.eq(36)
         expect(status.position).to.eq(4)
-        expect(status.currentTime).to.eq(2.25)
+        expect(status.startTime).to.eq(2.25)
     })
 
     it('plays percussion track', async () => {
@@ -24,10 +24,10 @@ describe('songPlayer', () => {
         const trackHandler = songInstance.startPlayback();
         await songInstance.waitForSongToFinish();
         const status = trackHandler.getTrackState();
-        expect(logCallback.callCount).to.eq(23)
+        expect(logCallback.callCount).to.eq(21)
         console.log(logCallback);
         expect(status.position).to.eq(8)
-        expect(status.currentTime).to.eq(2)
+        expect(status.startTime).to.eq(2)
     })
 
     it('playing a song without an instrument throws an error ', async () => {
