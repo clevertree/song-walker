@@ -5,7 +5,7 @@ const commands: { [commandName: string]: string } = {
     setVariable: 'setVariable',
     setCurrentToken: '_',
     startTrack: 'startTrack',
-    trackState: 'trackState',
+    getTrackState: 'getTrackState',
     // require: 'require',
     wait: 'wait',
     // getVariable: 'getVariable'

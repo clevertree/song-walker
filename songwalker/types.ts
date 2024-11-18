@@ -1,5 +1,3 @@
-import {PlayNoteEvent} from "@songwalker/events";
-
 export type TokenItem = {
     type: string,
     content: TokenList | string,
@@ -35,47 +33,50 @@ export interface HandlesTrackEvents {
 
 export type SongHandler = {
     isPlaying(): boolean,
-    startPlayback(): TrackHandler,
+    // startPlayback(): TrackHandler,
     stopPlayback(): void,
     // addEventCallback: (trackName: string, callback: TrackEventHandler) => void,
     waitForSongToFinish: () => Promise<void>
     // getRootTrackState: () => TrackState
 }
 
-export type TrackHandler = {
-    waitForTrackToFinish: () => Promise<void>,
-    getTrackState: () => TrackState,
-    getTrackName: () => string
-}
-
 export type TrackState = {
-    context: AudioContext,
-    destination?: AudioDestinationNode,
+    // context: AudioContext,
+    currentTime: number,
+    destination: AudioDestinationNode,
     instrument: InstrumentInstance,
-    // startTime: number,
-    startTime: number,
-    position: number,
-    // noteDuration: number,
-    // noteVelocity: number,
+    noteDuration: number,
     beatsPerMinute: number,
-    bufferDuration: number,
+    noteVelocity: number,
+    velocityDivisor: number,
+    // startTime: number,
+    // duration?: number,
+    // position?: number,
+    bufferDuration?: number,
     // durationDivisor?: number,
-    durationDefault?: number,
-    velocityDivisor?: number,
-    [key: string]: any
+    // [key: string]: any
     // promise: Promise<void> | null
 }
 
+// export type NoteRenderers = {
+//     [noteString: string]: (duration?: number, velocity?: number) => void;
+// }
+
+/** @deprecated **/
 export type TrackRenderer = {
-    trackState: TrackState,
+    getTrackName: () => string
+    getTrackState: () => TrackState,
     playNote: (noteString: string, duration?: number, velocity?: number) => void;
     loadInstrument: (instrumentPath: string | InstrumentLoader, config?: object) => Promise<InstrumentInstance>;
     loadPreset: (presetPath: string, config?: object) => Promise<InstrumentInstance>;
+    /* @depreciated */
     setVariable: (variablePath: string, variableValue: any) => void;
     // getVariable: (variablePath: string) => any;
     startTrack: (trackCallback: TrackCallback) => void;
-    wait: (duration: number) => Promise<void>;
+    waitUntil: (duration: number) => Promise<void>;
     setCurrentToken: (tokenID: number) => void;
+    waitForTrackToFinish: () => Promise<void>,
+    // notes: NoteRenderers
     // setCurrentInstrument: (instrument:Instrument) => void
     // promise: Promise<void> | null
 }
@@ -100,7 +101,10 @@ export interface NoteHandler {
     stop(when?: number): void;
 }
 
-export type InstrumentInstance = (noteEvent: PlayNoteEvent) => NoteHandler;
+// export type InstrumentInstance = (noteEvent: PlayNoteEvent) => NoteHandler;
+export type InstrumentInstance = (trackState: TrackState,
+                                  command: string,
+                                  ...props: any[]) => NoteHandler | undefined;
 
 export type InstrumentLoader = (config: object) => Promise<InstrumentInstance> | InstrumentInstance
 

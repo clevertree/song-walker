@@ -222,8 +222,8 @@ ${functionContent}
     }
 
     function formatVariableTokenContent(token: TokenItem) {
-        functionNames[COMMANDS.trackState] = true;
-        return `${COMMANDS.trackState}.${token.content}`
+        functionNames[COMMANDS.getTrackState] = true;
+        return `${COMMANDS.getTrackState}().${token.content}`
     }
 
 }

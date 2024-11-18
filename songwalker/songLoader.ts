@@ -8,6 +8,8 @@ import {
 } from "@songwalker/types";
 import PresetLibrary from "@/samples";
 import InstrumentLibrary from "./instruments/library";
+import is from "@sindresorhus/is";
+import undefined = is.undefined;
 
 export function loadSongAssets(
     songCallback: TrackCallback
@@ -27,7 +29,14 @@ export function loadTrackAssets(
     trackCallback: TrackCallback,
     trackState: TrackState) {
     const trackRenderer: TrackRenderer = {
-        trackState,
+        async waitForTrackToFinish(): Promise<void> {
+        },
+        getTrackName() {
+            return trackCallback.name
+        },
+        getTrackState() {
+            return trackState
+        },
         async loadPreset(presetPath: string, config: object | undefined): Promise<InstrumentInstance> {
             const {
                 instrument: instrumentPath,
@@ -54,7 +63,7 @@ export function loadTrackAssets(
             }
             loadTrackAssets(trackCallback, subTrackState)
         },
-        async wait(duration: number): Promise<void> {
+        async waitUntil(duration: number): Promise<void> {
             trackState.position += duration;
         },
         setCurrentToken(tokenID: number) {

@@ -1,0 +1,52 @@
+lead=loadPreset("FluidR3/AcousticGrandPiano")
+osc=loadInstrument("Oscillator", {'type':'square'})
+perc=loadPreset("FluidR3/DrumKitRoom1")
+
+track1(lead) beat1() 8
+track1(osc) beat1() 8
+
+track track1(instrument) {
+    duration=1/4
+    C5 /2
+    pitchBend:-0.4
+    config:{var: 'wut'}
+    C4d4v2 /2  // override duration and velocity
+    G4 /2
+    Eb4 /2
+    Eb5 /2
+    F5 /2
+    Eb5 /2
+    D5 /2
+    C5 /2
+    C4 /2
+    G4 /2
+    Eb4 /2
+    D5 /2
+    C4 /2
+    Bb4 /2
+}
+
+track track2() {
+    instrument=perc
+    velocityDivisor:10
+    chh     abd     /2
+    v:3
+    config:{}
+    chhv3           /2
+    chh     as      /2
+    chhv3           /2
+    chh     abd     /2
+    chhv3   abdv6   /2
+    chh     as      /2
+    chhv3           /4
+    chhv3           /4
+    chh     abd     /2
+    chhv3           /2
+    chh     as      /2
+    chhv3           /2
+    chh     abd     /2
+    chhv3   abdv6   /2
+    chh     as      /2
+    ohh::3           /2
+}
+

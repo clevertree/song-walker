@@ -1,41 +1,39 @@
-import {SongPlayer} from "./walker";
+import {SongWalker} from "./walker";
 import {ERRORS} from "./constants";
-import {InstrumentInstance, TrackRenderer} from "@songwalker/types";
+import {InstrumentInstance, TrackRenderer, TrackState} from "@songwalker/types";
+import {PolyphonyInstrument} from "@songwalker/instruments";
 
 describe('songPlayer', () => {
     it('plays sub-tracks', async () => {
         const logCallback = cy.stub();
-        const songInstance = new SongPlayer(testSong, {
+        const songInstance = new SongWalker(testSong, {
             handleTrackEvent: logCallback
         });
-        const trackHandler = songInstance.startPlayback();
         await songInstance.waitForSongToFinish();
-        const status = trackHandler.getTrackState();
+        const status = songInstance.rootTrackHandler?.getTrackState();
         expect(logCallback.callCount).to.eq(36)
         expect(status.position).to.eq(4)
-        expect(status.startTime).to.eq(2.25)
+        expect(status.currentTime).to.eq(2.25)
     })
 
     it('plays percussion track', async () => {
         const logCallback = cy.stub();
-        const songInstance = new SongPlayer(testTrackPercussion, {
+        const songInstance = new SongWalker(testTrackPercussion, {
             handleTrackEvent: logCallback
         });
-        const trackHandler = songInstance.startPlayback();
         await songInstance.waitForSongToFinish();
         const status = trackHandler.getTrackState();
         expect(logCallback.callCount).to.eq(21)
         console.log(logCallback);
         expect(status.position).to.eq(8)
-        expect(status.startTime).to.eq(2)
+        expect(status.currentTime).to.eq(2)
     })
 
     it('playing a song without an instrument throws an error ', async () => {
-        const songInstance = new SongPlayer(testSongNoInstrument, {
+        const songInstance = new SongWalker(testSongNoInstrument, {
             handleTrackEvent: cy.stub()
         });
         try {
-            songInstance.startPlayback();
             await songInstance.waitForSongToFinish();
             // noinspection ExceptionCaughtLocallyJS
             throw new Error("Song finished without error")
@@ -48,7 +46,7 @@ describe('songPlayer', () => {
 
 
 async function testSong(trackRenderer: TrackRenderer) {
-    const {wait: w, loadInstrument} = trackRenderer;
+    const {waitUntil: w, loadInstrument} = trackRenderer;
     await loadInstrument(testMelodicInstrument)
     trackRenderer.setVariable('beatsPerMinute', 160)
     trackRenderer.startTrack(testTrack)
@@ -62,8 +60,39 @@ async function testSongNoInstrument(trackRenderer: TrackRenderer) {
     trackRenderer.startTrack(testTrack)
 }
 
-async function testTrack(trackRenderer: TrackRenderer) {
-    const {playNote: n, wait: w, setCurrentToken: _} = trackRenderer;
+async function wait(trackState: TrackState, duration: number) {
+
+}
+
+const bps: number = 60 / 120;
+const instrument: InstrumentInstance = PolyphonyInstrument();
+
+async function newStyle(ts: TrackState) {
+    ts.noteDuration = 1 / 4;
+    ts.instrument(ts, 'C5')
+    ts.instrument(ts, 'config', {});
+    await wait(ts, (1 / 4));
+    ts.noteVelocity = 3
+    ts.noteDuration = 1 / 4;
+    ts.instrument(ts, 'C4');
+    await wait(ts, (1 / 4));
+    ts.instrument(ts, 'G4');
+    await wait(ts, (1 / 4));
+    ts.instrument(ts, 'Eb4');
+    await wait(ts, (1 / 4));
+    ts.instrument(ts, 'Eb5');
+    await wait(ts, (1 / 4));
+    ts.instrument(ts, 'F5');
+    await wait(ts, (1 / 4));
+    ts.instrument(ts, 'Eb5');
+    await wait(ts, (1 / 4));
+    ts.instrument(ts, 'D5');
+    await wait(ts, (1 / 4));
+    testTrack({...ts});
+}
+
+async function testTrack(trackState: TrackState) {
+    const {playNote: n, waitUntil: w, setCurrentToken: _} = trackRenderer;
 
     let tokenID = 1
     _(tokenID++);
@@ -122,7 +151,7 @@ function testPercussionInstrument(config: object): InstrumentInstance {
 }
 
 async function testTrackPercussion(trackRenderer: TrackRenderer) {
-    const {playNote: n, wait: w, setVariable: v, loadInstrument} = trackRenderer;
+    const {playNote: n, waitUntil: w, setVariable: v, loadInstrument} = trackRenderer;
     await loadInstrument(testPercussionInstrument)
     v('beatsPerMinute', 240)
     n("kick");
