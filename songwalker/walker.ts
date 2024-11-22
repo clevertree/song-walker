@@ -239,6 +239,6 @@ function calcDurationWithBPM(duration: number, beatsPerMinute: number) {
 //     }
 // }
 //
-// export const UnassignedInstrument: InstrumentInstance = (noteEvent: PlayNoteEvent) => {
+// export const UnassignedInstrument: InstrumentInstance = (trackState: TrackState, command: string) => {
 //     throw new Error(ERRORS.ERR_NO_INSTRUMENT);
 // }

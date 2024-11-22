@@ -1,4 +1,5 @@
 import {PlayNoteEvent} from "@songwalker/events";
+import {TrackState} from "@songwalker/types";
 
 const DEFAULT_VELOCITY = 1;
 
@@ -17,18 +18,18 @@ export default function EnvelopeEffect(config: EnvelopeEffectConfig = {}) {
     // console.log('EnvelopeEffect', config, config.mixer);
     // const destination = audioCtx.destination;
     // let activeOscillators = [];
-    return function (noteEvent: PlayNoteEvent) {
-        const {destination, startTime, duration, velocity} = noteEvent;
+    return function (trackState: TrackState) {
+        const {destination, currentTime, noteDuration, noteVelocity} = trackState;
         let amplitude = config.mixer || 1;
-        if (velocity)
-            amplitude *= velocity;
+        if (noteVelocity)
+            amplitude *= noteVelocity;
         let source = destination.context.createGain();
         source.connect(destination);
 
         // Attack is the time taken for initial run-up of level from nil to peak, beginning when the key is pressed.
         if (config.attack) {
             source.gain.value = 0;
-            source.gain.linearRampToValueAtTime(amplitude, startTime + (config.attack / 1000));
+            source.gain.linearRampToValueAtTime(amplitude, currentTime + (config.attack / 1000));
         } else {
             source.gain.value = amplitude;
         }

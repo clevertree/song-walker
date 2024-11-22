@@ -40,7 +40,7 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
     }));
 
 
-    return function playPolyphonyNote(noteEvent: PlayNoteEvent) {
+    return function playPolyphonyNote(trackState: TrackState, command: string) {
         const noteHandlers: NoteHandler[] = [];
         // let noteCount = 0;
         const noteHandler: NoteHandler = {

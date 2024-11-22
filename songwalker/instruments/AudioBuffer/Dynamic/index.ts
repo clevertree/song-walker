@@ -1,4 +1,4 @@
-import {InstrumentInstance} from "@songwalker/types";
+import {InstrumentInstance, TrackState} from "@songwalker/types";
 import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "../index";
 import {parseFrequencyString} from "@songwalker/note";
 import {PlayNoteEvent} from "@songwalker/events";
@@ -15,9 +15,9 @@ export default async function AudioBufferDynamicInstrument(config: AudioBufferDy
 
     let frequencyRoot = getFrequencyRoot(config.frequencyRoot)
 
-    return function (noteEvent: PlayNoteEvent) {
-        const audioBuffer = audioBufferInstrument(noteEvent) as AudioBufferSourceNode;
-        const frequency = parseFrequencyString(noteEvent.value)
+    return function (trackState: TrackState, command: string) {
+        const audioBuffer = audioBufferInstrument(trackState, command) as AudioBufferSourceNode;
+        const frequency = parseFrequencyString(command)
         // Playback Rate
         audioBuffer.playbackRate.value = frequency / frequencyRoot;
         return audioBuffer;

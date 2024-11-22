@@ -70,11 +70,13 @@ const instrument: InstrumentInstance = PolyphonyInstrument();
 async function newStyle(ts: TrackState) {
     ts.noteDuration = 1 / 4;
     ts.instrument(ts, 'C5')
-    ts.instrument(ts, 'config', {});
+    // ts.instrument(ts, 'config', {});
+    // ts.config = {} // no need for config objects
     await wait(ts, (1 / 4));
+    ts.currentTime = 1
     ts.noteVelocity = 3
     ts.noteDuration = 1 / 4;
-    ts.instrument(ts, 'C4');
+    ts.instrument.apply(ts, 'C4');
     await wait(ts, (1 / 4));
     ts.instrument(ts, 'G4');
     await wait(ts, (1 / 4));

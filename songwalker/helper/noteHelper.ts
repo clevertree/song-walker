@@ -1,9 +1,50 @@
 const DEFAULT_FREQUENCY_A4 = 432;
 
-const REGEX_FREQ = /^([A-G][#qb]{0,2})(\d)?$/
+const REGEX_COMMAND = /^([A-G][#qb]{0,2})(\d)?((?:[vd]\d(?:[./]\d)?)+)$/
+const REGEX_COMMAND_PARAMS = /([vd])((\d)(?:([.\/])(\d))?)/g
+
+interface ParsedNoteCommandParams {
+    velocity?: number,
+    duration?: number
+}
+interface ParsedNoteCommand {
+    params: ParsedNoteCommandParams
+}
+
+export function parseNote(noteString: string):ParsedNoteCommand|null {
+    const match = noteString.match(REGEX_COMMAND);
+    if(!match)
+        return null;
+    const [, note, octaveString, paramString] = match;
+    const params:ParsedNoteCommandParams = {}
+    if(paramString) {
+        const paramMatches = [...paramString.matchAll(REGEX_COMMAND_PARAMS)];
+        for(const paramMatch of paramMatches) {
+            let [, paramName, paramValue, paramNumerator, valueFraction, valueDenominator] = paramMatch;
+            let calcValue = (valueFraction === '/')
+            ? parseInt(paramNumerator) / parseInt(valueDenominator)
+                : parseFloat(paramValue)
+            switch(paramName) {
+                case 'v':
+                    params.velocity = calcValue
+                    break;
+                case 'd':
+                    params.duration = calcValue
+                    break;
+            }
+            debugger;
+
+        }
+    }
+    return {
+        params
+    }
+}
+
+const REGEX_FREQOld = /^([A-G][#qb]{0,2})(\d)?$/
 
 export function matchFrequencyString(noteString: string) {
-    return noteString.match(REGEX_FREQ);
+    return noteString.match(REGEX_FREQOld);
 }
 
 export function parseFrequencyString(noteString: string) {

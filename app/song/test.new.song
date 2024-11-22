@@ -8,8 +8,8 @@ track1(osc) beat1() 8
 track track1(instrument) {
     duration=1/4
     C5 /2
-    pitchBend:-0.4
-    config:{var: 'wut'}
+    pitchBend=-0.4
+    config={var: 'wut'}
     C4d4v2 /2  // override duration and velocity
     G4 /2
     Eb4 /2
@@ -47,6 +47,6 @@ track track2() {
     chh     abd     /2
     chhv3   abdv6   /2
     chh     as      /2
-    ohh::3           /2
+    ohhv3           /2
 }
 

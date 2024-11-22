@@ -1,4 +1,4 @@
-import {InstrumentInstance} from "@songwalker/types";
+import {InstrumentInstance, TrackState} from "@songwalker/types";
 import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/Envelope";
 import {PlayNoteEvent} from "@songwalker/events";
 
@@ -25,23 +25,28 @@ export default async function AudioBufferInstrument(config: AudioBufferInstrumen
         audioBuffer = src;
     }
 
-    return function (noteEvent: PlayNoteEvent) {
-        const {startTime, duration, velocity, destination} = noteEvent;
+    return function (trackState: TrackState, command: string) {
+        const {currentTime, noteDuration, noteVelocity, destination} = trackState;
+        const audioContext = destination.context;
+        if (currentTime < audioContext.currentTime) {
+            console.warn("skipping note that occurs in the past: ", command, currentTime, '<', audioContext.currentTime)
+            return
+        }
         let gainNode: AudioNode = destination;
-        if (velocity) {
-            gainNode = createEnvelope(noteEvent);
+        if (noteVelocity) {
+            gainNode = createEnvelope(trackState);
         }
 
         // Audio Buffer
-        const bufferNode = destination.context.createBufferSource();
+        const bufferNode = audioContext.createBufferSource();
         bufferNode.buffer = audioBuffer;
 
         if (typeof detune !== "undefined")
-            bufferNode.detune.setValueAtTime(detune, startTime); // value in cents
+            bufferNode.detune.setValueAtTime(detune, currentTime); // value in cents
         bufferNode.connect(gainNode);
-        bufferNode.start(startTime);
-        if (duration) {
-            const endTime = startTime + duration;
+        bufferNode.start(currentTime);
+        if (noteDuration) {
+            const endTime = currentTime + noteDuration;
             bufferNode.stop(endTime);
         }
         // TODO: implement noteOff / release

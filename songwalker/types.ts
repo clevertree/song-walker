@@ -101,12 +101,11 @@ export interface NoteHandler {
     stop(when?: number): void;
 }
 
-// export type InstrumentInstance = (noteEvent: PlayNoteEvent) => NoteHandler;
+// export type InstrumentInstance = (trackState: TrackState, command: string) => NoteHandler;
 export type InstrumentInstance = (trackState: TrackState,
-                                  command: string,
-                                  ...props: any[]) => NoteHandler | undefined;
+                                  command: string) => NoteHandler | undefined;
 
-export type InstrumentLoader = (config: object) => Promise<InstrumentInstance> | InstrumentInstance
+export type InstrumentLoader = (config?: any) => Promise<InstrumentInstance> | InstrumentInstance
 
 // export type PresetList = {
 //     [presetName: string]: (relativeURL: string) => InstrumentPreset
