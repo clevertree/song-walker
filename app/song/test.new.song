@@ -10,7 +10,7 @@ track track1(instrument) {
     C5 /2
     pitchBend=-0.4
     config={var: 'wut'}
-    C4d4v2 /2  // override duration and velocity
+    C4d/4v82 /2  // override duration and velocity
     G4 /2
     Eb4 /2
     Eb5 /2
