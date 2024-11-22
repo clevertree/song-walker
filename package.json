@@ -13,6 +13,7 @@
     "cypress:open": "cypress open",
     "cypress-prod:run": "CYPRESS_BASE_URL=https://paradigmthreat.net cypress run",
     "lint": "next lint",
+    "lint-fix": "eslint --fix .",
     "electron": "electron ./scripts/runElectron.js"
   },
   "dependencies": {
