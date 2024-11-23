@@ -1,7 +1,8 @@
 import AudioBufferInstrument from "@songwalker/instruments/AudioBufferInstrument";
+import {parseCommand, TrackState} from "@songwalker";
 
 describe('AudioBuffer', () => {
-    it('AudioBuffer plays C#4v0.1d1/2', async () => {
+    it('AudioBuffer plays C#4^0.1d1/2', async () => {
         const context = new AudioContext();
         const src = context.createBuffer(1, 8192, 44100);
         const audioBufferArray = src.getChannelData(0);
@@ -28,9 +29,14 @@ describe('AudioBuffer', () => {
             trackState.currentTime += (duration) * (60 / trackState.beatsPerMinute);
         }
 
-        instrument(trackState, 'C#3v0.1d1/8')
+        function playCommand(commandString: string) {
+            const commandInfo = parseCommand(commandString);
+            trackState.instrument(commandInfo.command, trackState, commandInfo.params)
+        }
+
+        playCommand('C#4^0.1@1/8')
         wait(1 / 8)
-        instrument(trackState, 'D#3v0.1d1/8')
+        playCommand('D#4^0.1@1/8')
         wait(1 / 8)
     })
 })

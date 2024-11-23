@@ -1,5 +1,5 @@
 import {InstrumentInstance, TrackState, parseNote} from "@songwalker";
-import {ParsedCommandParams} from "@songwalker/types";
+import {NoteHandler, ParsedCommandParams, ParsedNote} from "@songwalker/types";
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
@@ -17,17 +17,17 @@ export interface OscillatorInstrumentConfig {
     release?: number
 }
 
+type CB = (noteInfo: ParsedNote, trackState: TrackState, noteParams: ParsedCommandParams) => NoteHandler | undefined
+
 export default function OscillatorInstrument(config: OscillatorInstrumentConfig): InstrumentInstance {
     // console.log('OscillatorInstrument', config, config.type);
     // let activeOscillators = [];
     // let createEnvelope = EnvelopeEffect(config.envelope)
 
-    return function playOscillator(noteCommand: string, trackState: TrackState, noteParams: ParsedCommandParams) {
-        const noteInfo = parseNote(noteCommand);
-        if (!noteInfo)
-            throw new Error("Unrecognized note: " + noteCommand);
+
+    function playOscillator(noteInfo: ParsedNote, trackState: TrackState, noteParams: ParsedCommandParams) {
+
         const {frequency} = noteInfo;
-        // TODO: key range
         let {
             destination,
             currentTime,
@@ -83,4 +83,48 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
 
     }
 
+    let handleCommand = configEnvelope(
+        configFilterByKeyRange(
+            configEnvelope(
+                configDetune(
+                    playOscillator
+                )
+            )
+        )
+    )
+
+
+    return function parseCommand(noteCommand: string, trackState: TrackState, noteParams: ParsedCommandParams) {
+        const noteInfo = parseNote(noteCommand);
+        if (!noteInfo)
+            throw new Error("Unrecognized note: " + noteCommand);
+        return handleCommand(noteInfo, trackState, noteParams)
+    }
+
+    function configEnvelope(callback: CB): CB {
+        return callback;
+    }
+
+    function configDetune(callback: CB): CB {
+        return callback;
+    }
+
+
+    function configFilterByKeyRange(callback: CB): CB {
+        // TODO keyRangeHigh
+        if (config.keyRangeLow || config.keyRangeHigh) {
+            const {keyRangeLow, keyRangeHigh} = config;
+            if (typeof keyRangeLow !== "undefined") {
+                const keyRangeLowFrequency = parseNote(keyRangeLow).frequency;
+                return (noteInfo: ParsedNote, ...args) => {
+                    if (keyRangeLowFrequency > noteInfo.frequency) {
+                        return;
+                    }
+                    return callback(noteInfo, ...args)
+                }
+            }
+        }
+        return callback;
+    }
 }
+
