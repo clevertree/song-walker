@@ -18,39 +18,32 @@ export interface OscillatorInstrumentConfig {
 }
 
 type CB = (noteInfo: ParsedNote, trackState: TrackState, noteParams: ParsedCommandParams) => NoteHandler | undefined
+type GainCB = (trackState: TrackState) => GainNode
 
 export default function OscillatorInstrument(config: OscillatorInstrumentConfig): InstrumentInstance {
     // console.log('OscillatorInstrument', config, config.type);
     // let activeOscillators = [];
     // let createEnvelope = EnvelopeEffect(config.envelope)
 
+    let createGain = configEnvelope((trackState) => {
+        const {destination} = trackState;
+        let gainNode = destination.context.createGain();
+        gainNode.connect(destination);
+        return gainNode;
+    })
 
     function playOscillator(noteInfo: ParsedNote, trackState: TrackState, noteParams: ParsedCommandParams) {
 
         const {frequency} = noteInfo;
         let {
-            destination,
             currentTime,
             noteDuration,
             noteVelocity,
             beatsPerMinute
         } = {...trackState, ...noteParams};
         // const gainNode = audioContext.createGain(); //to get smooth rise/fall
-        let amplitude = config.mixer || 1;
-        if (noteVelocity)
-            amplitude *= noteVelocity;
-        let gainNode = destination.context.createGain();
-        gainNode.connect(destination);
+        let gainNode = createGain(trackState);
 
-        // Attack is the time taken for initial run-up of level from nil to peak, beginning when the key is pressed.
-        if (config.attack) {
-            gainNode.gain.value = 0;
-            gainNode.gain.linearRampToValueAtTime(amplitude, currentTime + (config.attack / 1000));
-        } else {
-            gainNode.gain.value = amplitude;
-        }
-        // Envelope
-        // const velocityGainNode = createEnvelope(trackState, noteCommand);
 
         const oscillator = createOscillator(gainNode, config.type || DEFAULT_OSCILLATOR_TYPE);
         oscillator.frequency.value = frequency;
@@ -83,9 +76,9 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
 
     }
 
-    let handleCommand = configEnvelope(
-        configFilterByKeyRange(
-            configEnvelope(
+    let handleCommand = (
+        configFilterByKeyRangeLow(
+            configFilterByKeyRangeHigh(
                 configDetune(
                     playOscillator
                 )
@@ -101,7 +94,18 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
         return handleCommand(noteInfo, trackState, noteParams)
     }
 
-    function configEnvelope(callback: CB): CB {
+    function configEnvelope(callback: GainCB): GainCB {
+        // Attack is the time taken for initial run-up of level from nil to peak, beginning when the key is pressed.
+        if (config.attack) {
+            const {attack, mixer = 1} = config;
+            return (trackState: TrackState) => {
+                const {currentTime} = trackState
+                const gainNode = callback(trackState);
+                gainNode.gain.value = 0;
+                gainNode.gain.linearRampToValueAtTime(mixer, currentTime + (attack / 1000));
+                return gainNode;
+            }
+        }
         return callback;
     }
 
@@ -110,18 +114,27 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
     }
 
 
-    function configFilterByKeyRange(callback: CB): CB {
-        // TODO keyRangeHigh
-        if (config.keyRangeLow || config.keyRangeHigh) {
-            const {keyRangeLow, keyRangeHigh} = config;
-            if (typeof keyRangeLow !== "undefined") {
-                const keyRangeLowFrequency = parseNote(keyRangeLow).frequency;
-                return (noteInfo: ParsedNote, ...args) => {
-                    if (keyRangeLowFrequency > noteInfo.frequency) {
-                        return;
-                    }
-                    return callback(noteInfo, ...args)
+    function configFilterByKeyRangeLow(callback: CB): CB {
+        if (typeof config.keyRangeLow !== 'undefined') {
+            const keyRangeLowFrequency = parseNote(config.keyRangeLow).frequency;
+            return (noteInfo: ParsedNote, ...args) => {
+                if (keyRangeLowFrequency > noteInfo.frequency) {
+                    return;
                 }
+                return callback(noteInfo, ...args)
+            }
+        }
+        return callback;
+    }
+
+    function configFilterByKeyRangeHigh(callback: CB): CB {
+        if (typeof config.keyRangeHigh !== 'undefined') {
+            const keyRangeHighFrequency = parseNote(config.keyRangeHigh).frequency;
+            return (noteInfo: ParsedNote, ...args) => {
+                if (keyRangeHighFrequency < noteInfo.frequency) {
+                    return;
+                }
+                return callback(noteInfo, ...args)
             }
         }
         return callback;
