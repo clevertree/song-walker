@@ -1,5 +1,10 @@
-import {InstrumentInstance, InstrumentPreset, NoteHandler, TrackState} from "@songwalker/types";
-import {parseFrequencyString} from "@songwalker/note";
+import {
+    InstrumentInstance,
+    InstrumentPreset,
+    NoteHandler,
+    ParsedCommandParams,
+    TrackState
+} from "@songwalker/types";
 
 
 export interface PolyphonyInstrumentConfig<TConfig> {
@@ -34,7 +39,7 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
     }));
 
 
-    return function playPolyphonyNote(trackState: TrackState, command: string) {
+    return function playPolyphonyNote(noteCommand: string, trackState: TrackState, noteParams: ParsedCommandParams) {
         const noteHandlers: NoteHandler[] = [];
         // let noteCount = 0;
         const noteHandler: NoteHandler = {
@@ -46,9 +51,8 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
             },
         }
 
-// TODO: parse command to determine alias i.e. 'chhv3d3'
-        if (aliases[noteEvent.value]) {
-            return aliases[noteEvent.value](noteEvent);
+        if (aliases[noteCommand]) {
+            return aliases[noteCommand](noteCommand, trackState, noteParams);
             // if alias is found, execute directly
         } else {
             if (noteEvent.hasFrequency()) {
@@ -71,12 +75,4 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
     }
 
 
-}
-
-function parseFrequency(frequencyValue: string | number | undefined): number {
-    if (!frequencyValue)
-        throw new Error("Invalid frequency value: " + typeof frequencyValue);
-    if (typeof frequencyValue === "string")
-        frequencyValue = parseFrequencyString(frequencyValue);
-    return frequencyValue
 }

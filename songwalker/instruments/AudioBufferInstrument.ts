@@ -1,4 +1,4 @@
-import {InstrumentInstance, TrackState} from "@songwalker/types";
+import {InstrumentInstance, ParsedCommandParams, TrackState} from "@songwalker/types";
 import {parseNote} from "@songwalker";
 
 
@@ -35,25 +35,19 @@ export default async function AudioBufferInstrument(config: AudioBufferInstrumen
         audioBuffer = src;
     }
 
-    return function (trackState: TrackState, noteCommand: string) {
-        // TODO: handle alias i.e. 'chhv3d3'
+    return function (noteCommand: string, trackState: TrackState, noteParams: ParsedCommandParams) {
         const noteInfo = parseNote(noteCommand);
         if (!noteInfo)
             throw new Error("Unrecognized note: " + noteCommand);
-        const {frequency, params} = noteInfo;
+        const {frequency} = noteInfo;
+        // TODO: key range
         let {
             beatsPerMinute,
             currentTime,
             noteDuration,
             noteVelocity,
             destination
-        } = trackState;
-        if (params) {
-            if (params.duration)
-                noteDuration = params.duration
-            if (params.velocity)
-                noteVelocity = params.velocity
-        }
+        } = {...trackState, ...noteParams};
         const audioContext = destination.context;
         if (currentTime < audioContext.currentTime) {
             console.warn("skipping note that occurs in the past: ", noteCommand, currentTime, '<', audioContext.currentTime)

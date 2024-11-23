@@ -2,6 +2,7 @@ import {SongWalker} from "./walker";
 import {ERRORS} from "./constants";
 import {InstrumentInstance, TrackRenderer, TrackState} from "@songwalker/types";
 import {PolyphonyInstrument} from "@songwalker/instruments";
+import {parseCommand, parseNote} from "@songwalker/helper/noteHelper";
 
 describe('songPlayer', () => {
     it('plays sub-tracks', async () => {
@@ -61,7 +62,13 @@ async function testSongNoInstrument(trackRenderer: TrackRenderer) {
 }
 
 async function wait(trackState: TrackState, duration: number) {
+    trackState.currentTime += (duration * (60 / trackState.beatsPerMinute));
 
+}
+
+function playCommand(trackState: TrackState, commandString: string) {
+    const commandInfo = parseCommand(commandString);
+    trackState.instrument(commandInfo.command, trackState, commandInfo.params)
 }
 
 const bps: number = 60 / 120;
@@ -69,26 +76,26 @@ const instrument: InstrumentInstance = PolyphonyInstrument();
 
 async function newStyle(ts: TrackState) {
     ts.noteDuration = 1 / 4;
-    ts.instrument(ts, 'C5')
-    // ts.instrument(ts, 'config', {});
+    playCommand(ts, 'C5^2')
+    // playCommand(ts, 'config', {});
     // ts.config = {} // no need for config objects
     await wait(ts, (1 / 4));
     ts.currentTime = 1
     ts.noteVelocity = 3
     ts.noteDuration = 1 / 4;
-    ts.instrument.apply(ts, 'C4');
+    playCommand(ts, 'C4@/3');
     await wait(ts, (1 / 4));
-    ts.instrument(ts, 'G4');
+    playCommand(ts, 'G4');
     await wait(ts, (1 / 4));
-    ts.instrument(ts, 'Eb4');
+    playCommand(ts, 'Eb4');
     await wait(ts, (1 / 4));
-    ts.instrument(ts, 'Eb5');
+    playCommand(ts, 'Eb5');
     await wait(ts, (1 / 4));
-    ts.instrument(ts, 'F5');
+    playCommand(ts, 'F5');
     await wait(ts, (1 / 4));
-    ts.instrument(ts, 'Eb5');
+    playCommand(ts, 'Eb5');
     await wait(ts, (1 / 4));
-    ts.instrument(ts, 'D5');
+    playCommand(ts, 'D5');
     await wait(ts, (1 / 4));
     testTrack({...ts});
 }

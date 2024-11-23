@@ -1,4 +1,5 @@
 import {InstrumentInstance, TrackState, parseNote} from "@songwalker";
+import {ParsedCommandParams} from "@songwalker/types";
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
@@ -21,24 +22,19 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
     // let activeOscillators = [];
     // let createEnvelope = EnvelopeEffect(config.envelope)
 
-    return function (trackState: TrackState, noteCommand: string) {
+    return function playOscillator(noteCommand: string, trackState: TrackState, noteParams: ParsedCommandParams) {
         const noteInfo = parseNote(noteCommand);
         if (!noteInfo)
             throw new Error("Unrecognized note: " + noteCommand);
-        const {frequency, params} = noteInfo;
+        const {frequency} = noteInfo;
+        // TODO: key range
         let {
             destination,
             currentTime,
             noteDuration,
             noteVelocity,
             beatsPerMinute
-        } = trackState;
-        if (params) {
-            if (params.duration)
-                noteDuration = params.duration
-            if (params.velocity)
-                noteVelocity = params.velocity
-        }
+        } = {...trackState, ...noteParams};
         // const gainNode = audioContext.createGain(); //to get smooth rise/fall
         let amplitude = config.mixer || 1;
         if (noteVelocity)

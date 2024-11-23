@@ -1,4 +1,8 @@
-import {parseNote} from './helper/noteHelper'
+import {
+    parseNote,
+    parseCommand,
+    parseNumeric
+} from './helper/commandHelper'
 import {
     InstrumentInstance,
     TrackState,
@@ -12,4 +16,6 @@ export type {
 
 export {
     parseNote,
+    parseCommand,
+    parseNumeric
 }

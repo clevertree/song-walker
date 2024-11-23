@@ -19,6 +19,22 @@ export type SongError = {
     trackName?: string;
 }
 
+export interface ParsedCommandParams {
+    noteVelocity?: number,
+    noteDuration?: number
+}
+
+export interface ParsedCommand {
+    command: string,
+    params: ParsedCommandParams
+}
+
+export interface ParsedNote {
+    note: string,
+    octave: number,
+    frequency: number,
+}
+
 
 export type TrackEventHandler = (trackEvent: SongTrackEvent, tokenID: number) => void;
 export type SongState = {
@@ -45,8 +61,8 @@ export type TrackState = {
     currentTime: number,
     destination: AudioDestinationNode,
     instrument: InstrumentInstance,
-    noteDuration: number,
     beatsPerMinute: number,
+    noteDuration: number,
     noteVelocity: number,
     velocityDivisor: number,
     // startTime: number,
@@ -101,9 +117,11 @@ export interface NoteHandler {
     stop(when?: number): void;
 }
 
+
 // export type InstrumentInstance = (trackState: TrackState, command: string) => NoteHandler;
-export type InstrumentInstance = (trackState: TrackState,
-                                  command: string) => NoteHandler | undefined;
+export type InstrumentInstance = (command: string,
+                                  trackState: TrackState,
+                                  params: ParsedCommandParams) => NoteHandler | undefined;
 
 export type InstrumentLoader = (config?: any) => Promise<InstrumentInstance> | InstrumentInstance
 
