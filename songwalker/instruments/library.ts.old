@@ -1,15 +1,12 @@
 import {InstrumentBank, InstrumentLoader} from "@songwalker/types";
-import {
-    AudioBufferDynamicInstrument,
-    AudioBufferInstrument,
-    OscillatorInstrument,
-    PolyphonyInstrument
-} from "@songwalker/instruments/index";
+import OscillatorInstrument from "@songwalker/instruments/OscillatorInstrument";
+import AudioBufferInstrument from "@songwalker/instruments/AudioBufferInstrument";
+import PolyphonyInstrument from "@songwalker/instruments/PolyphonyInstrument";
+
 
 const instrumentList: { [instrumentName: string]: any } = {
     'Oscillator': OscillatorInstrument,
     'AudioBuffer': AudioBufferInstrument,
-    'AudioBufferDynamic': AudioBufferDynamicInstrument,
     'Polyphony': PolyphonyInstrument
 }
 

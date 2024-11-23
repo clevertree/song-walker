@@ -126,13 +126,13 @@ export interface PresetBank {
 
 export type InstrumentPreset<Config = object> = {
     title?: string,
-    instrument: string,
+    instrument: InstrumentLoader,
     config: Config
 }
 
-export type InstrumentBank = {
-    getInstrumentLoader(instrumentPath: string): InstrumentLoader
-}
+// export type InstrumentBank = {
+//     getInstrumentLoader(instrumentPath: string): InstrumentLoader
+// }
 
 // export type InstrumentList = {
 //     [instrumentName: string]: InstrumentLoader

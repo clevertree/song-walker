@@ -1,12 +1,15 @@
 const DEFAULT_FREQUENCY_A4 = 432;
 
-const REGEX_COMMAND = /^([A-G][#qb]{0,2})(\d*)((?:[vd]\d*(?:[.\/]\d+)?)+)$/
-const REGEX_COMMAND_PARAMS = /([vd])((\d*)(?:([.\/])(\d+))?)/g
+// TODO parse commands without note frequencies
+const REGEX_COMMAND = /^([A-G][#qb]{0,2})(\d*)((?:[@^]\d*(?:[.\/]\d+)?)+)$/
+const REGEX_COMMAND_PARAMS = /([@^])((\d*)(?:([.\/])(\d+))?)/g
 
+// TODO switch velocity and duration to symbols
 interface ParsedNoteCommandParams {
     velocity?: number,
     duration?: number
 }
+
 interface ParsedNoteCommand {
     note: string,
     octave: number,
@@ -15,28 +18,28 @@ interface ParsedNoteCommand {
 }
 
 export function parseNoteParams(paramString: string) {
-    const params:ParsedNoteCommandParams = {}
-        const paramMatches = [...paramString.matchAll(REGEX_COMMAND_PARAMS)];
-        for(const paramMatch of paramMatches) {
-            let [, paramName, paramValue, paramNumerator, valueFraction, valueDenominator] = paramMatch;
-            let calcValue = (valueFraction === '/')
-                ? (paramNumerator ? parseInt(paramNumerator) : 1) / parseInt(valueDenominator)
-                : parseFloat(paramValue)
-            switch(paramName) {
-                case 'v':
-                    params.velocity = calcValue
-                    break;
-                case 'd':
-                    params.duration = calcValue
-                    break;
-            }
+    const params: ParsedNoteCommandParams = {}
+    const paramMatches = [...paramString.matchAll(REGEX_COMMAND_PARAMS)];
+    for (const paramMatch of paramMatches) {
+        let [, paramName, paramValue, paramNumerator, valueFraction, valueDenominator] = paramMatch;
+        let calcValue = (valueFraction === '/')
+            ? (paramNumerator ? parseInt(paramNumerator) : 1) / parseInt(valueDenominator)
+            : parseFloat(paramValue)
+        switch (paramName) {
+            case 'v':
+                params.velocity = calcValue
+                break;
+            case 'd':
+                params.duration = calcValue
+                break;
         }
-        return params;
+    }
+    return params;
 }
 
-export function parseNote(noteString: string):ParsedNoteCommand|null {
+export function parseNote(noteString: string): ParsedNoteCommand | null {
     const match = noteString.match(REGEX_COMMAND);
-    if(!match)
+    if (!match)
         return null;
     const [, note, octaveString, paramString] = match;
     const octave: number = parseInt(octaveString);

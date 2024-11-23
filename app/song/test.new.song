@@ -11,6 +11,7 @@ track track1(instrument) {
     pitchBend=-0.4
     config={var: 'wut'}
     C4d/4v82 /2  // override duration and velocity
+    C4@/4^82 /2  // override duration and velocity
     G4 /2
     Eb4 /2
     Eb5 /2
@@ -32,21 +33,21 @@ track track2() {
     chh     abd     /2
     v:3
     config:{}
-    chhv3           /2
+    chh^3           /2
     chh     as      /2
-    chhv3           /2
+    chh^3@/8        /2
     chh     abd     /2
-    chhv3   abdv6   /2
+    chh^3   abd^6   /2
     chh     as      /2
-    chhv3           /4
-    chhv3           /4
+    chh^3           /4
+    chh^3           /4
     chh     abd     /2
-    chhv3           /2
+    chh^3           /2
     chh     as      /2
-    chhv3           /2
+    chh^3           /2
     chh     abd     /2
-    chhv3   abdv6   /2
+    chh^3   abd^6   /2
     chh     as      /2
-    ohhv3           /2
+    ohh^3           /2
 }
 

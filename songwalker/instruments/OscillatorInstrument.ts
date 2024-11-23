@@ -1,13 +1,13 @@
-import EnvelopeEffect, {EnvelopeEffectConfig} from "../effects/Envelope";
 import {InstrumentInstance, TrackState, parseNote} from "@songwalker";
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
 export interface OscillatorInstrumentConfig {
     type?: string,
-    envelope?: EnvelopeEffectConfig
     detune?: number,
     pulseWidth?: number,
+    keyRangeLow?: string,
+    keyRangeHigh?: string,
     mixer?: number,
     attack?: number,
     // hold?: number,
@@ -26,7 +26,13 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
         if (!noteInfo)
             throw new Error("Unrecognized note: " + noteCommand);
         const {frequency, params} = noteInfo;
-        let {destination, currentTime, noteDuration, noteVelocity} = trackState;
+        let {
+            destination,
+            currentTime,
+            noteDuration,
+            noteVelocity,
+            beatsPerMinute
+        } = trackState;
         if (params) {
             if (params.duration)
                 noteDuration = params.duration
@@ -56,7 +62,7 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
             oscillator.detune.setValueAtTime(config.detune, currentTime); // value in cents
         oscillator.start(currentTime);
         if (noteDuration) {
-            const endTime = currentTime + noteDuration;
+            const endTime = currentTime + (noteDuration * (60 / beatsPerMinute));
             oscillator.stop(endTime);
         }
         return oscillator
