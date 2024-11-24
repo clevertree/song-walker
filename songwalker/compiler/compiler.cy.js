@@ -14,7 +14,7 @@ describe('compiler', () => {
             ]]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE);
-        debugger;
+        expect(javascriptContent).to.eq("ts.instrument(ts, 'C5', {noteDuration:3/8, noteVelocity:.2});")
     })
 
     it('wait statement compiles to tokens - 1/6;', () => {
@@ -26,9 +26,11 @@ describe('compiler', () => {
                 ";"
             ]]]
         ))
+        const javascriptContent = compileSongToJavascript(SONG_SOURCE);
+        expect(javascriptContent).to.eq("await wait(ts, 1/6);")
     })
 
-    it('set string variable compiles to tokens', () => {
+    it('set track variable compiles to tokens', () => {
         const SONG_SOURCE = `someVar = 'wutValue';`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
@@ -39,10 +41,12 @@ describe('compiler', () => {
                 ";"
             ]]]
         ))
+        const javascriptContent = compileSongToJavascript(SONG_SOURCE);
+        expect(javascriptContent).to.eq("ts.someVar='wutValue';")
     })
 
-    it('set track variable compiles to tokens', () => {
-        const SONG_SOURCE = `someVar = wutVar;`
+    it('set const variable compiles to tokens', () => {
+        const SONG_SOURCE = `const someVar = wutVar;`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
             [["variable-statement", [
@@ -52,14 +56,14 @@ describe('compiler', () => {
                 ";"
             ]]]
         ))
+        const javascriptContent = compileSongToJavascript(SONG_SOURCE);
+        expect(javascriptContent).to.eq("await wait(ts, 1/6);")
     })
 
 
     it('compiles to javascript', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
-                const trackList = parseTrackList(SONG_SOURCE)
-                expect(Object.values(trackList).length).to.eq(2);
                 const javascriptContent = compileSongToJavascript(SONG_SOURCE);
                 // expect(Object.values(tokens).length).to.eq(88);
                 const cmdList1 = javascriptContent.split(/\s+/);

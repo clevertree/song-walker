@@ -145,8 +145,10 @@ export function findTokenByType(tokenList: TokenList, tokenType: RegExp): TokenI
             return true;
         }
     })
-    if (!foundToken)
+    if (!foundToken) {
+        debugger;
         throw new Error("Token type not found: " + tokenType);
+    }
     return foundToken;
 }
 

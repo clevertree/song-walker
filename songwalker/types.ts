@@ -6,6 +6,7 @@ export type TokenItem = [name: string, content: TokenList | string]
 export type TokenList = Array<TokenItem | string>
 
 
+/** @deprecated **/
 export type TrackSourceMap = {
     [trackName: string]: string,
 }
