@@ -1,7 +1,7 @@
 import {
     InstrumentInstance,
     InstrumentPreset,
-    ParsedCommandParams,
+    CommandParams,
     TrackState
 } from "@songwalker/types";
 
@@ -42,7 +42,7 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
     }
 
 
-    return function playPolyphonyNote(noteCommand: string, trackState: TrackState, noteParams: ParsedCommandParams) {
+    return function playPolyphonyNote(noteCommand: string, trackState: TrackState, noteParams: CommandParams) {
         if (aliases[noteCommand]) {
             // if alias is found, execute directly
             return aliases[noteCommand](noteCommand, trackState, noteParams);

@@ -1,4 +1,4 @@
-import {ParsedCommand, ParsedCommandParams, ParsedNote} from "@songwalker/types";
+import {ParsedCommand, CommandParams, ParsedNote} from "@songwalker/types";
 
 const DEFAULT_FREQUENCY_A4 = 432;
 
@@ -24,7 +24,7 @@ export function parseCommand(fullCommandString: string): ParsedCommand {
     if (!match)
         throw new Error("Invalid command string: " + fullCommandString);
     const [, command, paramString] = match;
-    const params: ParsedCommandParams = {}
+    const params: CommandParams = {}
     const paramMatches = [...paramString.matchAll(REGEX_PARSE_COMMAND_PARAMS)];
     for (const paramMatch of paramMatches) {
         let [, paramSymbol, paramValue] = paramMatch;

@@ -1,12 +1,9 @@
-export type TokenItem = {
-    type: string,
-    content: TokenList | string,
-}
+export type TokenItem = [name: string, content: TokenList | string]
 
-export type TokenItemOrString = TokenItem | string
+// export type TokenItemOrString = TokenItem | string
 
 
-export type TokenList = Array<TokenItemOrString>
+export type TokenList = Array<TokenItem | string>
 
 
 export type TrackSourceMap = {
@@ -19,14 +16,19 @@ export type SongError = {
     trackName?: string;
 }
 
-export interface ParsedCommandParams {
+export interface CommandParams {
     noteVelocity?: number,
     noteDuration?: number
 }
 
+export interface CommandParamsAliases {
+    '@': keyof CommandParams,
+    '^': keyof CommandParams
+}
+
 export interface ParsedCommand {
     command: string,
-    params: ParsedCommandParams
+    params: CommandParams
 }
 
 export interface ParsedNote {
@@ -121,7 +123,7 @@ export interface NoteHandler {
 // export type InstrumentInstance = (trackState: TrackState, command: string) => NoteHandler;
 export type InstrumentInstance = (command: string,
                                   trackState: TrackState,
-                                  params: ParsedCommandParams) => NoteHandler | undefined;
+                                  params: CommandParams) => NoteHandler | undefined;
 
 export type InstrumentLoader = (config?: any) => Promise<InstrumentInstance> | InstrumentInstance
 

@@ -1,6 +1,6 @@
 import {
     findTokenByType,
-    findTokensByType,
+    findTokensByType, getFirstTokenValue,
     PATTERN_TRACK_START,
     ROOT_TRACK,
     sourceToTokens,
@@ -8,7 +8,8 @@ import {
 } from "./tokens";
 
 import {COMMANDS, VARIABLES} from "../constants";
-import {TokenItem, TokenItemOrString, TokenList, TrackSourceMap} from "@songwalker/types";
+import {CommandParams, CommandParamsAliases, TokenItem, TokenList, TrackSourceMap} from "@songwalker/types";
+import {PARAM_ALIAS} from "@songwalker/constants/commands";
 // import {getRequireCallback, InstrumentBank} from "@songwalker/walker";
 // import Instruments from "../instruments/";
 
@@ -51,9 +52,9 @@ export function parseTrackList(songSource: string): TrackSourceMap {
         if (typeof token === 'string') {
             lastTrackSource = token;
         } else {
-            switch (token.type) {
+            switch (token[0]) {
                 case 'track-start':
-                    const trackName = findTokenByType(token.content as TokenList, /^track-start-name$/).content as string;
+                    const trackName = findTokenByType(token[1] as TokenList, /^track-start-name$/).content as string;
                     // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
                     trackList[currentTrackName] = lastTrackSource
                     currentTrackName = trackName;
@@ -78,6 +79,7 @@ export function compileTrackTokensToJavascript(
 
 function formatTrack(trackName: string, trackSource: string, eventMode: boolean) {
     const tokenList = sourceToTokens(trackSource);
+    /** @deprecated **/
     const functionNames: { [key: string]: boolean } = {};
     let debugMapper = (s: string, t: number) => s + '';
     if (eventMode) {
@@ -116,28 +118,28 @@ ${functionContent}
             }).join(', ')
     }
 
-    function formatTokenContent(token: TokenItemOrString): string {
+    function formatTokenContent(token: TokenItem | string): string {
         if (typeof token === "string")
             return token;
-        switch (token.type) {
+        switch (token[0]) {
             case 'name':
             case 'function-name':
             case 'punctuation':
             case 'param-numeric':
             case 'param-factor':
             case 'param-key':
-                return token.content as string;
+                return token[1] as string;
             case 'param-duration':
-                const durationValues = tokensToKeys(token.content as TokenList);
+                const durationValues = tokensToKeys(token[1] as TokenList);
                 return formatNumericString(durationValues['param-numeric'], durationValues['param-factor']);
             case 'param-variable':
                 return formatVariableTokenContent(token);
             case 'param-string':
                 return formatStringTokenContent(token);
             case 'function-statement':
-                const functionTokenList = [...token.content as TokenList];
+                const functionTokenList = [...token[1] as TokenList];
                 const functionNameToken = findTokenByType(functionTokenList, /^function-name$/);
-                const functionNameString = functionNameToken.content as string;
+                const functionNameString = functionNameToken[1] as string;
                 const functionAssignResultToVariableToken = findTokenByType(functionTokenList, /^assign-to-variable$/);
                 let functionIsAwait = false;
 
@@ -148,56 +150,66 @@ ${functionContent}
                     // const firstParamToken = findTokenByType(functionTokenList, /^param-/);
                     // if (firstParamToken.type === 'param-string') {
                     //     const pos = functionTokenList.indexOf(firstParamToken);
-                    //     functionTokenList.splice(pos, 1, `require(${firstParamToken.content})`)
+                    //     functionTokenList.splice(pos, 1, `require(${firstParamToken[1]})`)
                     // }
                 }
                 functionNames[functionNameString] = true;
                 if (functionAssignResultToVariableToken) {
                     const functionTokenPos = functionTokenList.indexOf(functionNameToken);
                     const functionParamString = functionTokenList.slice(functionTokenPos)
-                        .filter(token => typeof token === "string" || token.content !== ';')
+                        .filter(token => typeof token === "string" || token[1] !== ';')
                         .map((token) => formatTokenContent(token))
                         .join('');
                     functionNames[COMMANDS.setVariable] = true;
-                    return `${COMMANDS.setVariable}('${functionAssignResultToVariableToken.content}', ${functionIsAwait ? 'await ' : ''}${functionParamString})`;
+                    return `${COMMANDS.setVariable}('${functionAssignResultToVariableToken[1]}', ${functionIsAwait ? 'await ' : ''}${functionParamString})`;
                 } else {
                     return (functionIsAwait ? 'await ' : '') + functionTokenList.map((token) => formatTokenContent(token)).join('')
                 }
             case 'variable-statement':
-                const variableTokenList = [...token.content as TokenList];
+                const variableTokenList = [...token[1] as TokenList];
                 const variableNameToken = findTokenByType(variableTokenList, /^assign-to-variable$/);
                 const variableValueToken = findTokenByType(variableTokenList, /^param-/);
                 functionNames[COMMANDS.setVariable] = true;
-                return `${COMMANDS.setVariable}('${variableNameToken.content}', ${formatTokenContent(variableValueToken)})`;
-            case 'track-start':
-                throw new Error("Shouldn't happen");
-            case 'play-statement':
-                const frequencyToken = findTokenByType(token.content as TokenList, /^play-note$/);
-                const noteArgs = findTokensByType(token.content as TokenList, /^play-arg$/);
-                functionNames[COMMANDS.playNote] = true;
-                return `${COMMANDS.playNote}('${frequencyToken.content}'${noteArgs.length === 0 ? ''
-                    : ', ' + noteArgs.map(t => formatTokenContent(t)).join(', ')})`;
-            case 'play-arg':
-                const playArgParamToken = findTokensByType(token.content as TokenList, /^param-/);
-                return playArgParamToken.length > 0 ? formatTokenContent(playArgParamToken[0]) : 'null';
-            case 'play-track-statement':
-                const trackNameToken = findTokenByType(token.content as TokenList, /^play-track-name$/);
-                functionNames[COMMANDS.startTrack] = true;
-                return `${COMMANDS.startTrack}(${trackNameToken.content})`;
+                return `${COMMANDS.setVariable}('${variableNameToken[1]}', ${formatTokenContent(variableValueToken)})`;
+            // case 'track-start':
+            //     throw new Error("Shouldn't happen");
+            case 'command-statement':
+                const commandParams = findTokensByType(token[1] as TokenList, /^param$/);
+                const params: string[] = [];
+                for (const commandParam of commandParams) {
+                    const symbol = getFirstTokenValue(commandParam[1] as TokenList, 'symbol') as keyof CommandParamsAliases;
+                    const value = getFirstTokenValue(commandParam[1] as TokenList, 'value') as keyof CommandParamsAliases;
+                    const alias = PARAM_ALIAS[symbol];
+                    if (!alias)
+                        throw new Error("Invalid parameter symbol: " + symbol);
+                    params.push(`${alias}:${value}`)
+                }
+                // functionNames[COMMANDS.playNote] = true;
+                return `${COMMANDS.playNote}('${frequencyToken[1]}'${params.length === 0 ? ''
+                    : ', {' + params.map(t => formatTokenContent(t)).join(', ') + '}'
+                })`;
+            // case 'play-arg':
+            //     const playArgParamToken = findTokensByType(token[1] as TokenList, /^param-/);
+            //     return playArgParamToken.length > 0 ? formatTokenContent(playArgParamToken[0]) : 'null';
+            // case 'play-track-statement':
+            //     const trackNameToken = findTokenByType(token[1] as TokenList, /^play-track-name$/);
+            //     functionNames[COMMANDS.startTrack] = true;
+            //     return `${COMMANDS.startTrack}(${trackNameToken[1]})`;
             case 'wait-statement':
-                const waitValues = tokensToKeys(token.content as TokenList);
+                const waitValues = tokensToKeys(token[1] as TokenList);
                 let numericString = formatNumericString(waitValues['param-numeric'], waitValues['param-factor']);
                 functionNames[COMMANDS.wait] = true;
                 return `await ${COMMANDS.wait}(${numericString})`;
             default:
             case 'unknown':
-                throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${currentTokenID}`);
+                throw new Error(`Unknown token type '${token[0]}': ${JSON.stringify(token)} at tokenID ${currentTokenID}`);
 
-            // return token.content as string;
+            // return token[1] as string;
             // throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${tokenID}`);
         }
     }
 
+    /** @deprecated **/
     function formatNumericString(numericString: string, factorString: string) {
         if (numericString.startsWith('/') && numericString.length > 1)
             numericString = `1${numericString}`;
@@ -215,15 +227,15 @@ ${functionContent}
     }
 
     function formatStringTokenContent(token: TokenItem) {
-        // if (!/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/.test(token.content)) {
-        // return `'${token.content}'`
+        // if (!/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/.test(token[1])) {
+        // return `'${token[1]}'`
         // }
-        return token.content as string;
+        return token[1] as string;
     }
 
     function formatVariableTokenContent(token: TokenItem) {
         functionNames[COMMANDS.getTrackState] = true;
-        return `${COMMANDS.getTrackState}().${token.content}`
+        return `${COMMANDS.getTrackState}().${token[1]}`
     }
 
 }

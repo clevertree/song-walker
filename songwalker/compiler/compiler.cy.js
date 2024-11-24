@@ -1,7 +1,60 @@
 import {compileSongToJavascript, parseTrackList} from './compiler'
 import {sourceToTokens} from "./tokens";
 
-describe('songLoader', () => {
+describe('compiler', () => {
+    it('play statement compiles to tokens - C5@3/8^.2;', () => {
+        const SONG_SOURCE = `C5@3/8^.2;`
+        const compiledSource = sourceToTokens(SONG_SOURCE);
+        expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
+            [["command-statement", [
+                ["command", "C5"],
+                ["param", [["symbol", "@"], ["value", "3/8"]]],
+                ["param", [["symbol", "^"], ["value", ".2"]]],
+                ';'
+            ]]]
+        ))
+        const javascriptContent = compileSongToJavascript(SONG_SOURCE);
+        debugger;
+    })
+
+    it('wait statement compiles to tokens - 1/6;', () => {
+        const SONG_SOURCE = `1/6;`
+        const compiledSource = sourceToTokens(SONG_SOURCE);
+        expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
+            [["wait-statement", [
+                ["duration", "1/6"],
+                ";"
+            ]]]
+        ))
+    })
+
+    it('set string variable compiles to tokens', () => {
+        const SONG_SOURCE = `someVar = 'wutValue';`
+        const compiledSource = sourceToTokens(SONG_SOURCE);
+        expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
+            [["variable-statement", [
+                ["assign-to-variable", "someVar"],
+                " = ",
+                ["param-string", "'wutValue'"],
+                ";"
+            ]]]
+        ))
+    })
+
+    it('set track variable compiles to tokens', () => {
+        const SONG_SOURCE = `someVar = wutVar;`
+        const compiledSource = sourceToTokens(SONG_SOURCE);
+        expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
+            [["variable-statement", [
+                ["assign-to-variable", "someVar"],
+                " = ",
+                ["param-variable", "wutVar"],
+                ";"
+            ]]]
+        ))
+    })
+
+
     it('compiles to javascript', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
@@ -28,41 +81,6 @@ describe('songLoader', () => {
                 cy.log('javascriptContent', javascriptContent)
             })
         })
-    })
-
-
-    it('play statement compiles to tokens', () => {
-        const SONG_SOURCE = `C5:1/4D`
-        const compiledSource = sourceToTokens(SONG_SOURCE);
-        expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [{
-                "type": "play-statement",
-                "content": [{"type": "play-note", "content": "C5"}, {
-                    "type": "play-arg",
-                    "content": [{
-                        "type": "param-duration",
-                        "content": [":", {"type": "param-numeric", "content": "1/4"}, {
-                            "type": "param-factor",
-                            "content": "D"
-                        }]
-                    }]
-                }]
-            }]
-        ))
-    })
-
-    it('wait statement compiles to tokens', () => {
-        const SONG_SOURCE = `1/4T;`
-        const compiledSource = sourceToTokens(SONG_SOURCE);
-        expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [{
-                "type": "wait-statement",
-                "content": [
-                    {"type": "param-numeric", "content": "1/4"},
-                    {"type": "param-factor", "content": "T"},
-                    ";"]
-            }]
-        ))
     })
 
     it('function compiles to tokens', () => {

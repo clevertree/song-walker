@@ -1,8 +1,8 @@
 import {SongWalker} from "./walker";
 import {ERRORS} from "./constants";
 import {InstrumentInstance, TrackRenderer, TrackState} from "@songwalker/types";
-import {PolyphonyInstrument} from "@songwalker/instruments";
-import {parseCommand, parseNote} from "@songwalker/helper/noteHelper";
+import PolyphonyInstrument from "./instruments/PolyphonyInstrument";
+import {parseCommand, parseNote} from "./helper/commandHelper";
 
 describe('songPlayer', () => {
     it('plays sub-tracks', async () => {

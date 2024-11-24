@@ -1,5 +1,5 @@
 import {InstrumentInstance, TrackState, parseNote} from "@songwalker";
-import {ParsedCommandParams, ParsedNote} from "@songwalker/types";
+import {CommandParams, ParsedNote} from "@songwalker/types";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {
     configFilterByCurrentTime,
@@ -22,7 +22,7 @@ export default function OscillatorInstrument(config: OscillatorInstrumentConfig)
     let createGain = configEnvelope(config);
     let filterNote = configFilterByKeyRange(config, configFilterByCurrentTime())
 
-    return function parseCommand(noteCommand: string, trackState: TrackState, noteParams: ParsedCommandParams) {
+    return function parseCommand(noteCommand: string, trackState: TrackState, noteParams: CommandParams) {
         const noteInfo = parseNote(noteCommand);
         if (!noteInfo)
             throw new Error("Unrecognized note: " + noteCommand);

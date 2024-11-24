@@ -1,4 +1,4 @@
-import {InstrumentInstance, ParsedCommandParams, ParsedNote, TrackState} from "@songwalker/types";
+import {InstrumentInstance, CommandParams, ParsedNote, TrackState} from "@songwalker/types";
 import {parseNote} from "..";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, configFilterByCurrentTime, KeyRangeConfig} from "./common/filter";
@@ -23,7 +23,7 @@ export default async function AudioBufferInstrument(config: AudioBufferInstrumen
     let createGain = configEnvelope(config);
     let filterNote = configFilterByKeyRange(config, configFilterByCurrentTime())
 
-    return function parseCommand(noteCommand: string, trackState: TrackState, noteParams: ParsedCommandParams) {
+    return function parseCommand(noteCommand: string, trackState: TrackState, noteParams: CommandParams) {
         // TODO: check alias
         switch (noteCommand) {
             case 'play':

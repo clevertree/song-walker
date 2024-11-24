@@ -1,4 +1,6 @@
-const commands: { [commandName: string]: string } = {
+import {CommandParamsAliases} from "@songwalker/types";
+
+export const commands: { [commandName: string]: string } = {
     loadInstrument: 'loadInstrument',
     loadPreset: 'loadPreset',
     playNote: 'playNote',
@@ -12,4 +14,8 @@ const commands: { [commandName: string]: string } = {
     // setVariable: 'setVariable',
 };
 
-export default commands;
+export const PARAM_ALIAS: CommandParamsAliases = {
+    '@': 'noteDuration',
+    '^': 'noteVelocity'
+};
+

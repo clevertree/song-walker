@@ -1,29 +1,53 @@
-lead=loadInstrument("oscillator", {wait: 1/8D})
-lead2=loadInstrument("oscillator", {'type':'square'})
+lead=loadPreset("FluidR3/AcousticGrandPiano")
+osc=loadInstrument("Oscillator", {'type':'square'})
+perc=loadPreset("FluidR3/DrumKitRoom1")
 
-currentInstrument=lead2
-waitTime = 1/4T;
+track1(lead) beat1() 8
+track1(osc) beat1() 8
 
+track track1(instrument) {
+    duration=1/4
+    C5 /2
+    pitchBend=-0.4
+    config={var: 'wut'}
+    C4d/4v82 /2  // override duration and velocity
+    C4@/4^82 /2  // override duration and velocity
+    G4 /2
+    Eb4 /2
+    Eb5 /2
+    F5 /2
+    Eb5 /2
+    D5 /2
+    C5 /2
+    C4 /2
+    G4 /2
+    Eb4 /2
+    D5 /2
+    C4 /2
+    Bb4 /2
+}
 
-wut='ohok';omfg='1230WUT2of' ; rully='yup' bpm=120
-currentInstrument=lead
-@track1 3/8
-currentInstrument=lead2
-@track1 5/8 3T;
+track beat1() {
+    instrument=perc
+    velocityDivisor:10
+    chh     abd     /2
+    v:3
+    config:{}
+    chh^3           /2
+    chh     as      /2
+    chh^3@/8        /2
+    chh     abd     /2
+    chh^3   abd^6   /2
+    chh     as      /2
+    chh^3           /4
+    chh^3           /4
+    chh     abd     /2
+    chh^3           /2
+    chh     as      /2
+    chh^3           /2
+    chh     abd     /2
+    chh^3   abd^6   /2
+    chh     as      /2
+    ohh^3           /2
+}
 
-[track1]
-C5:1/4D; 1/4;
-C4:1/4D:0.8;1/4;
-G4:1/4 1/4
-Eb4:1/4D:0.8 1/4
-Eb5:1/4T 1/4
-F5:1/4T 1/4
-Eb5:1/4T 1/4
-D5:1/4T 1/4
-C5:1/4D 1/4
-C4:1/4D:0.8 1/4
-G4:1/4 1/4
-Eb4:1/4D:0.8 1/4
-D5:1/4 1/4
-C4:1/4:.8 1/4
-Bb4:1/4 1/4
