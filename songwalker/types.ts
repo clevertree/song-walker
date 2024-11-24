@@ -144,6 +144,7 @@ export interface PresetBank {
 
 export type InstrumentPreset<Config = object> = {
     title?: string,
+    alias?: string,
     instrument: InstrumentLoader,
     config: Config
 }

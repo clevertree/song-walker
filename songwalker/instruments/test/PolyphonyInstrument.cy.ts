@@ -1,5 +1,7 @@
-import AudioBufferInstrument from "@songwalker/instruments/AudioBufferInstrument";
-import {parseCommand, TrackState} from "@songwalker";
+import PolyphonyInstrument from "@songwalker/instruments/PolyphonyInstrument";
+import {parseCommand} from "@songwalker";
+import OscillatorInstrument, {OscillatorInstrumentConfig} from "@songwalker/instruments/OscillatorInstrument";
+import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBufferInstrument";
 
 function generateRandomBuffer(context: AudioContext) {
     const src = context.createBuffer(1, 8192, 44100);
@@ -10,14 +12,25 @@ function generateRandomBuffer(context: AudioContext) {
     return src;
 }
 
-describe('AudioBuffer', () => {
-    it('AudioBuffer plays C#4^0.1d1/2', async () => {
+describe('Polyphony', () => {
+    it('Polyphony plays C#4^0.1d1/2', async () => {
         const context = new AudioContext();
-        const src = generateRandomBuffer(context)
-        const instrument = await AudioBufferInstrument({
-            src,
-            loop: true,
-            mixer: 0.1
+        const instrument = await PolyphonyInstrument({
+            voices: [{
+                alias: 'osc',
+                instrument: OscillatorInstrument,
+                config: {
+                    mixer: 0.1,
+                    type: 'sawtooth'
+                } as OscillatorInstrumentConfig
+            }, {
+                alias: 'buffer',
+                instrument: AudioBufferInstrument,
+                config: {
+                    mixer: 0.1,
+                    src: generateRandomBuffer(context)
+                } as AudioBufferInstrumentConfig
+            }]
         })
         const trackState = {
             beatsPerMinute: 180,

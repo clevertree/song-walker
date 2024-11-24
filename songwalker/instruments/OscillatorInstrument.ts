@@ -10,7 +10,7 @@ import {
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
 export interface OscillatorInstrumentConfig extends EnvelopeConfig, KeyRangeConfig {
-    type?: string,
+    type?: 'sine' | 'square' | 'sawtooth' | 'triangle',
     detune?: number,
     pulseWidth?: number,
 }

@@ -7,7 +7,7 @@ import {
     tokensToKeys
 } from "./tokens";
 
-import {COMMANDS, VARIABLES} from "./constants";
+import {COMMANDS, VARIABLES} from "../constants";
 import {TokenItem, TokenItemOrString, TokenList, TrackSourceMap} from "@songwalker/types";
 // import {getRequireCallback, InstrumentBank} from "@songwalker/walker";
 // import Instruments from "../instruments/";
