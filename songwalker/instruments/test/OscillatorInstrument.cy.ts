@@ -3,7 +3,9 @@ import {parseCommand} from "@songwalker";
 
 describe('Oscillator', () => {
     it('Oscillator plays C#4^0.1d1/2', async () => {
-        const instrument = OscillatorInstrument({})
+        const instrument = OscillatorInstrument({
+            mixer: 0.1
+        })
         const context = new AudioContext();
         const trackState = {
             beatsPerMinute: 180,
@@ -12,7 +14,7 @@ describe('Oscillator', () => {
             destination: context.destination,
             noteDuration: 0,
             noteVelocity: 0,
-            velocityDivisor: 0,
+            velocityDivisor: 1,
             instrument
         }
 

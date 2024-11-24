@@ -12,16 +12,16 @@ describe('AudioBuffer', () => {
         const instrument = await AudioBufferInstrument({
             src,
             loop: true,
-            frequencyRoot: 216
+            mixer: 0.1
         })
         const trackState = {
-            beatsPerMinute: 6,
+            beatsPerMinute: 180,
             bufferDuration: 0,
             currentTime: 0,
             destination: context.destination,
             noteDuration: 0,
             noteVelocity: 0,
-            velocityDivisor: 0,
+            velocityDivisor: 1,
             instrument
         }
 
@@ -34,9 +34,11 @@ describe('AudioBuffer', () => {
             trackState.instrument(commandInfo.command, trackState, commandInfo.params)
         }
 
-        playCommand('C#4^0.1@1/8')
-        wait(1 / 8)
-        playCommand('D#4^0.1@1/8')
-        wait(1 / 8)
+        for (let i = 0; i < 8; i++) {
+            playCommand('C#4^0.1@1/8')
+            wait(1 / 8)
+            playCommand('D#4^0.1@1/8')
+            wait(1 / 8)
+        }
     })
 })
