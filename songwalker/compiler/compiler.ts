@@ -38,7 +38,7 @@ export function compileSongToJavascript(
             // currentTokenID = tokenID;
             if (typeof token === "string")
                 return token;
-            return `${formatTokenContent(token, tokenID)};`;
+            return `${formatTokenContent(token, tokenID)}`;
         })
         // .map(debugMapper)
         .join('');
@@ -96,14 +96,19 @@ function formatTokenContent(token: TokenItem | string, currentTokenID = 0): stri
         case 'param-numeric':
         case 'param-factor':
         case 'param-key':
+        case 'param-variable':
+        case 'param-string':
             return token[1] as string;
+        case 'function-statement':
+        case 'variable-statement':
+            return token[1] as string;
+        case 'function-definition':
+            return (token[1] as string).replace(/^track/i, 'function');
         case 'param-duration':
             const durationValues = tokensToKeys(token[1] as TokenList);
             return formatNumericString(durationValues['param-numeric'], durationValues['param-factor']);
-        case 'param-variable':
-            return formatVariableTokenContent(token);
-        case 'param-string':
-            return formatStringTokenContent(token);
+        // return formatVariableTokenContent(token);
+        // return formatStringTokenContent(token);
         // case 'function-statement':
         //     const functionTokenList = [...token[1] as TokenList];
         //     const functionNameToken = findTokenByType(functionTokenList, /^function-name$/);
@@ -133,14 +138,16 @@ function formatTokenContent(token: TokenItem | string, currentTokenID = 0): stri
         //     } else {
         //         return (functionIsAwait ? 'await ' : '') + functionTokenList.map((token) => formatTokenContent(token)).join('')
         //     }
-        case 'variable-statement':
-            const variableName = getFirstTokenValue(token[1] as TokenList, 'assign-to-variable') as string;
-            // const variableName = getFirstTokenValue(token[1] as TokenList, 'param-variable') as string;
-            // const variableTokenList = [...token[1] as TokenList];
-            // const variableNameToken = findTokenByType(variableTokenList, /^assign-to-variable$/);
-            const variableValueToken = findTokenByType(token[1] as TokenList, /^param-/);
-            // functionNames[COMMANDS.setVariable] = true;
-            return EXPORT_JS.variable(variableName, formatTokenContent(variableValueToken));
+        // case 'variable-statement':
+        //     debugger;
+        //     const variableName = getFirstTokenValue(token[1] as TokenList, 'assign-to-variable') as string;
+        //     const variableValue = getFirstTokenValue(token[1] as TokenList, 'assign-value') as string;
+        //     // const variableName = getFirstTokenValue(token[1] as TokenList, 'param-variable') as string;
+        //     // const variableTokenList = [...token[1] as TokenList];
+        //     // const variableNameToken = findTokenByType(variableTokenList, /^assign-to-variable$/);
+        //     // const variableValueToken = findTokenByType(token[1] as TokenList, /^param-/);
+        //     // functionNames[COMMANDS.setVariable] = true;
+        //     return EXPORT_JS.variable(variableName, variableValue);
         // return `${COMMANDS.setVariable}('${variableNameToken[1]}', ${formatTokenContent(variableValueToken)})`;
         // case 'track-start':
         //     throw new Error("Shouldn't happen");
@@ -194,17 +201,17 @@ function formatNumericString(numericString: string, factorString: string) {
     }
 }
 
-function formatStringTokenContent(token: TokenItem) {
-    // if (!/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/.test(token[1])) {
-    // return `'${token[1]}'`
-    // }
-    return token[1] as string;
-}
-
-function formatVariableTokenContent(token: TokenItem) {
-    // functionNames[COMMANDS.getTrackState] = true;
-    return `${VARIABLES.trackState}.${token[1]}`
-}
+// function formatStringTokenContent(token: TokenItem) {
+//     // if (!/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/.test(token[1])) {
+//     // return `'${token[1]}'`
+//     // }
+//     return token[1] as string;
+// }
+//
+// function formatVariableTokenContent(token: TokenItem) {
+//     // functionNames[COMMANDS.getTrackState] = true;
+//     return `${VARIABLES.trackState}.${token[1]}`
+// }
 
 
 /** @deprecated **/

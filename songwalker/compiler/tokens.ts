@@ -45,14 +45,15 @@ export const LANGUAGE = {
     //         // 'punctuation': /[{}[\];(),.:]/
     //     }
     // },
-    'variable-statement': {
-        pattern: /[\w.]+[ \t]*=[ \t]*([\w'./])+[ \t]*;?/,
-        inside: {
-            "assign-to-variable": /^[\w.]+(?=[ \t]*=[ \t]*)/,
-            'param-string': /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
-            'param-variable': /\b[a-zA-Z_]\w*\b/,
-        }
-    },
+    'function-definition': /\b(function|track)[ \t]+([\w.]+)[ \t]*\(([^)]*)\)\s*{/,
+    'function-statement': /\b(((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?\w+\([^)]*\)[ \t]*;?/,
+    'variable-statement': /((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*([\w'./-])+[ \t]*;?/,
+    // inside: {
+    //     "assign-to-variable": /^((const|let)[ \t]*)?[\w.]+(?=[ \t]*=[ \t]*)/,
+    //     'param-string': /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
+    // 'assign-value': /[^=;]+/,
+    // }
+    // },
     // 'play-track-statement': {
     //     pattern: /@\w+/,
     //     inside: {

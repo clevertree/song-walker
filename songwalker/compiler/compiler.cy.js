@@ -2,7 +2,7 @@ import {compileSongToJavascript, parseTrackList} from './compiler'
 import {sourceToTokens} from "./tokens";
 
 describe('compiler', () => {
-    it('play statement compiles to tokens - C5@3/8^.2;', () => {
+    it('play statement - C5@3/8^.2;', () => {
         const SONG_SOURCE = `C5@3/8^.2;`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
@@ -14,10 +14,10 @@ describe('compiler', () => {
             ]]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE);
-        expect(javascriptContent).to.eq("ts.instrument(ts, 'C5', {noteDuration:3/8, noteVelocity:.2});")
+        expect(javascriptContent).to.eq("this.instrument(this, 'C5', {noteDuration:3/8, noteVelocity:.2});")
     })
 
-    it('wait statement compiles to tokens - 1/6;', () => {
+    it('wait statement - 1/6;', () => {
         const SONG_SOURCE = `1/6;`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
@@ -27,37 +27,47 @@ describe('compiler', () => {
             ]]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE);
-        expect(javascriptContent).to.eq("await wait(ts, 1/6);")
+        expect(javascriptContent).to.eq("await wait(this, 1/6);")
     })
 
-    it('set track variable compiles to tokens', () => {
-        const SONG_SOURCE = `someVar = 'wutValue';`
+    it('set track variable', () => {
+        const SONG_SOURCE = `this.someVar = 'wutValue';this.someVar=1/7;this.someVar = this.otherVar;`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [["variable-statement", [
-                ["assign-to-variable", "someVar"],
-                " = ",
-                ["param-string", "'wutValue'"],
-                ";"
-            ]]]
+            [
+                ["variable-statement", "this.someVar = 'wutValue';"],
+                ["variable-statement", "this.someVar=1/7;"],
+                ["variable-statement", "this.someVar = this.otherVar;"]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE);
-        expect(javascriptContent).to.eq("ts.someVar='wutValue';")
+        expect(javascriptContent).to.eq("this.someVar = 'wutValue';this.someVar=1/7;this.someVar = this.otherVar;")
     })
 
-    it('set const variable compiles to tokens', () => {
-        const SONG_SOURCE = `const someVar = wutVar;`
+    it('set const variable', () => {
+        const SONG_SOURCE = `const someVar = wutVar;let otherVar=1/7;`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [["variable-statement", [
-                ["assign-to-variable", "someVar"],
-                " = ",
-                ["param-variable", "wutVar"],
-                ";"
-            ]]]
+            [
+                ["variable-statement", "const someVar = wutVar;"],
+                ["variable-statement", "let otherVar=1/7;"]
+            ]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE);
-        expect(javascriptContent).to.eq("await wait(ts, 1/6);")
+        expect(javascriptContent).to.eq("const someVar = wutVar;let otherVar=1/7;")
+    })
+
+
+    it('track declaration', () => {
+        const SONG_SOURCE = `track myTrack() { C4^2 D4@2 }`
+        const compiledSource = sourceToTokens(SONG_SOURCE);
+        expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
+            [
+                ["variable-statement", "const someVar = wutVar;"],
+                ["variable-statement", "let otherVar=1/7;"]
+            ]
+        ))
+        const javascriptContent = compileSongToJavascript(SONG_SOURCE);
+        expect(javascriptContent).to.eq("const someVar = wutVar;let otherVar=1/7;")
     })
 
 
@@ -65,6 +75,7 @@ describe('compiler', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
                 const javascriptContent = compileSongToJavascript(SONG_SOURCE);
+                console.log(javascriptContent)
                 // expect(Object.values(tokens).length).to.eq(88);
                 const cmdList1 = javascriptContent.split(/\s+/);
                 const cmdList2 = SONG_SOURCE_COMPILED.split(/\s+/);
@@ -87,14 +98,14 @@ describe('compiler', () => {
         })
     })
 
-    it('function compiles to tokens', () => {
+    it('function', () => {
         const SONG_SOURCE = `testFunction('arg');`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.eq(JSON.stringify(
             [{
                 "type": "function-statement",
                 "content": [{"type": "function-name", "content": "testFunction"}, "(", {
-                    "type": "param-string",
+                    "type": "assign-value",
                     "content": "'arg'"
                 }, ");"]
             }]

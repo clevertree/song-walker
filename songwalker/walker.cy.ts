@@ -74,33 +74,33 @@ function playCommand(trackState: TrackState, commandString: string) {
 const bps: number = 60 / 120;
 const instrument: InstrumentInstance = PolyphonyInstrument();
 
-async function newStyle(ts: TrackState) {
-    ts.noteDuration = 1 / 4;
-    playCommand(ts, 'C5^2')
-    // playCommand(ts, 'config', {});
-    // ts.config = {} // no need for config objects
-    await wait(ts, (1 / 4));
-    ts.currentTime = 1
-    ts.noteVelocity = 3
-    ts.noteDuration = 1 / 4;
-    playCommand(ts, 'C4@/3');
-    await wait(ts, (1 / 4));
-    playCommand(ts, 'G4');
-    await wait(ts, (1 / 4));
-    playCommand(ts, 'Eb4');
-    await wait(ts, (1 / 4));
-    playCommand(ts, 'Eb5');
-    await wait(ts, (1 / 4));
-    playCommand(ts, 'F5');
-    await wait(ts, (1 / 4));
-    playCommand(ts, 'Eb5');
-    await wait(ts, (1 / 4));
-    playCommand(ts, 'D5');
-    await wait(ts, (1 / 4));
-    testTrack({...ts});
+async function newStyle(this: TrackState) {
+    this.noteDuration = 1 / 4;
+    playCommand(this, 'C5^2')
+    // playCommand(this, 'config', {});
+    // this.config = {} // no need for config objecthis
+    await wait(this, (1 / 4));
+    this.currentTime = 1
+    this.noteVelocity = 3
+    this.noteDuration = 1 / 4;
+    playCommand(this, 'C4@/3');
+    await wait(this, (1 / 4));
+    playCommand(this, 'G4');
+    await wait(this, (1 / 4));
+    playCommand(this, 'Eb4');
+    await wait(this, (1 / 4));
+    playCommand(this, 'Eb5');
+    await wait(this, (1 / 4));
+    playCommand(this, 'F5');
+    await wait(this, (1 / 4));
+    playCommand(this, 'Eb5');
+    await wait(this, (1 / 4));
+    playCommand(this, 'D5');
+    await wait(this, (1 / 4));
+    testTrack.bind({...this})().then(); //TODO: always bind new object?
 }
 
-async function testTrack(trackState: TrackState) {
+async function testTrack(this: TrackState) {
     const {playNote: n, waitUntil: w, setCurrentToken: _} = trackRenderer;
 
     let tokenID = 1

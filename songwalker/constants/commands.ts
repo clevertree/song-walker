@@ -15,15 +15,15 @@ export const COMMMANDS: { [commandName: string]: string } = {
 };
 
 export const VARIABLES = {
-    trackState: 'ts',
+    trackState: 'this',
 }
 
 export const EXPORT_JS = {
     songTemplate: (sourceCode: string) => `(() => {return ${sourceCode}})()`,
 
-    instrument: (...param: string[]) => VARIABLES.trackState + `.instrument(${VARIABLES.trackState}, ${param.join(', ')})`,
-    variable: (variableName: string, variableContent: string) => VARIABLES.trackState + `.${variableName}=${variableContent}`,
-    wait: (...param: string[]) => `await ${COMMMANDS.wait}(${VARIABLES.trackState}, ${param.join(', ')})`
+    instrument: (...param: string[]) => VARIABLES.trackState + `.instrument(${VARIABLES.trackState}, ${param.join(', ')});`,
+    variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
+    wait: (...param: string[]) => `await ${COMMMANDS.wait}(${VARIABLES.trackState}, ${param.join(', ')});`
 
 }
 
