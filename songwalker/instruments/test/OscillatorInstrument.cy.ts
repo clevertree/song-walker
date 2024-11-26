@@ -1,5 +1,5 @@
 import OscillatorInstrument from "@songwalker/instruments/OscillatorInstrument";
-import {parseCommand} from "@songwalker";
+import {parseCommandValues} from "@songwalker";
 
 describe('Oscillator', () => {
     it('Oscillator plays C#4^0.1d1/2', async () => {
@@ -23,7 +23,7 @@ describe('Oscillator', () => {
         }
 
         function playCommand(commandString: string) {
-            const commandInfo = parseCommand(commandString);
+            const commandInfo = parseCommandValues(commandString);
             trackState.instrument(commandInfo.command, trackState, commandInfo.params)
         }
 

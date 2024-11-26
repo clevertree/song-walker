@@ -1,6 +1,6 @@
 import {
     parseNote,
-    parseCommand,
+    parseCommandValues,
     parseNumeric
 } from './helper/commandHelper'
 import {
@@ -16,6 +16,6 @@ export type {
 
 export {
     parseNote,
-    parseCommand,
+    parseCommandValues,
     parseNumeric
 }

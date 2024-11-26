@@ -1,17 +1,16 @@
-const lead=loadPreset("FluidR3/AcousticGrandPiano")
-const osc=loadInstrument("Oscillator", {'type':'square'})
-const perc=loadPreset("FluidR3/DrumKitRoom1")
+const lead=await loadPreset("FluidR3/AcousticGrandPiano")
+const osc=await loadInstrument("Oscillator", {'type':'square'})
+const perc=await loadPreset("FluidR3/DrumKitRoom1")
 
-track1(lead) beat1() 8
+track1(lead); beat1(); 8;
 track1(osc) beat1() 8
 
 track track1(instrument) {
-    this.instrument = instrument;
-    this.duration=1/4
+    track.instrument = instrument;
+    track.noteDuration=1/4
     C5 /2
-    this.pitchBend=-0.4
-    this.config={var: 'wut'}
-    C4d/4v82 /2  // override duration and velocity
+    track.pitchBend=-0.4
+    track.config={var: 'wut'}
     C4@/4^82 /2  // override duration and velocity
     G4 /2
     Eb4 /2
@@ -29,8 +28,8 @@ track track1(instrument) {
 }
 
 track beat1() {
-    this.instrument=perc
-    this.velocityDivisor:10
+    track.instrument=perc
+    track.velocityDivisor:10
     chh     abd     /2
     chh^3           /2
     chh^3           /2

@@ -22,6 +22,10 @@ export interface CommandParams {
     noteDuration?: number
 }
 
+export type ParsedParams = {
+    [paramName in keyof CommandParams]?: string;
+}
+
 export interface CommandParamsAliases {
     '@': keyof CommandParams,
     '^': keyof CommandParams

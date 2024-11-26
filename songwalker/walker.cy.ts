@@ -2,7 +2,7 @@ import {SongWalker} from "./walker";
 import {ERRORS} from "./constants";
 import {InstrumentInstance, TrackRenderer, TrackState} from "@songwalker/types";
 import PolyphonyInstrument from "./instruments/PolyphonyInstrument";
-import {parseCommand, parseNote} from "./helper/commandHelper";
+import {parseCommandValues, parseNote} from "./helper/commandHelper";
 
 describe('songPlayer', () => {
     it('plays sub-tracks', async () => {
@@ -67,7 +67,7 @@ async function wait(trackState: TrackState, duration: number) {
 }
 
 function playCommand(trackState: TrackState, commandString: string) {
-    const commandInfo = parseCommand(commandString);
+    const commandInfo = parseCommandValues(commandString);
     trackState.instrument(commandInfo.command, trackState, commandInfo.params)
 }
 
@@ -75,32 +75,34 @@ const bps: number = 60 / 120;
 const instrument: InstrumentInstance = PolyphonyInstrument();
 
 async function newStyle(this: TrackState) {
-    this.noteDuration = 1 / 4;
-    playCommand(this, 'C5^2')
-    // playCommand(this, 'config', {});
-    // this.config = {} // no need for config objecthis
-    await wait(this, (1 / 4));
-    this.currentTime = 1
-    this.noteVelocity = 3
-    this.noteDuration = 1 / 4;
-    playCommand(this, 'C4@/3');
-    await wait(this, (1 / 4));
-    playCommand(this, 'G4');
-    await wait(this, (1 / 4));
-    playCommand(this, 'Eb4');
-    await wait(this, (1 / 4));
-    playCommand(this, 'Eb5');
-    await wait(this, (1 / 4));
-    playCommand(this, 'F5');
-    await wait(this, (1 / 4));
-    playCommand(this, 'Eb5');
-    await wait(this, (1 / 4));
-    playCommand(this, 'D5');
-    await wait(this, (1 / 4));
-    testTrack.bind({...this})().then(); //TODO: always bind new object?
+    const track = {...this};
+    track.noteDuration = 1 / 4;
+    playCommand(track, 'C5^2')
+    // playCommand(track, 'config', {});
+    // track.config = {} // no need for config objectrack
+    await wait(track, (1 / 4));
+    track.currentTime = 1
+    track.noteVelocity = 3
+    track.noteDuration = 1 / 4;
+    playCommand(track, 'C4@/3');
+    await wait(track, (1 / 4));
+    playCommand(track, 'G4');
+    await wait(track, (1 / 4));
+    playCommand(track, 'Eb4');
+    await wait(track, (1 / 4));
+    playCommand(track, 'Eb5');
+    await wait(track, (1 / 4));
+    playCommand(track, 'F5');
+    await wait(track, (1 / 4));
+    playCommand(track, 'Eb5');
+    await wait(track, (1 / 4));
+    playCommand(track, 'D5');
+    await wait(track, (1 / 4));
+    testTrack.bind(track)().then();
 }
 
 async function testTrack(this: TrackState) {
+    const track = {...this};
     const {playNote: n, waitUntil: w, setCurrentToken: _} = trackRenderer;
 
     let tokenID = 1

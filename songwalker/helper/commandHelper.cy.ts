@@ -1,8 +1,8 @@
-import {parseCommand, parseNote} from "./commandHelper";
+import {parseCommandValues, parseNote} from "./commandHelper";
 
 describe('noteHelper', () => {
     it('parseNote C#4v0.5d1/2', async () => {
-        const commandInfo = parseCommand('C#4^0.5@1/2');
+        const commandInfo = parseCommandValues('C#4^0.5@1/2');
         expect(commandInfo).to.deep.eq({
             "command": "C#4",
             "params": {
@@ -18,7 +18,7 @@ describe('noteHelper', () => {
         })
     })
     it('parseNote C#4v.5d/2', async () => {
-        const commandInfo = parseCommand('C#q4^.5@/2');
+        const commandInfo = parseCommandValues('C#q4^.5@/2');
         expect(commandInfo).to.deep.eq({
             "command": "C#q4",
             "params": {

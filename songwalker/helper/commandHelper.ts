@@ -1,8 +1,9 @@
-import {ParsedCommand, CommandParams, ParsedNote} from "@songwalker/types";
+import {ParsedCommand, CommandParams, ParsedNote, ParsedParams, CommandParamsAliases} from "@songwalker/types";
+import {PARAM_ALIAS} from "@songwalker/constants/commands";
 
 const DEFAULT_FREQUENCY_A4 = 432;
 
-const REGEX_PARSE_COMMAND = /^([^@^\s]+)((?:[@^][^@^\s]+)*)$/
+const REGEX_PARSE_COMMAND = /^([^@^;\s]+)((?:[@^][^@^;\s]+)*)(?=;)?$/
 const REGEX_PARSE_COMMAND_PARAMS = /([@^])([^@^\s]+)/g
 const REGEX_PARSE_FRACTION = /^(\d*)\/(\d+)?$/
 const REGEX_NOTE_COMMAND = /^([A-G][#qb]{0,2})(\d*)$/
@@ -19,28 +20,41 @@ export function parseNumeric(numericString: string) {
     }
 }
 
-export function parseCommand(fullCommandString: string): ParsedCommand {
+export function parseCommand(fullCommandString: string) {
     const match = fullCommandString.match(REGEX_PARSE_COMMAND);
     if (!match)
         throw new Error("Invalid command string: " + fullCommandString);
     const [, command, paramString] = match;
+    return [
+        command,
+        paramString
+    ];
+}
+
+export function parseCommandValues(fullCommandString: string): ParsedCommand {
     const params: CommandParams = {}
-    const paramMatches = [...paramString.matchAll(REGEX_PARSE_COMMAND_PARAMS)];
-    for (const paramMatch of paramMatches) {
-        let [, paramSymbol, paramValue] = paramMatch;
-        switch (paramSymbol) {
-            case '^':
-                params.noteVelocity = parseNumeric(paramValue)
-                break;
-            case '@':
-                params.noteDuration = parseNumeric(paramValue)
-                break;
-        }
+    const [command, paramString] = parseCommand(fullCommandString);
+    const parsedParams = parseCommandParams(paramString);
+    const paramNames = Object.keys(parsedParams) as (keyof ParsedParams)[]
+    for (let paramName of paramNames) {
+        const paramValue = parsedParams[paramName]
+        if (paramValue)
+            params[paramName] = parseNumeric(paramValue);
     }
     return {
         command,
         params
     };
+}
+
+export function parseCommandParams(paramString: string): ParsedParams {
+    const parsedParams: ParsedParams = {};
+    const paramMatches = [...paramString.matchAll(REGEX_PARSE_COMMAND_PARAMS)];
+    for (const paramMatch of paramMatches) {
+        let [, paramSymbol, paramValue] = paramMatch;
+        parsedParams[PARAM_ALIAS[paramSymbol as keyof CommandParamsAliases]] = formatDuration(paramValue)
+    }
+    return parsedParams;
 }
 
 export function parseNote(noteCommand: string): ParsedNote {
@@ -63,6 +77,10 @@ export function parseNote(noteCommand: string): ParsedNote {
         // keyNumber,
         frequency,
     }
+}
+
+export function formatDuration(durationString: string): string {
+    return durationString.replace(/^\//, '1/')
 }
 
 // const REGEX_FREQOld = /^([A-G][#qb]{0,2})(\d)?$/

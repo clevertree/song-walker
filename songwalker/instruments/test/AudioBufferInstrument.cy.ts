@@ -1,5 +1,5 @@
 import AudioBufferInstrument from "@songwalker/instruments/AudioBufferInstrument";
-import {parseCommand, TrackState} from "@songwalker";
+import {parseCommandValues, TrackState} from "@songwalker";
 
 function generateRandomBuffer(context: AudioContext) {
     const src = context.createBuffer(1, 8192, 44100);
@@ -35,7 +35,7 @@ describe('AudioBuffer', () => {
         }
 
         function playCommand(commandString: string) {
-            const commandInfo = parseCommand(commandString);
+            const commandInfo = parseCommandValues(commandString);
             trackState.instrument(commandInfo.command, trackState, commandInfo.params)
         }
 

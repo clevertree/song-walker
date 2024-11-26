@@ -33,7 +33,7 @@ export const LANGUAGE = {
     //         // 'assign-operator': /=/,
     //         'function-name': /\b\w+(?=\()/,
     //         'param-key': {
-    //             pattern: /((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z\xA0-\uFFFF](?:(?!\s)[$\w\xA0-\uFFFF])*(?=\s*:)/m,
+    //             pattern: /((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z0-9](?:(?!\s)[$\w0-9])*(?=\s*:)/m,
     //             lookbehind: true
     //         },
     //         'param-string': {
@@ -45,9 +45,32 @@ export const LANGUAGE = {
     //         // 'punctuation': /[{}[\];(),.:]/
     //     }
     // },
-    'function-definition': /\b(function|track)[ \t]+([\w.]+)[ \t]*\(([^)]*)\)\s*{/,
-    'function-statement': /\b(((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?\w+\([^)]*\)[ \t]*;?/,
-    'variable-statement': /((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*([\w'./-])+[ \t]*;?/,
+    'comment': /(\/\/).*$/m,
+    'track-definition': /(?=async\s+)?\b(track)\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{\s*/,
+    'function-definition': /(?=async\s+)?\bfunction\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{\s*/,
+    'function-statement': /\b((?:(?:const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?(await\s+)?\b([$\w][$\w]+)\(((?:[^()]|\([^()]*\))*)\)/,
+    // 'function-statement': /\b(function|track)[ \t]+([\w.]+)[ \t]*\(([^)]*)\)\s*{/,
+    // 'function-statement': /\b(((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?\w+\([^)]*\)[ \t]*;?/,
+    'variable-statement': /((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*([\w'.\/-]|\{[^{}]*})+[ \t]*;?/,
+    'command-statement': /\b([a-zA-Z][^@^=;\s]*)((?:[@^][^@^=;\s;]+)*)(?=;)?/,
+    //     inside: {
+    //         command: /^[^@^\s]+/,
+    //         param: {
+    //             pattern: /([@^][^@^\s;]+)/,
+    //             inside: {
+    //                 symbol: /^[@^]/,
+    //                 value: /[^@^\s;]+$/,
+    //             }
+    //         },
+    //         // punctuation: /;/
+    //     }
+    // },
+    'wait-statement': /\d*[\/.]?\d+(?=;)?/,
+    //     inside: {
+    //         duration: /\d*[\/.]?\d+/,
+    //         // punctuation: /;/
+    //     }
+    // },
     // inside: {
     //     "assign-to-variable": /^((const|let)[ \t]*)?[\w.]+(?=[ \t]*=[ \t]*)/,
     //     'param-string': /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
@@ -81,27 +104,6 @@ export const LANGUAGE = {
     //         // punctuation: /;/
     //     },
     // },
-    'command-statement': {
-        pattern: /\b([a-zA-Z][^@^\s]*)((?:[@^][^@^\s;]+)*);?/,
-        inside: {
-            command: /^[^@^\s]+/,
-            param: {
-                pattern: /([@^][^@^\s;]+)/,
-                inside: {
-                    symbol: /^[@^]/,
-                    value: /[^@^\s;]+$/,
-                }
-            },
-            // punctuation: /;/
-        }
-    },
-    'wait-statement': {
-        pattern: /\b\d*[\/.]?\d+;?/,
-        inside: {
-            duration: /\d*[\/.]?\d+/,
-            // punctuation: /;/
-        }
-    },
     // 'token-unknown': /\S+/
     // punctuation: /;/
     // 'newline': REGEXP_NEWLINE,

@@ -1,35 +1,55 @@
-(() => {return async function rootTrack(trackRenderer) {
-	const {loadInstrument, setVariable, startTrack, trackState, wait} = trackRenderer;
-	setVariable('lead', await loadInstrument("oscillator", {wait: (1/8)*1.5}));
-	setVariable('lead2', await loadInstrument("oscillator", {'type':'square'}));
+const lead=await loadPreset.bind(track)("FluidR3/AcousticGrandPiano")
+const osc=await loadInstrument.bind(track)("Oscillator", {'type':'square'})
+const perc=await loadPreset.bind(track)("FluidR3/DrumKitRoom1")
 
-	setVariable('currentInstrument', trackState.lead2);
-	setVariable('waitTime', (1/4)/1.5);
+track1.bind(track)(lead); beat1.bind(track)(); await tw(8);
+track1.bind(track)(osc) beat1.bind(track)() await tw(8)
 
-
-	setVariable('wut', 'ohok');	setVariable('omfg', '1230WUT2of'); 	setVariable('rully', 'yup');	setVariable('bpm', 120);
-	setVariable('currentInstrument', trackState.lead);
-	startTrack(track1); 	await wait(3/8);
-	setVariable('currentInstrument', trackState.lead2);
-	startTrack(track1); 	await wait(5/8); 	await wait((3)/1.5);
-
+async function track1(instrument) {
+    const track = {...this};
+	const tw = wait.bind(track)
+	track.instrument = instrument;
+    track.noteDuration=1/4
+    track.instrument(track, 'C5') await tw(1/2)
+    track.pitchBend=-0.4
+    track.config={var: 'wut'}
+    track.instrument(track, 'C4', {noteDuration:1/4,noteVelocity:82}) await tw(1/2)  // override duration and velocity
+    track.instrument(track, 'G4') await tw(1/2)
+    track.instrument(track, 'Eb4') await tw(1/2)
+    track.instrument(track, 'Eb5') await tw(1/2)
+    track.instrument(track, 'F5') await tw(1/2)
+    track.instrument(track, 'Eb5') await tw(1/2)
+    track.instrument(track, 'D5') await tw(1/2)
+    track.instrument(track, 'C5') await tw(1/2)
+    track.instrument(track, 'C4') await tw(1/2)
+    track.instrument(track, 'G4') await tw(1/2)
+    track.instrument(track, 'Eb4') await tw(1/2)
+    track.instrument(track, 'D5') await tw(1/2)
+    track.instrument(track, 'C4') await tw(1/2)
+    track.instrument(track, 'Bb4') await tw(1/2)
 }
 
-async function track1(trackRenderer) {
-	const {playNote, wait} = trackRenderer;
-	playNote('C5', (1/4)*1.5); 	await wait(1/4);
-	playNote('C4', (1/4)*1.5, 0.8);	await wait(1/4);
-	playNote('G4', 1/4); 	await wait(1/4);
-	playNote('Eb4', (1/4)*1.5, 0.8); 	await wait(1/4);
-	playNote('Eb5', (1/4)/1.5); 	await wait(1/4);
-	playNote('F5', (1/4)/1.5); 	await wait(1/4);
-	playNote('Eb5', (1/4)/1.5); 	await wait(1/4);
-	playNote('D5', (1/4)/1.5); 	await wait(1/4);
-	playNote('C5', (1/4)*1.5); 	await wait(1/4);
-	playNote('C4', (1/4)*1.5, 0.8); 	await wait(1/4);
-	playNote('G4', 1/4); 	await wait(1/4);
-	playNote('Eb4', (1/4)*1.5, 0.8); 	await wait(1/4);
-	playNote('D5', 1/4); 	await wait(1/4);
-	playNote('C4', 1/4, .8); 	await wait(1/4);
-	playNote('Bb4', 1/4); 	await wait(1/4);
-}})()
+async function beat1() {
+    const track = {...this};
+	const tw = wait.bind(track)
+	track.instrument=perc
+    track.instrument(track, 'track.velocityDivisor:10')
+    track.instrument(track, 'chh')     track.instrument(track, 'abd')     await tw(1/2)
+    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/2)
+    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/2)
+    track.instrument(track, 'chh')     track.instrument(track, 'as')      await tw(1/2)
+    track.instrument(track, 'chh', {noteVelocity:3,noteDuration:1/8})        await tw(1/2)
+    track.instrument(track, 'chh')     track.instrument(track, 'abd')     await tw(1/2)
+    track.instrument(track, 'chh', {noteVelocity:3})   track.instrument(track, 'abd', {noteVelocity:6})   await tw(1/2)
+    track.instrument(track, 'chh')     track.instrument(track, 'as')      await tw(1/2)
+    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/4)
+    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/4)
+    track.instrument(track, 'chh')     track.instrument(track, 'abd')     await tw(1/2)
+    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/2)
+    track.instrument(track, 'chh')     track.instrument(track, 'as')      await tw(1/2)
+    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/2)
+    track.instrument(track, 'chh')     track.instrument(track, 'abd')     await tw(1/2)
+    track.instrument(track, 'chh', {noteVelocity:3})   track.instrument(track, 'abd', {noteVelocity:6})   await tw(1/2)
+    track.instrument(track, 'chh')     track.instrument(track, 'as')      await tw(1/2)
+    track.instrument(track, 'ohh', {noteVelocity:3})           await tw(1/2)
+}

@@ -1,5 +1,5 @@
 import PolyphonyInstrument from "@songwalker/instruments/PolyphonyInstrument";
-import {parseCommand} from "@songwalker";
+import {parseCommandValues} from "@songwalker";
 import OscillatorInstrument, {OscillatorInstrumentConfig} from "@songwalker/instruments/OscillatorInstrument";
 import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBufferInstrument";
 
@@ -48,7 +48,7 @@ describe('Polyphony', () => {
         }
 
         function playCommand(commandString: string) {
-            const commandInfo = parseCommand(commandString);
+            const commandInfo = parseCommandValues(commandString);
             trackState.instrument(commandInfo.command, trackState, commandInfo.params)
         }
 

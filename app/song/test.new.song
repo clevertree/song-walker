@@ -6,10 +6,11 @@ track1(lead) beat1() 8
 track1(osc) beat1() 8
 
 track track1(instrument) {
-    duration=1/4
+    this.instrument = instrument
+    this.duration=1/4
     C5 /2
-    pitchBend=-0.4
-    config={var: 'wut'}
+    this.pitchBend=-0.4
+    this.config={var: 'wut'}
     C4d/4v82 /2  // override duration and velocity
     C4@/4^82 /2  // override duration and velocity
     G4 /2
@@ -28,7 +29,7 @@ track track1(instrument) {
 }
 
 track track2() {
-    instrument=perc
+    this.instrument = perc
     velocityDivisor:10
     chh     abd     /2
     v:3

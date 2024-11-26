@@ -1,6 +1,6 @@
 import {
     findTokenByType,
-    findTokensByType, getFirstTokenValue,
+    findTokensByType, getFirstTokenValue, LANGUAGE,
     PATTERN_TRACK_START,
     ROOT_TRACK,
     sourceToTokens,
@@ -9,6 +9,8 @@ import {
 
 import {CommandParamsAliases, TokenItem, TokenList} from "@songwalker/types";
 import {EXPORT_JS, PARAM_ALIAS, VARIABLES} from "../constants/commands";
+import {parseCommandValues, parseNote} from "@songwalker";
+import {parseCommand, parseCommandParams} from "@songwalker/helper/commandHelper";
 // import {getRequireCallback, InstrumentBank} from "@songwalker/walker";
 // import Instruments from "../instruments/";
 
@@ -98,15 +100,28 @@ function formatTokenContent(token: TokenItem | string, currentTokenID = 0): stri
         case 'param-key':
         case 'param-variable':
         case 'param-string':
+        case 'comment':
             return token[1] as string;
         case 'function-statement':
+            const functionMatch = (token[1] as string).match(LANGUAGE["function-statement"]);
+            if (!functionMatch)
+                throw new Error("Invalid function: " + token[1])
+            const [, fsVarStatement = "", fsAwaitStatement = "", fsMethodName, fsParamString] = functionMatch;
+            return `${fsVarStatement}${fsAwaitStatement}${fsMethodName}.bind(${VARIABLES.trackState})(${fsParamString})`
         case 'variable-statement':
-            return token[1] as string;
         case 'function-definition':
-            return (token[1] as string).replace(/^track/i, 'function');
-        case 'param-duration':
-            const durationValues = tokensToKeys(token[1] as TokenList);
-            return formatNumericString(durationValues['param-numeric'], durationValues['param-factor']);
+            return token[1] as string;
+        case 'track-definition':
+            return EXPORT_JS.trackDefinition(token[1] as string);
+        // case 'param-duration':
+        //     const durationValues = tokensToKeys(token[1] as TokenList);
+        //     return formatNumericString(durationValues['param-numeric'], durationValues['param-factor']);
+        case 'command-statement':
+            const [commandString, paramString] = parseCommand(token[1] as string);
+            const parsedParams = parseCommandParams(paramString);
+            return EXPORT_JS.instrument(commandString, parsedParams);
+        case 'wait-statement':
+            return EXPORT_JS.wait(token[1] as string);
         // return formatVariableTokenContent(token);
         // return formatStringTokenContent(token);
         // case 'function-statement':
@@ -151,20 +166,6 @@ function formatTokenContent(token: TokenItem | string, currentTokenID = 0): stri
         // return `${COMMANDS.setVariable}('${variableNameToken[1]}', ${formatTokenContent(variableValueToken)})`;
         // case 'track-start':
         //     throw new Error("Shouldn't happen");
-        case 'command-statement':
-            const commandString = getFirstTokenValue(token[1] as TokenList, 'command') as string;
-            const commandParams = findTokensByType(token[1] as TokenList, /^param$/);
-            const params: string[] = [];
-            for (const commandParam of commandParams) {
-                const symbol = getFirstTokenValue(commandParam[1] as TokenList, 'symbol') as keyof CommandParamsAliases;
-                const value = getFirstTokenValue(commandParam[1] as TokenList, 'value') as keyof CommandParamsAliases;
-                const alias = PARAM_ALIAS[symbol];
-                if (!alias)
-                    throw new Error("Invalid parameter symbol: " + symbol);
-                params.push(`${alias}:${value}`)
-            }
-            // functionNames[COMMANDS.playNote] = true;
-            return EXPORT_JS.instrument(`'${commandString}'`, `{${params.map(t => formatTokenContent(t)).join(', ')}}`);
         // case 'play-arg':
         //     const playArgParamToken = findTokensByType(token[1] as TokenList, /^param-/);
         //     return playArgParamToken.length > 0 ? formatTokenContent(playArgParamToken[0]) : 'null';
@@ -172,9 +173,6 @@ function formatTokenContent(token: TokenItem | string, currentTokenID = 0): stri
         //     const trackNameToken = findTokenByType(token[1] as TokenList, /^play-track-name$/);
         //     functionNames[COMMANDS.startTrack] = true;
         //     return `${COMMANDS.startTrack}(${trackNameToken[1]})`;
-        case 'wait-statement':
-            const duration = getFirstTokenValue(token[1] as TokenList, 'duration') as string;
-            return EXPORT_JS.wait(duration);
         default:
         case 'unknown':
             throw new Error(`Unknown token type '${token[0]}': ${JSON.stringify(token)} at tokenID ${currentTokenID}`);
