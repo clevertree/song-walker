@@ -1,5 +1,5 @@
 import PolyphonyInstrument from "@songwalker/instruments/PolyphonyInstrument";
-import {parseCommandValues} from "@songwalker";
+import {parseCommandValues, TrackState} from "@songwalker";
 import OscillatorInstrument, {OscillatorInstrumentConfig} from "@songwalker/instruments/OscillatorInstrument";
 import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBufferInstrument";
 
@@ -15,7 +15,17 @@ function generateRandomBuffer(context: AudioContext) {
 describe('Polyphony', () => {
     it('Polyphony plays C#4^0.1d1/2', async () => {
         const context = new AudioContext();
-        const instrument = await PolyphonyInstrument({
+        const trackState: TrackState = {
+            beatsPerMinute: 180,
+            bufferDuration: 0,
+            currentTime: 0,
+            destination: context.destination,
+            noteDuration: 0,
+            noteVelocity: 0,
+            velocityDivisor: 1,
+            instrument: () => undefined
+        }
+        trackState.instrument = await PolyphonyInstrument.bind(trackState)({
             voices: [{
                 alias: 'osc',
                 instrument: OscillatorInstrument,
@@ -32,16 +42,6 @@ describe('Polyphony', () => {
                 } as AudioBufferInstrumentConfig
             }]
         })
-        const trackState = {
-            beatsPerMinute: 180,
-            bufferDuration: 0,
-            currentTime: 0,
-            destination: context.destination,
-            noteDuration: 0,
-            noteVelocity: 0,
-            velocityDivisor: 1,
-            instrument
-        }
 
         function wait(duration: number) {
             trackState.currentTime += (duration) * (60 / trackState.beatsPerMinute);
@@ -49,7 +49,7 @@ describe('Polyphony', () => {
 
         function playCommand(commandString: string) {
             const commandInfo = parseCommandValues(commandString);
-            trackState.instrument(commandInfo.command, trackState, commandInfo.params)
+            trackState.instrument.bind(trackState)({...trackState, ...commandInfo.params, command: commandInfo.command})
         }
 
         for (let i = 0; i < 8; i++) {

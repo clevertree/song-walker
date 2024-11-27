@@ -2,7 +2,7 @@ import {
     InstrumentInstance,
     InstrumentPreset,
     CommandParams,
-    TrackState
+    TrackState, CommandState
 } from "@songwalker/types";
 
 
@@ -17,7 +17,7 @@ export interface PolyphonyInstrumentConfig {
 // }
 
 
-export default async function PolyphonyInstrument(config: PolyphonyInstrumentConfig): Promise<InstrumentInstance> {
+export default async function PolyphonyInstrument(this: TrackState, config: PolyphonyInstrumentConfig): Promise<InstrumentInstance> {
     // console.log('PolyphonyInstrument', config, config.title);
 
     let aliases: { [key: string]: InstrumentInstance } = {}
@@ -42,13 +42,14 @@ export default async function PolyphonyInstrument(config: PolyphonyInstrumentCon
     }
 
 
-    return function playPolyphonyNote(noteCommand: string, trackState: TrackState, noteParams: CommandParams) {
-        if (aliases[noteCommand]) {
+    return function playPolyphonyNote(this: TrackState, commandState: CommandState) {
+        const {command} = commandState;
+        if (aliases[command]) {
             // if alias is found, execute directly
-            return aliases[noteCommand](noteCommand, trackState, noteParams);
+            return aliases[command].bind(this)(commandState);
         } else {
             for (let i = 0; i < voices.length; i++) {
-                voices[i](noteCommand, trackState, noteParams);
+                voices[i].bind(this)(commandState);
             }
         }
     }

@@ -14,12 +14,7 @@ describe('AudioBuffer', () => {
     it('AudioBuffer plays C#4^0.1d1/2', async () => {
         const context = new AudioContext();
         const src = generateRandomBuffer(context)
-        const instrument = await AudioBufferInstrument({
-            src,
-            loop: true,
-            mixer: 0.1
-        })
-        const trackState = {
+        const trackState: TrackState = {
             beatsPerMinute: 180,
             bufferDuration: 0,
             currentTime: 0,
@@ -27,8 +22,13 @@ describe('AudioBuffer', () => {
             noteDuration: 0,
             noteVelocity: 0,
             velocityDivisor: 1,
-            instrument
+            instrument: () => undefined
         }
+        trackState.instrument = await AudioBufferInstrument.bind(trackState)({
+            src,
+            loop: true,
+            mixer: 0.1
+        })
 
         function wait(duration: number) {
             trackState.currentTime += (duration) * (60 / trackState.beatsPerMinute);
@@ -36,7 +36,7 @@ describe('AudioBuffer', () => {
 
         function playCommand(commandString: string) {
             const commandInfo = parseCommandValues(commandString);
-            trackState.instrument(commandInfo.command, trackState, commandInfo.params)
+            trackState.instrument.bind(trackState)({...trackState, ...commandInfo.params, command: commandInfo.command})
         }
 
         for (let i = 0; i < 8; i++) {

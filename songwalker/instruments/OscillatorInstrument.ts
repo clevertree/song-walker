@@ -1,5 +1,5 @@
 import {InstrumentInstance, TrackState, parseNote} from "@songwalker";
-import {CommandParams, ParsedNote} from "@songwalker/types";
+import {CommandState, ParsedNote} from "@songwalker/types";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {
     configFilterByCurrentTime,
@@ -15,33 +15,33 @@ export interface OscillatorInstrumentConfig extends EnvelopeConfig, KeyRangeConf
     pulseWidth?: number,
 }
 
-export default function OscillatorInstrument(config: OscillatorInstrumentConfig): InstrumentInstance {
+export default function OscillatorInstrument(this: TrackState, config: OscillatorInstrumentConfig): InstrumentInstance {
     // console.log('OscillatorInstrument', config, config.type);
 
     let createOscillator = configOscillator();
     let createGain = configEnvelope(config);
     let filterNote = configFilterByKeyRange(config, configFilterByCurrentTime())
 
-    return function parseCommand(noteCommand: string, trackState: TrackState, noteParams: CommandParams) {
-        const noteInfo = parseNote(noteCommand);
+    return function parseCommand(this: TrackState, commandState: CommandState) {
+        const {command} = commandState;
+        const noteInfo = parseNote(command);
         if (!noteInfo)
-            throw new Error("Unrecognized note: " + noteCommand);
-        const trackStateWithParams: TrackState = {...trackState, ...noteParams};
-        if (filterNote(noteInfo, trackStateWithParams))
+            throw new Error("Unrecognized note: " + command);
+        if (filterNote(noteInfo, commandState))
             return
-        return playOscillator(noteInfo, trackStateWithParams)
+        return playOscillator(noteInfo, commandState)
     }
 
-    function playOscillator(noteInfo: ParsedNote, trackState: TrackState) {
+    function playOscillator(noteInfo: ParsedNote, commandState: CommandState) {
         let {
             currentTime,
             noteDuration,
             beatsPerMinute
-        } = trackState;
+        } = commandState;
 
 
         // Envelope
-        const gainNode = createGain(trackState);
+        const gainNode = createGain(commandState);
         // Oscillator
         const oscillator = createOscillator(noteInfo, gainNode);
 

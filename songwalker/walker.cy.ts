@@ -68,7 +68,11 @@ async function wait(trackState: TrackState, duration: number) {
 
 function playCommand(trackState: TrackState, commandString: string) {
     const commandInfo = parseCommandValues(commandString);
-    trackState.instrument(commandInfo.command, trackState, commandInfo.params)
+    trackState.instrument.bind(trackState)({
+        ...trackState,
+        ...commandInfo.params,
+        command: commandString
+    })
 }
 
 const bps: number = 60 / 120;

@@ -29,7 +29,7 @@ track track1(instrument) {
 
 track beat1() {
     track.instrument=perc
-    track.velocityDivisor:10
+    track.velocityDivisor=10
     chh     abd     /2
     chh^3           /2
     chh^3           /2
@@ -49,4 +49,3 @@ track beat1() {
     chh     as      /2
     ohh^3           /2
 }
-

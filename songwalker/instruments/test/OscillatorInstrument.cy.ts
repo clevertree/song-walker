@@ -1,13 +1,12 @@
 import OscillatorInstrument from "@songwalker/instruments/OscillatorInstrument";
-import {parseCommandValues} from "@songwalker";
+import {parseCommandValues, TrackState} from "@songwalker";
+import AudioBufferInstrument from "@songwalker/instruments/AudioBufferInstrument";
 
 describe('Oscillator', () => {
     it('Oscillator plays C#4^0.1d1/2', async () => {
-        const instrument = OscillatorInstrument({
-            mixer: 0.1
-        })
+
         const context = new AudioContext();
-        const trackState = {
+        const trackState: TrackState = {
             beatsPerMinute: 180,
             bufferDuration: 0,
             currentTime: 0,
@@ -15,8 +14,11 @@ describe('Oscillator', () => {
             noteDuration: 0,
             noteVelocity: 0,
             velocityDivisor: 1,
-            instrument
+            instrument: () => undefined
         }
+        trackState.instrument = await OscillatorInstrument.bind(trackState)({
+            mixer: 0.1
+        })
 
         function wait(duration: number) {
             trackState.currentTime += (duration) * (60 / trackState.beatsPerMinute);
@@ -24,7 +26,7 @@ describe('Oscillator', () => {
 
         function playCommand(commandString: string) {
             const commandInfo = parseCommandValues(commandString);
-            trackState.instrument(commandInfo.command, trackState, commandInfo.params)
+            trackState.instrument.bind(trackState)({...trackState, ...commandInfo.params, command: commandInfo.command})
         }
 
         for (let i = 0; i < 8; i++) {

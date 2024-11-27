@@ -1,55 +1,74 @@
-const lead=await loadPreset.bind(track)("FluidR3/AcousticGrandPiano")
-const osc=await loadInstrument.bind(track)("Oscillator", {'type':'square'})
-const perc=await loadPreset.bind(track)("FluidR3/DrumKitRoom1")
+(async function rootTrack() {
+if(!track.destination) {
+	const context = new AudioContext();
+	track.destination = context.destination;
+}
+async function wait(d) {
+	track.currentTime += d * (60 / track.beatsPerMinute);
+	const waitTime = track.currentTime - track.destination.context.currentTime;
+	if (waitTime > 0) {
+		console.log('Waiting ', waitTime);
+		await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+	}
+}
+const track = {...this};
+	const _tw = wait.bind(track)
+	const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
+	const lead=await loadPreset.bind(track)("FluidR3/AcousticGrandPiano");
+const osc=await loadInstrument.bind(track)("Oscillator", {'type':'square'});
+const perc=await loadPreset.bind(track)("FluidR3/DrumKitRoom1");
 
-track1.bind(track)(lead); beat1.bind(track)(); await tw(8);
-track1.bind(track)(osc) beat1.bind(track)() await tw(8)
+track1.bind(track)(lead); beat1.bind(track)(); await _tw(8);
+track1.bind(track)(osc); beat1.bind(track)(); await _tw(8);
 
 async function track1(instrument) {
     const track = {...this};
-	const tw = wait.bind(track)
+	const _tw = wait.bind(track)
+	const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
 	track.instrument = instrument;
     track.noteDuration=1/4
-    track.instrument(track, 'C5') await tw(1/2)
+    _tp('C5'); await _tw(1/2);
     track.pitchBend=-0.4
     track.config={var: 'wut'}
-    track.instrument(track, 'C4', {noteDuration:1/4,noteVelocity:82}) await tw(1/2)  // override duration and velocity
-    track.instrument(track, 'G4') await tw(1/2)
-    track.instrument(track, 'Eb4') await tw(1/2)
-    track.instrument(track, 'Eb5') await tw(1/2)
-    track.instrument(track, 'F5') await tw(1/2)
-    track.instrument(track, 'Eb5') await tw(1/2)
-    track.instrument(track, 'D5') await tw(1/2)
-    track.instrument(track, 'C5') await tw(1/2)
-    track.instrument(track, 'C4') await tw(1/2)
-    track.instrument(track, 'G4') await tw(1/2)
-    track.instrument(track, 'Eb4') await tw(1/2)
-    track.instrument(track, 'D5') await tw(1/2)
-    track.instrument(track, 'C4') await tw(1/2)
-    track.instrument(track, 'Bb4') await tw(1/2)
+    _tp('C4', {noteDuration:1/4,noteVelocity:82}); await _tw(1/2);  // override duration and velocity
+    _tp('G4'); await _tw(1/2);
+    _tp('Eb4'); await _tw(1/2);
+    _tp('Eb5'); await _tw(1/2);
+    _tp('F5'); await _tw(1/2);
+    _tp('Eb5'); await _tw(1/2);
+    _tp('D5'); await _tw(1/2);
+    _tp('C5'); await _tw(1/2);
+    _tp('C4'); await _tw(1/2);
+    _tp('G4'); await _tw(1/2);
+    _tp('Eb4'); await _tw(1/2);
+    _tp('D5'); await _tw(1/2);
+    _tp('C4'); await _tw(1/2);
+    _tp('Bb4'); await _tw(1/2);
 }
 
 async function beat1() {
     const track = {...this};
-	const tw = wait.bind(track)
+	const _tw = wait.bind(track)
+	const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
 	track.instrument=perc
-    track.instrument(track, 'track.velocityDivisor:10')
-    track.instrument(track, 'chh')     track.instrument(track, 'abd')     await tw(1/2)
-    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/2)
-    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/2)
-    track.instrument(track, 'chh')     track.instrument(track, 'as')      await tw(1/2)
-    track.instrument(track, 'chh', {noteVelocity:3,noteDuration:1/8})        await tw(1/2)
-    track.instrument(track, 'chh')     track.instrument(track, 'abd')     await tw(1/2)
-    track.instrument(track, 'chh', {noteVelocity:3})   track.instrument(track, 'abd', {noteVelocity:6})   await tw(1/2)
-    track.instrument(track, 'chh')     track.instrument(track, 'as')      await tw(1/2)
-    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/4)
-    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/4)
-    track.instrument(track, 'chh')     track.instrument(track, 'abd')     await tw(1/2)
-    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/2)
-    track.instrument(track, 'chh')     track.instrument(track, 'as')      await tw(1/2)
-    track.instrument(track, 'chh', {noteVelocity:3})           await tw(1/2)
-    track.instrument(track, 'chh')     track.instrument(track, 'abd')     await tw(1/2)
-    track.instrument(track, 'chh', {noteVelocity:3})   track.instrument(track, 'abd', {noteVelocity:6})   await tw(1/2)
-    track.instrument(track, 'chh')     track.instrument(track, 'as')      await tw(1/2)
-    track.instrument(track, 'ohh', {noteVelocity:3})           await tw(1/2)
+    track.velocityDivisor=10
+    _tp('chh');     _tp('abd');     await _tw(1/2);
+    _tp('chh', {noteVelocity:3});           await _tw(1/2);
+    _tp('chh', {noteVelocity:3});           await _tw(1/2);
+    _tp('chh');     _tp('as');      await _tw(1/2);
+    _tp('chh', {noteVelocity:3,noteDuration:1/8});        await _tw(1/2);
+    _tp('chh');     _tp('abd');     await _tw(1/2);
+    _tp('chh', {noteVelocity:3});   _tp('abd', {noteVelocity:6});   await _tw(1/2);
+    _tp('chh');     _tp('as');      await _tw(1/2);
+    _tp('chh', {noteVelocity:3});           await _tw(1/4);
+    _tp('chh', {noteVelocity:3});           await _tw(1/4);
+    _tp('chh');     _tp('abd');     await _tw(1/2);
+    _tp('chh', {noteVelocity:3});           await _tw(1/2);
+    _tp('chh');     _tp('as');      await _tw(1/2);
+    _tp('chh', {noteVelocity:3});           await _tw(1/2);
+    _tp('chh');     _tp('abd');     await _tw(1/2);
+    _tp('chh', {noteVelocity:3});   _tp('abd', {noteVelocity:6});   await _tw(1/2);
+    _tp('chh');     _tp('as');      await _tw(1/2);
+    _tp('ohh', {noteVelocity:3});           await _tw(1/2);
 }
+ })

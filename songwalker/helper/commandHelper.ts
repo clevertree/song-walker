@@ -1,9 +1,9 @@
 import {ParsedCommand, CommandParams, ParsedNote, ParsedParams, CommandParamsAliases} from "@songwalker/types";
-import {PARAM_ALIAS} from "@songwalker/constants/commands";
+import {LANGUAGE, PARAM_ALIAS} from "@songwalker/compiler/compiler";
 
 const DEFAULT_FREQUENCY_A4 = 432;
 
-const REGEX_PARSE_COMMAND = /^([^@^;\s]+)((?:[@^][^@^;\s]+)*)(?=;)?$/
+// const REGEX_PARSE_COMMAND = LANGUAGE["command-statement"]; // /^([^@^;\s]+)((?:[@^][^@^;\s]+)*)(?=;)?$/
 const REGEX_PARSE_COMMAND_PARAMS = /([@^])([^@^\s]+)/g
 const REGEX_PARSE_FRACTION = /^(\d*)\/(\d+)?$/
 const REGEX_NOTE_COMMAND = /^([A-G][#qb]{0,2})(\d*)$/
@@ -21,7 +21,7 @@ export function parseNumeric(numericString: string) {
 }
 
 export function parseCommand(fullCommandString: string) {
-    const match = fullCommandString.match(REGEX_PARSE_COMMAND);
+    const match = fullCommandString.match(LANGUAGE["command-statement"]);
     if (!match)
         throw new Error("Invalid command string: " + fullCommandString);
     const [, command, paramString] = match;
@@ -77,6 +77,15 @@ export function parseNote(noteCommand: string): ParsedNote {
         // keyNumber,
         frequency,
     }
+}
+
+
+export function parseWait(fullWaitString: string) {
+    const match = fullWaitString.match(LANGUAGE["wait-statement"]);
+    if (!match)
+        throw new Error("Invalid wait string: " + fullWaitString);
+    const [, duration] = match;
+    return formatDuration(duration);
 }
 
 export function formatDuration(durationString: string): string {
