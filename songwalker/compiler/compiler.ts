@@ -1,4 +1,12 @@
-import {CommandParamsAliases, ParsedParams, SongCallback, TokenItem, TokenList, TrackState} from "@songwalker/types";
+import {
+    CommandParamsAliases,
+    ParsedParams,
+    SongCallback,
+    TokenItem,
+    TokenList,
+    TrackState,
+    WaitCallback
+} from "@songwalker/types";
 import {parseCommand, parseCommandParams, parseWait} from "@songwalker/helper/commandHelper";
 import Prism, {Token} from "prismjs";
 
@@ -14,27 +22,28 @@ const VAR_TRACK_STATE = 'track';
 const VAR_CURRENT_TIME: keyof TrackState = 'currentTime';
 const VAR_DESTINATION: keyof TrackState = 'destination';
 const VAR_BPM: keyof TrackState = 'beatsPerMinute';
-const JS_TRACK_SETUP = `const ${VAR_TRACK_STATE} = {...this};`
-    + `\n\tconst ${COMMANDS.trackWait} = ${COMMANDS.wait}.bind(${VAR_TRACK_STATE})`
-    + `\n\tconst ${COMMANDS.trackPlay} = (command, p) => ${VAR_TRACK_STATE}.instrument.bind(${VAR_TRACK_STATE})({...track, ...p, command});`
-    + `\n\t`
+const JS_TRACK_SETUP = `\tconst ${VAR_TRACK_STATE} = {...this};`
+    + `\t\nconst ${COMMANDS.trackWait} = ${COMMANDS.wait}.bind(${VAR_TRACK_STATE})`
+    + `\t\nconst ${COMMANDS.trackPlay} = (command, p) => ${VAR_TRACK_STATE}.instrument.bind(${VAR_TRACK_STATE})({...track, ...p, command});`
+    + `\t\n`
 
-const JS_SONG_SETUP = `if(!${VAR_TRACK_STATE}.${VAR_DESTINATION}) {`
+const JS_SONG_SETUP = `\n${JS_TRACK_SETUP}`
+    + `if(!${VAR_TRACK_STATE}.${VAR_DESTINATION}) {`
     + `\n\tconst context = new AudioContext();`
     + `\n\t${VAR_TRACK_STATE}.${VAR_DESTINATION} = context.destination;`
     + `\n}`
-    + `\nasync function ${COMMANDS.wait}(d) {`
-    + `\n\t${VAR_TRACK_STATE}.${VAR_CURRENT_TIME} += d * (60 / ${VAR_TRACK_STATE}.${VAR_BPM});`
-    + `\n\tconst waitTime = ${VAR_TRACK_STATE}.${VAR_CURRENT_TIME} - ${VAR_TRACK_STATE}.${VAR_DESTINATION}.context.currentTime;`
-    + `\n\tif (waitTime > 0) {`
-    + `\n\t\tconsole.log('Waiting ', waitTime);`
-    + `\n\t\tawait new Promise(resolve => setTimeout(resolve, waitTime * 1000));`
-    + `\n\t}`
-    + `\n}`
+    // + `\nasync function ${COMMANDS.wait}(d) {`
+    // + `\n\t${VAR_TRACK_STATE}.${VAR_CURRENT_TIME} += d * (60 / ${VAR_TRACK_STATE}.${VAR_BPM});`
+    // + `\n\tconst waitTime = ${VAR_TRACK_STATE}.${VAR_CURRENT_TIME} - ${VAR_TRACK_STATE}.${VAR_DESTINATION}.context.currentTime;`
+    // + `\n\tif (waitTime > 0) {`
+    // + `\n\t\tconsole.log('Waiting ', waitTime);`
+    // + `\n\t\tawait new Promise(resolve => setTimeout(resolve, waitTime * 1000));`
+    // + `\n\t}`
+    // + `\n}`
     + `\n`
 export const EXPORT_JS = {
     // songTemplate: (sourceCode: string) => `(() => {return ${sourceCode}})()`,
-    songTemplate: (sourceCode: string) => `(async function ${ROOT_TRACK}() {\n${JS_SONG_SETUP}${JS_TRACK_SETUP}${sourceCode} })`,
+    songTemplate: (sourceCode: string) => `(async function ${ROOT_TRACK}(${COMMANDS.wait}) {${JS_SONG_SETUP}${sourceCode} })`,
 
     command: (commandString: string, params: ParsedParams) => {
         const propStrings: string[] = Object.keys(params).map(
@@ -313,6 +322,16 @@ export function compileSongToCallback(songSource: string) {
     const jsSource = compileSongToJavascript(songSource);
     const callback: SongCallback = eval(jsSource);
     return callback;
+}
+
+export const defaultWaitCallback: WaitCallback = async function defaultWaitCallback(this: TrackState, duration: number) {
+    debugger;
+    this.currentTime += duration * (60 / this.beatsPerMinute);
+    const waitTime = this.currentTime - this.destination.context.currentTime;
+    if (waitTime > 0) {
+        console.log(`Waiting ${waitTime} seconds`)
+        await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+    }
 }
 
 // export function walkTokens(tokenList: TokenList, callback: (token: string | TokenItem) => boolean | undefined | void): boolean {

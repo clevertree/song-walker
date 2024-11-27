@@ -1,20 +1,12 @@
-(async function rootTrack() {
+(async function rootTrack(wait) {
+	const track = {...this};
+const _tw = wait.bind(track)
+const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
 if(!track.destination) {
 	const context = new AudioContext();
 	track.destination = context.destination;
 }
-async function wait(d) {
-	track.currentTime += d * (60 / track.beatsPerMinute);
-	const waitTime = track.currentTime - track.destination.context.currentTime;
-	if (waitTime > 0) {
-		console.log('Waiting ', waitTime);
-		await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
-	}
-}
-const track = {...this};
-	const _tw = wait.bind(track)
-	const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
-	const lead=await loadPreset.bind(track)("FluidR3/AcousticGrandPiano");
+const lead=await loadPreset.bind(track)("FluidR3/AcousticGrandPiano");
 const osc=await loadInstrument.bind(track)("Oscillator", {'type':'square'});
 const perc=await loadPreset.bind(track)("FluidR3/DrumKitRoom1");
 
@@ -22,10 +14,10 @@ track1.bind(track)(lead); beat1.bind(track)(); await _tw(8);
 track1.bind(track)(osc); beat1.bind(track)(); await _tw(8);
 
 async function track1(instrument) {
-    const track = {...this};
-	const _tw = wait.bind(track)
-	const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
-	track.instrument = instrument;
+    	const track = {...this};
+const _tw = wait.bind(track)
+const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
+track.instrument = instrument;
     track.noteDuration=1/4
     _tp('C5'); await _tw(1/2);
     track.pitchBend=-0.4
@@ -47,10 +39,10 @@ async function track1(instrument) {
 }
 
 async function beat1() {
-    const track = {...this};
-	const _tw = wait.bind(track)
-	const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
-	track.instrument=perc
+    	const track = {...this};
+const _tw = wait.bind(track)
+const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
+track.instrument=perc
     track.velocityDivisor=10
     _tp('chh');     _tp('abd');     await _tw(1/2);
     _tp('chh', {noteVelocity:3});           await _tw(1/2);

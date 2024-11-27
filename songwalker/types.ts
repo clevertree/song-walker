@@ -111,7 +111,7 @@ export type TrackRenderer = {
 /** @deprecated **/
 export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void> | void;
 
-export type WaitCallback = (this: TrackState, duration: string) => Promise<void>;
+export type WaitCallback = (this: TrackState, duration: number) => Promise<void>;
 export type SongCallback = (this: TrackState, wait: WaitCallback) => void;
 
 export interface SongTrackEvent {

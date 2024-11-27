@@ -1,7 +1,7 @@
 import {
     COMMANDS,
     compileSongToCallback,
-    compileSongToJavascript,
+    compileSongToJavascript, defaultWaitCallback,
     EXPORT_JS,
     parseTrackList,
     sourceToTokens
@@ -78,7 +78,7 @@ describe('compiler', () => {
         ))
     })
 
-    it('compiles to javascript', () => {
+    it('compiles to callback', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
                 const javascriptContent = compileSongToJavascript(SONG_SOURCE);
@@ -93,6 +93,15 @@ describe('compiler', () => {
                 }
                 // expect(javascriptContent).to.eq(SONG_SOURCE_COMPILED)
             })
+        })
+    })
+
+
+    it('compiles to callback', () => {
+        cy.fixture('test.song').then((SONG_SOURCE) => {
+            const javascriptContent = compileSongToCallback(SONG_SOURCE);
+            const trackState = {}
+            javascriptContent.bind(trackState)(defaultWaitCallback);
         })
     })
 
