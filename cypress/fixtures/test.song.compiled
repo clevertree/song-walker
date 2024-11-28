@@ -1,4 +1,4 @@
-(async function rootTrack(wait) {
+(async function rootTrack({wait, loadInstrument, loadPreset}) {
 	const track = {...this};
 const _tw = wait.bind(track)
 const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});

@@ -1,12 +1,4 @@
-import {
-    CommandParamsAliases,
-    ParsedParams,
-    SongCallback,
-    TokenItem,
-    TokenList,
-    TrackState,
-    WaitCallback
-} from "@songwalker/types";
+import {CommandParamsAliases, ParsedParams, SongCallback, TokenItem, TokenList, TrackState} from "@songwalker/types";
 import {parseCommand, parseCommandParams, parseWait} from "@songwalker/helper/commandHelper";
 import Prism, {Token} from "prismjs";
 
@@ -14,6 +6,8 @@ import Prism, {Token} from "prismjs";
 export const COMMANDS = {
     // setCurrentToken: '_',
     wait: 'wait',
+    loadInstrument: 'loadInstrument',
+    loadPreset: 'loadPreset',
     trackPlay: '_tp',
     trackWait: '_tw',
 };
@@ -43,7 +37,7 @@ const JS_SONG_SETUP = `\n${JS_TRACK_SETUP}`
     + `\n`
 export const EXPORT_JS = {
     // songTemplate: (sourceCode: string) => `(() => {return ${sourceCode}})()`,
-    songTemplate: (sourceCode: string) => `(async function ${ROOT_TRACK}(${COMMANDS.wait}) {${JS_SONG_SETUP}${sourceCode} })`,
+    songTemplate: (sourceCode: string) => `(async function ${ROOT_TRACK}({${COMMANDS.wait}, ${COMMANDS.loadInstrument}, ${COMMANDS.loadPreset}}) {${JS_SONG_SETUP}${sourceCode} })`,
 
     command: (commandString: string, params: ParsedParams) => {
         const propStrings: string[] = Object.keys(params).map(
@@ -324,15 +318,6 @@ export function compileSongToCallback(songSource: string) {
     return callback;
 }
 
-export const defaultWaitCallback: WaitCallback = async function defaultWaitCallback(this: TrackState, duration: number) {
-    debugger;
-    this.currentTime += duration * (60 / this.beatsPerMinute);
-    const waitTime = this.currentTime - this.destination.context.currentTime;
-    if (waitTime > 0) {
-        console.log(`Waiting ${waitTime} seconds`)
-        await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
-    }
-}
 
 // export function walkTokens(tokenList: TokenList, callback: (token: string | TokenItem) => boolean | undefined | void): boolean {
 //     for (const token of tokenList) {

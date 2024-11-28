@@ -66,12 +66,12 @@ export type SongHandler = {
 export interface TrackState {
     // context: AudioContext,
     currentTime: number,
+    beatsPerMinute: number,
     destination: AudioDestinationNode,
     instrument: InstrumentInstance,
-    beatsPerMinute: number,
-    noteDuration: number,
-    noteVelocity: number,
-    velocityDivisor: number,
+    noteDuration?: number,
+    noteVelocity?: number,
+    velocityDivisor?: number,
     // startTime: number,
     // duration?: number,
     // position?: number,
@@ -111,8 +111,18 @@ export type TrackRenderer = {
 /** @deprecated **/
 export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void> | void;
 
-export type WaitCallback = (this: TrackState, duration: number) => Promise<void>;
-export type SongCallback = (this: TrackState, wait: WaitCallback) => void;
+
+export interface SongFunctions {
+    wait: (this: TrackState, duration: number) => Promise<void>,
+    loadInstrument: (this: TrackState,
+                     instrumentPath: string,
+                     config: object) => Promise<InstrumentInstance>,
+    loadPreset: (this: TrackState,
+                 presetPath: string,
+                 configOverride: object) => Promise<InstrumentInstance>
+}
+
+export type SongCallback = (this: TrackState, functions: SongFunctions) => Promise<void>;
 
 export interface SongTrackEvent {
     waitForEventStart: () => Promise<void>,

@@ -1,14 +1,15 @@
 import {
     COMMANDS,
     compileSongToCallback,
-    compileSongToJavascript, defaultWaitCallback,
+    compileSongToJavascript,
     EXPORT_JS,
-    parseTrackList,
     sourceToTokens
 } from './compiler'
+import {TrackState} from "@songwalker";
+import {defaultSongFunctions} from "../helper/songHelper"
 
 describe('compiler', () => {
-    const emptyTemplate = (s) => s;
+    const emptyTemplate = (s: string) => s;
     it('play statement - C5@3/8^.2;', () => {
         const SONG_SOURCE = `C5@3/8^.2;`
         const compiledSource = sourceToTokens(SONG_SOURCE);
@@ -97,11 +98,21 @@ describe('compiler', () => {
     })
 
 
-    it('compiles to callback', () => {
+    it('executes song', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             const javascriptContent = compileSongToCallback(SONG_SOURCE);
-            const trackState = {}
-            javascriptContent.bind(trackState)(defaultWaitCallback);
+            const trackState: TrackState = {
+                beatsPerMinute: 0,
+                currentTime: 0,
+                destination: new AudioContext().destination,
+                instrument: () => {
+                    throw new Error("No instrument loaded")
+                }
+
+            }
+            const song = javascriptContent.bind(trackState);
+            cy.wrap(song(defaultSongFunctions)).then(() => {
+            });
         })
     })
 
