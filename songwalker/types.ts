@@ -89,27 +89,25 @@ export interface CommandState extends TrackState {
 //     [noteString: string]: (duration?: number, velocity?: number) => void;
 // }
 
-/** @deprecated **/
-export type TrackRenderer = {
-    getTrackName: () => string
-    getTrackState: () => TrackState,
-    playNote: (noteString: string, duration?: number, velocity?: number) => void;
-    loadInstrument: (instrumentPath: string | InstrumentLoader, config?: object) => Promise<InstrumentInstance>;
-    loadPreset: (presetPath: string, config?: object) => Promise<InstrumentInstance>;
-    /* @depreciated */
-    setVariable: (variablePath: string, variableValue: any) => void;
-    // getVariable: (variablePath: string) => any;
-    startTrack: (trackCallback: TrackCallback) => void;
-    waitUntil: (duration: number) => Promise<void>;
-    setCurrentToken: (tokenID: number) => void;
-    waitForTrackToFinish: () => Promise<void>,
-    // notes: NoteRenderers
-    // setCurrentInstrument: (instrument:Instrument) => void
-    // promise: Promise<void> | null
-}
+// export type TrackRenderer = {
+//     getTrackName: () => string
+//     getTrackState: () => TrackState,
+//     playNote: (noteString: string, duration?: number, velocity?: number) => void;
+//     loadInstrument: (instrumentPath: string | InstrumentLoader, config?: object) => Promise<InstrumentInstance>;
+//     // loadPreset: (presetPath: string, config?: object) => Promise<InstrumentInstance>;
+//     /* @depreciated */
+//     setVariable: (variablePath: string, variableValue: any) => void;
+//     // getVariable: (variablePath: string) => any;
+//     startTrack: (trackCallback: TrackCallback) => void;
+//     waitUntil: (duration: number) => Promise<void>;
+//     setCurrentToken: (tokenID: number) => void;
+//     waitForTrackToFinish: () => Promise<void>,
+//     // notes: NoteRenderers
+//     // setCurrentInstrument: (instrument:Instrument) => void
+//     // promise: Promise<void> | null
+// }
 
-/** @deprecated **/
-export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void> | void;
+// export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void> | void;
 
 
 export interface SongFunctions {
@@ -117,9 +115,7 @@ export interface SongFunctions {
     loadInstrument: (this: TrackState,
                      instrumentPath: string,
                      config: object) => Promise<InstrumentInstance>,
-    loadPreset: (this: TrackState,
-                 presetPath: string,
-                 configOverride: object) => Promise<InstrumentInstance>
+    playCommand: (this: TrackState, command: string, props?: CommandParams) => void
 }
 
 export type SongCallback = (this: TrackState, functions: SongFunctions) => Promise<void>;
@@ -145,7 +141,7 @@ export interface NoteHandler {
 
 // export type InstrumentInstance = (trackState: TrackState, command: string) => NoteHandler;
 export type InstrumentInstance = (this: TrackState,
-                                  commandState: CommandState) => NoteHandler | undefined;
+                                  commandState: CommandState) => NoteHandler | void;
 
 export type InstrumentLoader = (config?: any) => Promise<InstrumentInstance> | InstrumentInstance
 
@@ -159,9 +155,9 @@ export type InstrumentLoader = (config?: any) => Promise<InstrumentInstance> | I
 export interface PresetBank {
     title: string,
 
-    getPreset(presetPath: string): InstrumentPreset,
+    // getPreset(presetPath: string): InstrumentPreset | Promise<InstrumentPreset>,
 
-    listPresets(presetPath: string): Generator<InstrumentPreset>
+    listPresets(): Generator<InstrumentPreset> | AsyncGenerator<InstrumentPreset>
 
 }
 

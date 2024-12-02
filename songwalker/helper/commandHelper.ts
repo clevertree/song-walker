@@ -1,7 +1,7 @@
 import {ParsedCommand, CommandParams, ParsedNote, ParsedParams, CommandParamsAliases} from "@songwalker/types";
 import {LANGUAGE, PARAM_ALIAS} from "@songwalker/compiler/compiler";
 
-const DEFAULT_FREQUENCY_A4 = 432;
+const DEFAULT_FREQUENCY_A4 = 440; // 432;
 
 // const REGEX_PARSE_COMMAND = LANGUAGE["command-statement"]; // /^([^@^;\s]+)((?:[@^][^@^;\s]+)*)(?=;)?$/
 const REGEX_PARSE_COMMAND_PARAMS = /([@^])([^@^\s]+)/g

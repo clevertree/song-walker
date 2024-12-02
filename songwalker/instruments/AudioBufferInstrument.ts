@@ -1,7 +1,7 @@
 import {InstrumentInstance, ParsedNote, CommandState, TrackState} from "@songwalker/types";
 import {parseNote} from "..";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
-import {configFilterByKeyRange, configFilterByCurrentTime, KeyRangeConfig} from "./common/filter";
+import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
 
 const DEFAULT_FREQUENCY_ROOT = 220;
 
@@ -19,9 +19,9 @@ export interface AudioBufferInstrumentConfig extends EnvelopeConfig, KeyRangeCon
 export default async function AudioBufferInstrument(this: TrackState, config: AudioBufferInstrumentConfig): Promise<InstrumentInstance> {
     // console.log('AudioBufferInstrument', config, title);
 
-    let createSourceNode = await configAudioBuffer();
+    let createSourceNode = await configAudioBuffer(this.destination.context);
     let createGain = configEnvelope(config);
-    let filterNote = configFilterByKeyRange(config, configFilterByCurrentTime())
+    let filterNote = configFilterByKeyRange(config)
 
     return function parseCommand(this: TrackState, commandState: CommandState) {
         const {command} = commandState;
@@ -60,7 +60,7 @@ export default async function AudioBufferInstrument(this: TrackState, config: Au
         return bufferNode;
     }
 
-    async function configAudioBuffer() {
+    async function configAudioBuffer(context: BaseAudioContext) {
         let {
             src,
             loop = false,
@@ -69,14 +69,14 @@ export default async function AudioBufferInstrument(this: TrackState, config: Au
         } = config;
         let audioBuffer: AudioBuffer;
         if (typeof src === "string") {
-            audioBuffer = await getCachedAudioBuffer(src);
+            audioBuffer = await getCachedAudioBuffer(context, src);
         } else {
             audioBuffer = src;
         }
         const parsedFrequencyRoot = getFrequencyRoot(frequencyRoot);
         return (noteInfo: ParsedNote, destination: AudioNode) => {
             const {frequency} = noteInfo;
-            const bufferNode = destination.context.createBufferSource();
+            const bufferNode = context.createBufferSource();
             bufferNode.buffer = audioBuffer;
             bufferNode.detune.value = detune
             bufferNode.loop = loop;
@@ -91,18 +91,15 @@ export default async function AudioBufferInstrument(this: TrackState, config: Au
 
 let cache = new Map<string, AudioBuffer>();
 
-let loaderContext: BaseAudioContext;
 
-async function getCachedAudioBuffer(src: string): Promise<AudioBuffer> {
+async function getCachedAudioBuffer(context: BaseAudioContext, src: string): Promise<AudioBuffer> {
     if (cache.has(src))
         return cache.get(src) as AudioBuffer;
-    if (typeof loaderContext === "undefined")
-        loaderContext = new AudioContext();
     const response = await fetch(src);
     if (response.status !== 200)
         throw new Error(`Failed to fetch audio file (${response.status} ${response.statusText}): ${src}`);
     const arrayBuffer = await response.arrayBuffer();
-    const audioBuffer = await loaderContext.decodeAudioData(arrayBuffer);
+    const audioBuffer = await context.decodeAudioData(arrayBuffer);
     cache.set(src, audioBuffer);
     return audioBuffer;
 }

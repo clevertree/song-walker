@@ -2,7 +2,6 @@ import {InstrumentInstance, TrackState, parseNote} from "@songwalker";
 import {CommandState, ParsedNote} from "@songwalker/types";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {
-    configFilterByCurrentTime,
     configFilterByKeyRange,
     KeyRangeConfig
 } from "./common/filter";
@@ -20,7 +19,7 @@ export default function OscillatorInstrument(this: TrackState, config: Oscillato
 
     let createOscillator = configOscillator();
     let createGain = configEnvelope(config);
-    let filterNote = configFilterByKeyRange(config, configFilterByCurrentTime())
+    let filterNote = configFilterByKeyRange(config)
 
     return function parseCommand(this: TrackState, commandState: CommandState) {
         const {command} = commandState;

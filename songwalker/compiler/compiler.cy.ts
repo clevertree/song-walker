@@ -1,8 +1,7 @@
 import {
-    COMMANDS,
     compileSongToCallback,
     compileSongToJavascript,
-    EXPORT_JS,
+    EXPORT_JS, F_TRACK_PLAY, F_TRACK_WAIT,
     sourceToTokens
 } from './compiler'
 import {TrackState} from "@songwalker";
@@ -17,7 +16,7 @@ describe('compiler', () => {
             [["command-statement", "C5@3/8^.2;"]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(`${COMMANDS.trackPlay}('C5', {noteDuration:3/8,noteVelocity:.2});`)
+        expect(javascriptContent).to.eq(`${F_TRACK_PLAY}('C5', {noteDuration:3/8,noteVelocity:.2});`)
     })
 
     it('wait statement - 1/6; /5', () => {
@@ -27,7 +26,7 @@ describe('compiler', () => {
             [["wait-statement", "1/6;"], " ", ["wait-statement", "/5"]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(`await ${COMMANDS.trackWait}(1/6); await ${COMMANDS.trackWait}(1/5);`)
+        expect(javascriptContent).to.eq(`await ${F_TRACK_WAIT}(1/6); await ${F_TRACK_WAIT}(1/5);`)
     })
 
     it('set track variable', () => {
@@ -61,12 +60,12 @@ describe('compiler', () => {
         const SONG_SOURCE = `track myTrack() { C4^2 D4@2 }`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [["track-definition", "track myTrack() { "], ["command-statement", "C4^2"], " ", ["command-statement", "D4@2"], " }"]
+            [["track-definition", "track myTrack() {"], " ", ["command-statement", "C4^2"], " ", ["command-statement", "D4@2"], " }"]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
         expect(javascriptContent).to.eq(
-            EXPORT_JS.trackDefinition("function myTrack() { ")
-            + "_tp('C4', {noteVelocity:2}); _tp('D4', {noteDuration:2}); }")
+            EXPORT_JS.trackDefinition("function myTrack() {")
+            + " _tp('C4', {noteVelocity:2}); _tp('D4', {noteDuration:2}); }")
 
     })
 

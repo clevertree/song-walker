@@ -1,23 +1,20 @@
-(async function rootTrack({wait, loadInstrument, loadPreset}) {
-	const track = {...this};
-const _tw = wait.bind(track)
-const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
-if(!track.destination) {
-	const context = new AudioContext();
-	track.destination = context.destination;
-}
-const lead=await loadPreset.bind(track)("FluidR3/AcousticGrandPiano");
+(async function rootTrack({loadInstrument, wait, playCommand}) {
+const track = {...this};
+const _tw = wait.bind(track);
+const _tp = playCommand.bind(track);
+const lead=await loadInstrument.bind(track)("FluidR3/AcousticGrandPiano");
 const osc=await loadInstrument.bind(track)("Oscillator", {'type':'square'});
-const perc=await loadPreset.bind(track)("FluidR3/DrumKitRoom1");
+const perc=await loadInstrument.bind(track)("FluidR3/DrumKitRoom1");
 
 track1.bind(track)(lead); beat1.bind(track)(); await _tw(8);
 track1.bind(track)(osc); beat1.bind(track)(); await _tw(8);
 
 async function track1(instrument) {
-    	const track = {...this};
-const _tw = wait.bind(track)
-const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
-track.instrument = instrument;
+	const track = {...this};
+	const _tw = wait.bind(track);
+	const _tp = playCommand.bind(track);
+
+    track.instrument = instrument;
     track.noteDuration=1/4
     _tp('C5'); await _tw(1/2);
     track.pitchBend=-0.4
@@ -39,10 +36,11 @@ track.instrument = instrument;
 }
 
 async function beat1() {
-    	const track = {...this};
-const _tw = wait.bind(track)
-const _tp = (command, p) => track.instrument.bind(track)({...track, ...p, command});
-track.instrument=perc
+	const track = {...this};
+	const _tw = wait.bind(track);
+	const _tp = playCommand.bind(track);
+
+    track.instrument=perc
     track.velocityDivisor=10
     _tp('chh');     _tp('abd');     await _tw(1/2);
     _tp('chh', {noteVelocity:3});           await _tw(1/2);
@@ -63,4 +61,4 @@ track.instrument=perc
     _tp('chh');     _tp('as');      await _tw(1/2);
     _tp('ohh', {noteVelocity:3});           await _tw(1/2);
 }
- })
+})

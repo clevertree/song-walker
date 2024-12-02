@@ -32,14 +32,20 @@
       "@songwalker/*": [
         "./songwalker/*"
       ],
+      "@songwalker-presets": [
+        "./songwalker-presets"
+      ],
+      "@songwalker-presets/*": [
+        "./songwalker-presets/*"
+      ],
       "@songwalker-editor/*": [
         "./songwalker-editor/*"
       ],
+      "@samples/*": [
+        "./samples/*"
+      ],
       "@samples": [
         "./samples"
-      ],
-      "@/*": [
-        "./*"
       ]
     }
   },

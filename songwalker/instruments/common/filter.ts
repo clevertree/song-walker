@@ -11,7 +11,7 @@ type FilterCallback = (noteInfo: ParsedNote, commandState: CommandState) => bool
 export function configFilterByKeyRange({
                                            keyRangeHigh,
                                            keyRangeLow
-                                       }: KeyRangeConfig, callback: FilterCallback): FilterCallback {
+                                       }: KeyRangeConfig, callback: FilterCallback = () => false): FilterCallback {
     let filterCallback = callback;
     if (typeof keyRangeLow !== 'undefined') {
         const keyRangeLowFrequency = parseNote(keyRangeLow).frequency;
@@ -36,19 +36,19 @@ export function configFilterByKeyRange({
     return filterCallback;
 }
 
-export function configFilterByCurrentTime(): FilterCallback {
-    return (noteInfo: ParsedNote, commandState: CommandState) => {
-        let {
-            destination: {
-                context: audioContext
-            },
-            currentTime,
-        } = commandState;
-        if (currentTime < audioContext.currentTime) {
-            console.warn("skipping note that occurs in the past: ",
-                noteInfo.note, currentTime, '<', audioContext.currentTime)
-            return true
-        }
-        return false;
-    }
-}
+// export function configFilterByCurrentTime(): FilterCallback {
+//     return (noteInfo: ParsedNote, commandState: CommandState) => {
+//         let {
+//             destination: {
+//                 context: audioContext
+//             },
+//             currentTime,
+//         } = commandState;
+//         if (currentTime < audioContext.currentTime) {
+//             console.warn("skipping note that occurs in the past: ",
+//                 noteInfo.note, currentTime, '<', audioContext.currentTime)
+//             return true
+//         }
+//         return false;
+//     }
+// }

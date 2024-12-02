@@ -4,6 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/.idea/.idea.iml" filepath="$PROJECT_DIR$/.idea/.idea/.idea.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/music-app-nextjs.iml" filepath="$PROJECT_DIR$/.idea/music-app-nextjs.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../webaudiofontdata/.idea/webaudiofontdata.iml" filepath="$PROJECT_DIR$/../webaudiofontdata/.idea/webaudiofontdata.iml" />
     </modules>
   </component>
 </project>

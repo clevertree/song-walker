@@ -1,54 +1,43 @@
-import {CommandParamsAliases, ParsedParams, SongCallback, TokenItem, TokenList, TrackState} from "@songwalker/types";
+import {
+    CommandParamsAliases,
+    ParsedParams,
+    SongCallback,
+    SongFunctions,
+    TokenItem,
+    TokenList,
+    TrackState
+} from "@songwalker/types";
 import {parseCommand, parseCommandParams, parseWait} from "@songwalker/helper/commandHelper";
 import Prism, {Token} from "prismjs";
 
-
-export const COMMANDS = {
-    // setCurrentToken: '_',
-    wait: 'wait',
-    loadInstrument: 'loadInstrument',
-    loadPreset: 'loadPreset',
-    trackPlay: '_tp',
-    trackWait: '_tw',
-};
-const ROOT_TRACK = 'rootTrack';
-const VAR_TRACK_STATE = 'track';
-const VAR_CURRENT_TIME: keyof TrackState = 'currentTime';
-const VAR_DESTINATION: keyof TrackState = 'destination';
-const VAR_BPM: keyof TrackState = 'beatsPerMinute';
-const JS_TRACK_SETUP = `\tconst ${VAR_TRACK_STATE} = {...this};`
-    + `\t\nconst ${COMMANDS.trackWait} = ${COMMANDS.wait}.bind(${VAR_TRACK_STATE})`
-    + `\t\nconst ${COMMANDS.trackPlay} = (command, p) => ${VAR_TRACK_STATE}.instrument.bind(${VAR_TRACK_STATE})({...track, ...p, command});`
-    + `\t\n`
-
-const JS_SONG_SETUP = `\n${JS_TRACK_SETUP}`
-    + `if(!${VAR_TRACK_STATE}.${VAR_DESTINATION}) {`
-    + `\n\tconst context = new AudioContext();`
-    + `\n\t${VAR_TRACK_STATE}.${VAR_DESTINATION} = context.destination;`
-    + `\n}`
-    // + `\nasync function ${COMMANDS.wait}(d) {`
-    // + `\n\t${VAR_TRACK_STATE}.${VAR_CURRENT_TIME} += d * (60 / ${VAR_TRACK_STATE}.${VAR_BPM});`
-    // + `\n\tconst waitTime = ${VAR_TRACK_STATE}.${VAR_CURRENT_TIME} - ${VAR_TRACK_STATE}.${VAR_DESTINATION}.context.currentTime;`
-    // + `\n\tif (waitTime > 0) {`
-    // + `\n\t\tconsole.log('Waiting ', waitTime);`
-    // + `\n\t\tawait new Promise(resolve => setTimeout(resolve, waitTime * 1000));`
-    // + `\n\t}`
-    // + `\n}`
-    + `\n`
+export const ROOT_TRACK = 'rootTrack';
+export const VAR_TRACK_STATE = 'track';
+export const VAR_CURRENT_TIME: keyof TrackState = 'currentTime';
+export const VAR_DESTINATION: keyof TrackState = 'destination';
+export const VAR_BPM: keyof TrackState = 'beatsPerMinute';
+export const F_WAIT: keyof SongFunctions = "wait";
+export const F_LOAD: keyof SongFunctions = "loadInstrument";
+export const F_PLAY: keyof SongFunctions = "playCommand";
+export const F_TRACK_WAIT = '_tw';
+export const F_TRACK_PLAY = '_tp';
+const JS_TRACK_SETUP = (tab = '\t') => `\n${tab}const ${VAR_TRACK_STATE} = {...this};`
+    + `\n${tab}const ${F_TRACK_WAIT} = ${F_WAIT}.bind(${VAR_TRACK_STATE});`
+    + `\n${tab}const ${F_TRACK_PLAY} = ${F_PLAY}.bind(${VAR_TRACK_STATE});`
+    + `\n${tab}`;
 export const EXPORT_JS = {
     // songTemplate: (sourceCode: string) => `(() => {return ${sourceCode}})()`,
-    songTemplate: (sourceCode: string) => `(async function ${ROOT_TRACK}({${COMMANDS.wait}, ${COMMANDS.loadInstrument}, ${COMMANDS.loadPreset}}) {${JS_SONG_SETUP}${sourceCode} })`,
+    songTemplate: (sourceCode: string) => `(async function ${ROOT_TRACK}({${F_LOAD}, ${F_WAIT}, ${F_PLAY}}) {${JS_TRACK_SETUP('')}${sourceCode}})`,
 
     command: (commandString: string, params: ParsedParams) => {
         const propStrings: string[] = Object.keys(params).map(
             (paramName) => `${paramName}:${params[paramName as keyof ParsedParams]}`)
         let paramString = Object.values(params).length > 0 ? `, {${propStrings.join(',')}}` : '';
-        return `${COMMANDS.trackPlay}('${commandString}'${paramString});`
+        return `${F_TRACK_PLAY}('${commandString}'${paramString});`
     },
     // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
-    wait: (durationStatement: string) => `await ${COMMANDS.trackWait}(${durationStatement});`,
+    wait: (durationStatement: string) => `await ${F_TRACK_WAIT}(${durationStatement});`,
     trackDefinition: (functionDefinition: string) => `async ${(functionDefinition).replace(/^track/i, 'function')}`
-        + JS_TRACK_SETUP,
+        + JS_TRACK_SETUP('\t'),
     function: (functionStatement: string) => {
         const functionMatch = (functionStatement).match(LANGUAGE["function-statement"]);
         if (!functionMatch)
@@ -64,8 +53,8 @@ export const PARAM_ALIAS: CommandParamsAliases = {
 
 export const LANGUAGE = {
     'comment': /(\/\/).*$/m,
-    'track-definition': /(?=async\s+)?\b(track)\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{\s*/,
-    'function-definition': /(?=async\s+)?\bfunction\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{\s*/,
+    'track-definition': /(?=async\s+)?\b(track)\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{/,
+    'function-definition': /(?=async\s+)?\bfunction\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{/,
     'function-statement': /\b((?:(?:const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?(await\s+)?\b([$\w][$\w]+)\(((?:[^()]|\([^()]*\))*)\);?/,
     // 'function-statement': /\b(function|track)[ \t]+([\w.]+)[ \t]*\(([^)]*)\)\s*{/,
     // 'function-statement': /\b(((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?\w+\([^)]*\)[ \t]*;?/,
