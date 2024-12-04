@@ -10,7 +10,7 @@ describe('WebAudioFontInstrument', () => {
     it('loads and plays', async () => {
         const context = new AudioContext();
         const trackState: TrackState = {
-            beatsPerMinute: 180,
+            beatsPerMinute: 240,
             bufferDuration: 0,
             currentTime: 0,
             destination: context.destination,
@@ -32,7 +32,7 @@ describe('WebAudioFontInstrument', () => {
             trackState.instrument.bind(trackState)({...trackState, ...commandInfo.params, command: commandInfo.command})
         }
 
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < 4; i++) {
             playCommand('C3^0.1@1/2')
             wait(1 / 2)
             playCommand('D#3^0.1@1/2')

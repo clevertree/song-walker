@@ -25,13 +25,14 @@
     "react": "^18",
     "react-dom": "^18",
     "react-redux": "^9.0.2",
+    "sass": "^1.69.5",
     "undoh": "^1.2.2",
-    "sass": "^1.69.5"
+    "webaudiofont": "github:clevertree/webaudiofont"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
     "@types/prismjs": "^1.26.3",
+    "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10",
     "cypress": "^13.16.0",

@@ -1,9 +1,11 @@
 import {
     InstrumentInstance,
-    InstrumentPreset,
     TrackState, CommandState
 } from "@songwalker/types";
 import {parseNote} from "@songwalker";
+import WebAudioFontPlayer from "./src/player";
+import {Simulate} from "react-dom/test-utils";
+import load = Simulate.load;
 
 
 export interface WebAudioFontInstrumentConfig {
@@ -19,31 +21,27 @@ export interface WebAudioFontInstrumentConfig {
 
 export default async function WebAudioFontInstrument(this: TrackState, config: WebAudioFontInstrumentConfig): Promise<InstrumentInstance> {
 
-    const {
-        instrumentKey
-    } = config;
-    const fontConfig = await fetchWebAudioFontConfig(instrumentKey);
-
-    const {
-        WebAudioFontPlayer,
-    } = await fetchWebAudioFontPlayer();
+    // const {
+    //     WebAudioFontPlayer,
+    // } = await fetchWebAudioFontPlayer();
     const {
         destination: {
             context: audioContext
         }
     } = this;
-    // var selectedPreset=_tone_0000_JCLive_sf2_file;
-    // var AudioContextFunc = window.AudioContext || window.webkitAudioContext;
-    // var audioContext = new AudioContextFunc();
+    const startTime = audioContext.currentTime;
+    const {
+        instrumentKey
+    } = config;
+    const fontConfig = await fetchWebAudioFontConfig(instrumentKey);
     const player = new WebAudioFontPlayer();
-    player.adjustPreset(audioContext, fontConfig);
-    for (let i = 0; i < 100; i++) {
-        if (fontConfig.zones.every((zone: any) => !!zone.buffer))
-            break;
-        console.log("Waiting for all buffers to load");
-        await new Promise(resolve => setTimeout(resolve, 100));
+    await player.adjustPreset(audioContext, fontConfig);
+
+    const loadingTime = audioContext.currentTime;
+    if (loadingTime > 0) {
+        this.currentTime += loadingTime // Move track time forward to compensate for loading time
+        console.log("WebAudioFontInstrument Loading time: ", loadingTime)
     }
-    // player.loader.decodeAfterLoading(audioContext, '_tone_0000_JCLive_sf2_file');
 
     return function playWebAudioFontNote(commandState: CommandState) {
         const {
@@ -54,8 +52,9 @@ export default async function WebAudioFontInstrument(this: TrackState, config: W
         } = commandState;
         const {frequency} = parseNote(commandState.command);
         const pitch = (Math.log(frequency) / Math.log(2)) * 12
-        const playbackRate = Math.pow(2, (100.0 * pitch) / 1200.0);
-        player.queueWaveTable(audioContext, destination, fontConfig, currentTime, pitch, noteDuration * (60 / beatsPerMinute));
+        // const playbackRate = Math.pow(2, (100.0 * pitch) / 1200.0);
+        const duration = noteDuration * (60 / beatsPerMinute)
+        player.queueWaveTable(audioContext, destination, fontConfig, currentTime, pitch, duration);
     }
 }
 
@@ -81,10 +80,12 @@ export async function fetchWebAudioFontConfig(instrumentKey: string) {
     const fontURL = 'https://surikov.github.io/webaudiofontdata/sound/' + instrumentKey + '.js'
     const request = await fetch(fontURL);
     let fontJS = await request.text();
-    fontJS = fontJS.replaceAll(`_tone_${instrumentKey}`, '_config');
+    fontJS = fontJS.replaceAll(`_tone_${instrumentKey}`, '_config')
+        .replace("console.log('load _config');", '');
     fontJS = `(() => {${fontJS}; return _config;})()`
     const config = eval(fontJS);
     if (!config)
         throw new Error("Unable to evaluate webfont: " + fontURL);
+    console.log("fetchWebAudioFontConfig: ", config)
     return config;
 }
