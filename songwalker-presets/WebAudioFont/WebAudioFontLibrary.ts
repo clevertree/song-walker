@@ -1,7 +1,7 @@
 import {InstrumentPreset, PresetBank} from "@songwalker/types";
-import WebAudioFontInstrument, {
-    WebAudioFontInstrumentConfig
-} from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
+import WebAudioFontInstrumentLoader, {
+    WebAudioFontInstrumentLoaderConfig
+} from "@songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader";
 
 export const WebAudioFontLibrary: PresetBank = {
     title: 'WebAudioFont',
@@ -11,7 +11,8 @@ export const WebAudioFontLibrary: PresetBank = {
     },
 }
 
-async function* listInstruments(): AsyncGenerator<InstrumentPreset<WebAudioFontInstrumentConfig>> {
+async function* listInstruments(): AsyncGenerator<InstrumentPreset<WebAudioFontInstrumentLoaderConfig>> {
+    // TODO: fetch
     const {default: instrumentKeys} = await import("./instrumentKeys.json");
     const {default: instrumentNames} = await import("./instrumentNames.json");
     for (let i = 0; i < instrumentKeys.length; i++) {
@@ -23,15 +24,16 @@ async function* listInstruments(): AsyncGenerator<InstrumentPreset<WebAudioFontI
             .replace(/_sf2$/, '')
         yield {
             title: `${libraryName}/${instrumentNames[parseInt(pitch)]}`,
-            instrument: WebAudioFontInstrument,
+            instrument: WebAudioFontInstrumentLoader,
             config: {
-                instrumentKey
+                instrumentPath: `i/${instrumentKey}.json`
             }
         }
     }
 }
 
-async function* listDrumAndDrumSets(): AsyncGenerator<InstrumentPreset<WebAudioFontInstrumentConfig>> {
+async function* listDrumAndDrumSets(): AsyncGenerator<InstrumentPreset<WebAudioFontInstrumentLoaderConfig>> {
+    // TODO: fetch
     const {default: drumKeys} = await import("./drumKeys.json");
     const {default: drumSets} = await import("./drumSets.json");
     const {default: drumNames} = await import("./drumNames.json");
@@ -46,9 +48,9 @@ async function* listDrumAndDrumSets(): AsyncGenerator<InstrumentPreset<WebAudioF
             .replace(/_sf2$/, '')
         yield {
             title: `${libraryName}/${drumSetName}/${drumNames[pitch as keyof typeof drumNames]}`,
-            instrument: WebAudioFontInstrument,
+            instrument: WebAudioFontInstrumentLoader,
             config: {
-                instrumentKey: drumKey // todo;
+                instrumentPath: `d/${drumKey}.json`
             }
         }
     }
