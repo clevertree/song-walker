@@ -5,31 +5,10 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e87670a7-8e55-4d3a-9cd9-39fed29fbd42" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/mirrors.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrument.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea/.idea.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea/aws.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea/modules.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.idea/php.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/aws.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/music-app-nextjs.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/other.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/prettier.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrument.cy.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrumentLoader.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontLibrary.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontLibrary.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontLibrary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontLibrary.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/drumKeys.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/drumNames.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/drumSets.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/instrumentKeys.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/instrumentNames.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/src/loader.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/PolyphonyInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/PolyphonyInstrument.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +46,7 @@
     "WebServerToolWindowFactoryState": "false",
     "javascript.nodejs.core.library.configured.version": "18.20.4",
     "javascript.nodejs.core.library.typings.version": "18.19.67",
-    "last_opened_file_path": "/Users/ari.asulin/dev/p/song-walker",
+    "last_opened_file_path": "/Users/ari.asulin/dev/p/webaudiofontdata/public",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.standard": "true",
     "node.js.detected.package.tslint": "true",
@@ -81,14 +60,21 @@
   }
 }]]></component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../webaudiofontdata/public" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/../webaudiofontdata/public" />
       <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test" />
     </key>
     <key name="es6.move.members.recent.items">
       <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioFont/mirrors.ts" />
     </key>
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected="npm.cypress:open">
+    <configuration name="convert.mjs" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$PROJECT_DIR$/../webaudiofontdata/convert.mjs" working-dir="$PROJECT_DIR$/../webaudiofontdata">
+      <method v="2" />
+    </configuration>
     <configuration name="cypress:open" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
@@ -102,6 +88,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="npm.cypress:open" />
+        <item itemvalue="Node.js.convert.mjs" />
       </list>
     </recent_temporary>
   </component>
@@ -113,7 +100,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1733497061171</updated>
-      <workItem from="1733497062193" duration="4125000" />
+      <workItem from="1733497062193" duration="9320000" />
     </task>
     <servers />
   </component>

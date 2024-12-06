@@ -2,8 +2,6 @@
 
 import WebAudioFontInstrument from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
 import {parseCommandValues, TrackState} from "@songwalker";
-import {defaultSongFunctions} from "@songwalker/helper/songHelper";
-import instrumentKeys from './instrumentKeys.json'
 
 describe('WebAudioFontInstrument', () => {
 

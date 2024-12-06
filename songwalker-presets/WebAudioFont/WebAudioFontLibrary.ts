@@ -8,7 +8,8 @@ export const PRESET_PATH_INSTRUMENT_KEYS = '/instrumentKeys.json'
 export const PRESET_PATH_INSTRUMENT_NAMES = '/instrumentNames.json'
 export const PRESET_PATH_PERCUSSION_KEYS = '/percussionKeys.json'
 export const PRESET_PATH_PERCUSSION_NAMES = '/percussionNames.json'
-export const PRESET_PATH_DRUMSET_KEYS = '/drumSets.json'
+export const PRESET_PATH_DRUMSET_KEYS = '/drumSetKeys.json'
+export const PRESET_PATH_DRUMSET_NAMES = '/drumSetNames.json'
 export const PRESET_PATH_INSTRUMENT = '/i'
 export const PRESET_PATH_PERCUSSION = '/p'
 export const PRESET_PATH_DRUMSET = '/s'
@@ -34,6 +35,7 @@ async function* listInstruments(): AsyncGenerator<InstrumentPreset<WebAudioFontI
         yield {
             title: `${libraryName}/${instrumentNames[parseInt(pitch)]}`,
             instrument: WebAudioFontInstrumentLoader,
+            type: 'default',
             config: {
                 presetPath: `${PRESET_PATH_INSTRUMENT}/${instrumentKey}.json`
             }
@@ -44,23 +46,42 @@ async function* listInstruments(): AsyncGenerator<InstrumentPreset<WebAudioFontI
 async function* listDrumAndDrumSets(): AsyncGenerator<InstrumentPreset<WebAudioFontInstrumentLoaderConfig>> {
     let drumKeys = await fetchJSONFromMirror(PRESET_PATH_PERCUSSION_KEYS);
     let drumNames = await fetchJSONFromMirror(PRESET_PATH_PERCUSSION_NAMES);
-    let drumSets = await fetchJSONFromMirror(PRESET_PATH_DRUMSET_KEYS);
+    // let drumSets = await fetchJSONFromMirror(PRESET_PATH_DRUMSET_KEYS);
+    let drumSetNames = await fetchJSONFromMirror(PRESET_PATH_DRUMSET_NAMES);
     // const drumSetKeys = Object.keys(drumSets);
     for (let i = 0; i < drumKeys.length; i++) {
         const drumKey = drumKeys[i];
         const [pitch, drumSetID, ...libraryStringParts] = drumKey.split('_')
-        const libraryString = libraryStringParts.join('_').replace(/\.js$/, '');
-        const drumSetName = drumSets[libraryString as keyof typeof drumSets][parseInt(drumSetID)];
-        const libraryName = libraryString
+        const libraryString = libraryStringParts.join('_').replace(/\.js$/, '')
             .replace(/_file$/, '')
             .replace(/_sf2$/, '')
+        const drumSetName = drumSetNames[libraryString as keyof typeof drumSetNames][parseInt(drumSetID)];
         yield {
-            title: `${libraryName}/${drumSetName}/${drumNames[pitch as keyof typeof drumNames]}`,
+            title: `${libraryString}/${drumSetName}/${drumNames[pitch as keyof typeof drumNames]}`,
             instrument: WebAudioFontInstrumentLoader,
+            type: 'percussion',
             config: {
                 presetPath: `${PRESET_PATH_PERCUSSION}/${drumKey}.json`
             }
         }
     }
+    const drumSetLibraryKeys = Object.keys(drumSetNames)
+    for (const drumSetLibraryKey of drumSetLibraryKeys) {
+        const drumSets = drumSetNames[drumSetLibraryKey];
+        for (let i = 0; i < drumSets.length; i++) {
+            const drumSetName = drumSets[i];
+            const presetName = `${drumSetLibraryKey}_${drumSetName}`
+                .replaceAll(' ', '_')
+            yield {
+                title: `${drumSetLibraryKey}/${drumSetName}`,
+                type: 'drum-kit',
+                instrument: WebAudioFontInstrumentLoader,
+                config: {
+                    presetPath: `${PRESET_PATH_DRUMSET}/${presetName}.json`
+                }
+            }
+        }
+    }
+
 }
 

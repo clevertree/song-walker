@@ -161,9 +161,11 @@ export interface PresetBank {
 
 }
 
+export type InstrumentPresetType = 'default' | 'percussion' | 'drum-kit'
 
 export type InstrumentPreset<Config = object> = {
     title?: string,
+    type?: InstrumentPresetType,
     alias?: string,
     instrument: InstrumentLoader,
     config: Config
