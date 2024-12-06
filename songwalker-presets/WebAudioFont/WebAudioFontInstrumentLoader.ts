@@ -1,15 +1,13 @@
-import {
-    InstrumentInstance,
-    TrackState
-} from "@songwalker/types";
+import {InstrumentInstance, TrackState} from "@songwalker/types";
 import WebAudioFontInstrument, {
     WebAudioFontInstrumentConfig
 } from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
+import {fetchJSONFromMirror} from "@songwalker-presets/WebAudioFont/mirrors";
 
 
 export interface WebAudioFontInstrumentLoaderConfig {
     title?: string,
-    instrumentPath: string,
+    presetPath: string,
 }
 
 // export interface VoiceConfiguration {
@@ -26,12 +24,9 @@ export default async function WebAudioFontInstrumentLoader(this: TrackState, con
     } = this;
     const startTime = audioContext.currentTime;
     const {
-        instrumentPath
+        presetPath
     } = config;
-    const chosenMirrorID = Math.floor(Math.random() * URL_MIRROR.length);
-    const fontURL = URL_MIRROR[chosenMirrorID] + instrumentPath
-    const request = await fetch(fontURL);
-    const fontConfig: WebAudioFontInstrumentConfig = await request.json();
+    let fontConfig: WebAudioFontInstrumentConfig = await fetchJSONFromMirror(presetPath);
 
     const loadingTime = audioContext.currentTime - startTime;
     if (loadingTime > 0) {
@@ -42,7 +37,3 @@ export default async function WebAudioFontInstrumentLoader(this: TrackState, con
     return WebAudioFontInstrument.bind(this)(fontConfig)
 }
 
-const URL_MIRROR = [
-    'https://webaudiofontdata.clevertree.net/',
-    'https://clevertree.github.io/webaudiofontdata/'
-];

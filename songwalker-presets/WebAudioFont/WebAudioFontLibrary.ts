@@ -2,6 +2,16 @@ import {InstrumentPreset, PresetBank} from "@songwalker/types";
 import WebAudioFontInstrumentLoader, {
     WebAudioFontInstrumentLoaderConfig
 } from "@songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader";
+import {fetchJSONFromMirror} from "@songwalker-presets/WebAudioFont/mirrors";
+
+export const PRESET_PATH_INSTRUMENT_KEYS = '/instrumentKeys.json'
+export const PRESET_PATH_INSTRUMENT_NAMES = '/instrumentNames.json'
+export const PRESET_PATH_PERCUSSION_KEYS = '/percussionKeys.json'
+export const PRESET_PATH_PERCUSSION_NAMES = '/percussionNames.json'
+export const PRESET_PATH_DRUMSET_KEYS = '/drumSets.json'
+export const PRESET_PATH_INSTRUMENT = '/i'
+export const PRESET_PATH_PERCUSSION = '/p'
+export const PRESET_PATH_DRUMSET = '/s'
 
 export const WebAudioFontLibrary: PresetBank = {
     title: 'WebAudioFont',
@@ -12,9 +22,8 @@ export const WebAudioFontLibrary: PresetBank = {
 }
 
 async function* listInstruments(): AsyncGenerator<InstrumentPreset<WebAudioFontInstrumentLoaderConfig>> {
-    // TODO: fetch
-    const {default: instrumentKeys} = await import("./instrumentKeys.json");
-    const {default: instrumentNames} = await import("./instrumentNames.json");
+    let instrumentKeys = await fetchJSONFromMirror(PRESET_PATH_INSTRUMENT_KEYS);
+    let instrumentNames = await fetchJSONFromMirror(PRESET_PATH_INSTRUMENT_NAMES);
     for (let i = 0; i < instrumentKeys.length; i++) {
         const instrumentKey = instrumentKeys[i];
         const [pitch, ...libraryStringParts] = instrumentKey.split('_')
@@ -26,17 +35,16 @@ async function* listInstruments(): AsyncGenerator<InstrumentPreset<WebAudioFontI
             title: `${libraryName}/${instrumentNames[parseInt(pitch)]}`,
             instrument: WebAudioFontInstrumentLoader,
             config: {
-                instrumentPath: `i/${instrumentKey}.json`
+                presetPath: `${PRESET_PATH_INSTRUMENT}/${instrumentKey}.json`
             }
         }
     }
 }
 
 async function* listDrumAndDrumSets(): AsyncGenerator<InstrumentPreset<WebAudioFontInstrumentLoaderConfig>> {
-    // TODO: fetch
-    const {default: drumKeys} = await import("./drumKeys.json");
-    const {default: drumSets} = await import("./drumSets.json");
-    const {default: drumNames} = await import("./drumNames.json");
+    let drumKeys = await fetchJSONFromMirror(PRESET_PATH_PERCUSSION_KEYS);
+    let drumNames = await fetchJSONFromMirror(PRESET_PATH_PERCUSSION_NAMES);
+    let drumSets = await fetchJSONFromMirror(PRESET_PATH_DRUMSET_KEYS);
     // const drumSetKeys = Object.keys(drumSets);
     for (let i = 0; i < drumKeys.length; i++) {
         const drumKey = drumKeys[i];
@@ -50,7 +58,7 @@ async function* listDrumAndDrumSets(): AsyncGenerator<InstrumentPreset<WebAudioF
             title: `${libraryName}/${drumSetName}/${drumNames[pitch as keyof typeof drumNames]}`,
             instrument: WebAudioFontInstrumentLoader,
             config: {
-                instrumentPath: `d/${drumKey}.json`
+                presetPath: `${PRESET_PATH_PERCUSSION}/${drumKey}.json`
             }
         }
     }
