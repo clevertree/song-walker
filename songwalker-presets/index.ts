@@ -1,15 +1,10 @@
-import {SongWalkerLibrary} from "./songWalkerLibrary";
-import {GeneralUserGSLibrary} from "./generalUserGSLibrary";
-import {WebAudioFontLibrary} from "./WebAudioFontLibrary";
-import {registerPresetBank} from "@songwalker/instruments/library";
+import {registerPresetBank} from "@songwalker/presets";
+import {SongWalkerLibrary} from "./SongWalkerLibrary";
+import {WebAudioFontLibrary} from "./WebAudioFont/WebAudioFontLibrary";
 
-function registerAllPresetBanks() {
-    registerPresetBank(GeneralUserGSLibrary);
-    registerPresetBank(WebAudioFontLibrary);
-    registerPresetBank(SongWalkerLibrary);
-}
+registerPresetBank(SongWalkerLibrary);
+registerPresetBank(WebAudioFontLibrary);
 
-const SongWalkerPresets = {
-    registerAllPresetBanks
+export {
+    SongWalkerLibrary
 }
-export default SongWalkerPresets;

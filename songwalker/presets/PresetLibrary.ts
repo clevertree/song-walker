@@ -1,16 +1,24 @@
-import {InstrumentPreset, PresetBank} from "@songwalker/types";
+import {InstrumentPreset, PresetBank, PresetBankBase} from "@songwalker/types";
 import OscillatorInstrument from "@songwalker/instruments/OscillatorInstrument";
 import AudioBufferInstrument from "@songwalker/instruments/AudioBufferInstrument";
 import PolyphonyInstrument from "@songwalker/instruments/PolyphonyInstrument";
-import SongWalkerPresets from "@songwalker-presets";
 
 
 const presetBanks: Array<PresetBank> = []
 
 
-const PresetLibrary: PresetBank = {
+const PresetLibrary: PresetBankBase = {
     title: 'Default Library',
-    async* listPresets(): AsyncGenerator<InstrumentPreset> {
+    async findPreset(filter) {
+        for await (const preset of PresetLibrary.listPresets(filter)) {
+            if (filter.type === 'any' || filter.type == preset.type) {
+                if (filter.title.test(preset.title))
+                    return preset;
+            }
+        }
+        return null;
+    },
+    async* listPresets(filter): AsyncGenerator<InstrumentPreset> {
         yield {
             title: 'Oscillator',
             instrument: OscillatorInstrument,
@@ -27,7 +35,7 @@ const PresetLibrary: PresetBank = {
             config: {}
         }
         for (const presetBank of presetBanks) {
-            yield* presetBank.listPresets()
+            yield* presetBank.listPresets(filter)
         }
     },
 }
@@ -40,11 +48,7 @@ export function registerPresetBank(presetBank: PresetBank) {
 }
 
 try {
-    const SongWalkerPresets = require("@songwalker-presets");
-
-    if (SongWalkerPresets.default) {
-        SongWalkerPresets.default.registerAllPresetBanks()
-    }
+    require("@songwalker-presets");
 } catch (e) {
     console.error("Error loading preset library: ", e);
 }

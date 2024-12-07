@@ -1,8 +1,6 @@
 'use strict'
 import WebAudioFontChannel from "./channel";
 import WebAudioFontReverberator from "./reverberator";
-
-import packageJSON from '../../../package.json'
 import {WaveAHDSR, WaveEnvelope, WavePreset, WaveSlide, WaveZone} from "./otypes";
 
 // console.log(`WebAudioFont Engine v${packageJSON.version} GPL3 (SongWalker Fork)`, packageJSON);
@@ -266,9 +264,7 @@ export default class WebAudioFontPlayer {
     };
 
     adjustPreset = async function (this: WebAudioFontPlayer, audioContext: BaseAudioContext, preset: WavePreset) {
-        for (var i = 0; i < preset.zones.length; i++) {
-            await this.adjustZone(audioContext, preset.zones[i]);
-        }
+        return Promise.all(preset.zones.map(zone => this.adjustZone(audioContext, zone)));
     };
     adjustZone = async function (this: WebAudioFontPlayer, audioContext: BaseAudioContext, zone: WaveZone) {
         if (zone.buffer) {

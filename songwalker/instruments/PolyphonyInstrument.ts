@@ -20,13 +20,12 @@ export default async function PolyphonyInstrument(this: TrackState, config: Poly
         const {
             instrument: voiceLoader,
             config: voiceConfig,
-            alias
+            title
         } = voice;
         // const voiceLoader = InstrumentLibrary.getInstrumentLoader(instrumentPath)
         return new Promise<InstrumentInstance>(async (resolve) => {
             const voiceInstance = await voiceLoader.bind(this)(voiceConfig);
-            if (alias)
-                aliases[alias] = voiceInstance;
+            aliases[title] = voiceInstance;
             resolve(voiceInstance);
         })
     }));

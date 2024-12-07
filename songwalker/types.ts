@@ -152,21 +152,29 @@ export type InstrumentLoader = (config?: any) => Promise<InstrumentInstance> | I
 //     [presetName: string]: PresetBank
 // }
 
+export interface PresetFilter {
+    type: InstrumentPresetType,
+    title: RegExp
+}
+
+
 export interface PresetBank {
     title: string,
 
-    // getPreset(presetPath: string): InstrumentPreset | Promise<InstrumentPreset>,
-
-    listPresets(): Generator<InstrumentPreset> | AsyncGenerator<InstrumentPreset>
+    listPresets(presetFilter: PresetFilter): Generator<InstrumentPreset> | AsyncGenerator<InstrumentPreset>
 
 }
 
-export type InstrumentPresetType = 'default' | 'percussion' | 'drum-kit'
+export interface PresetBankBase extends PresetBank {
+    findPreset(presetFilter: PresetFilter): Promise<InstrumentPreset | null>,
+}
+
+export type InstrumentPresetType = 'any' | 'melodic' | 'percussion' | 'drum-kit'
 
 export type InstrumentPreset<Config = object> = {
-    title?: string,
+    title: string,
     type?: InstrumentPresetType,
-    alias?: string,
+    // alias?: string,
     instrument: InstrumentLoader,
     config: Config
 }

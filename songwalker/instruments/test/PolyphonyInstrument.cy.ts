@@ -27,14 +27,14 @@ describe('Polyphony', () => {
         }
         trackState.instrument = await PolyphonyInstrument.bind(trackState)({
             voices: [{
-                alias: 'osc',
+                title: 'osc',
                 instrument: OscillatorInstrument,
                 config: {
                     mixer: 0.1,
                     type: 'sawtooth'
                 } as OscillatorInstrumentConfig
             }, {
-                alias: 'buffer',
+                title: 'buffer',
                 instrument: AudioBufferInstrument,
                 config: {
                     mixer: 0.1,
