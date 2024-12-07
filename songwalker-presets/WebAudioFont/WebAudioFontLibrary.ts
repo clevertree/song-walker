@@ -14,15 +14,12 @@ export const PRESET_PATH_INSTRUMENT = '/i'
 export const PRESET_PATH_PERCUSSION = '/p'
 export const PRESET_PATH_DRUMSET = '/s'
 
-export const WebAudioFontLibrary: PresetBank = {
-    title: 'WebAudioFont',
-    async* listPresets(presetFilter) {
-        const {type} = presetFilter
-        if (type === 'any' || type === 'melodic')
-            yield* listInstruments()
-        if (type === 'any' || type === 'percussion' || type === 'drum-kit')
-            yield* listDrumAndDrumSets(presetFilter)
-    },
+export const WebAudioFontLibrary: PresetBank = async function* listPresets(presetFilter) {
+    const {type} = presetFilter
+    if (type === 'any' || type === 'melodic')
+        yield* listInstruments()
+    if (type === 'any' || type === 'percussion' || type === 'drum-kit')
+        yield* listDrumAndDrumSets(presetFilter)
 }
 
 async function* listInstruments(): AsyncGenerator<InstrumentPreset<WebAudioFontInstrumentLoaderConfig>> {
@@ -40,7 +37,7 @@ async function* listInstruments(): AsyncGenerator<InstrumentPreset<WebAudioFontI
             throw new Error(`Invalid instrument name (pitch = ${pitch})`)
         yield {
             title: `${libraryName}/${instrumentName}`,
-            instrument: WebAudioFontInstrumentLoader,
+            loader: WebAudioFontInstrumentLoader,
             type: 'melodic',
             config: {
                 presetPath: `${PRESET_PATH_INSTRUMENT}/${instrumentKey}.json`
@@ -68,7 +65,7 @@ async function* listDrumAndDrumSets(presetFilter: PresetFilter): AsyncGenerator<
                 yield {
                     title: `${drumSetLibraryKey}/${drumSetName}`,
                     type: 'drum-kit',
-                    instrument: WebAudioFontInstrumentLoader,
+                    loader: WebAudioFontInstrumentLoader,
                     config: {
                         presetPath: `${PRESET_PATH_DRUMSET}/${presetName}.json`
                     }
@@ -88,7 +85,7 @@ async function* listDrumAndDrumSets(presetFilter: PresetFilter): AsyncGenerator<
             const drumSetName = drumSetNames[libraryString as keyof typeof drumSetNames][parseInt(drumSetID)];
             yield {
                 title: `${libraryString}/${drumSetName}/${drumNames[pitch as keyof typeof drumNames]}`,
-                instrument: WebAudioFontInstrumentLoader,
+                loader: WebAudioFontInstrumentLoader,
                 type: 'percussion',
                 config: {
                     presetPath: `${PRESET_PATH_PERCUSSION}/${drumKey}.json`

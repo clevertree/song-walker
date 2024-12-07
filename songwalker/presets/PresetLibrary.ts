@@ -21,17 +21,17 @@ const PresetLibrary: PresetBankBase = {
     async* listPresets(filter): AsyncGenerator<InstrumentPreset> {
         yield {
             title: 'Oscillator',
-            instrument: OscillatorInstrument,
+            loader: OscillatorInstrument,
             config: {}
         }
         yield {
             title: 'AudioBuffer',
-            instrument: AudioBufferInstrument,
+            loader: AudioBufferInstrument,
             config: {}
         }
         yield {
             title: 'Polyphony',
-            instrument: PolyphonyInstrument,
+            loader: PolyphonyInstrument,
             config: {}
         }
         for (const presetBank of presetBanks) {

@@ -5,16 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e87670a7-8e55-4d3a-9cd9-39fed29fbd42" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/songwalker/presets/index.ts" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/songwalker/presets/test/PresetLibrary.cy.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-presets/SongWalkerLibrary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/SongWalkerLibrary.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontLibrary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontLibrary.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/src/player.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/src/player.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontLibrary.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontLibrary.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/index.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/instruments/PolyphonyInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/PolyphonyInstrument.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/library.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/presets/PresetLibrary.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/PolyphonyInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/PolyphonyInstrument.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/presets/PresetLibrary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/presets/PresetLibrary.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/types.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -111,7 +108,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1733497061171</updated>
-      <workItem from="1733497062193" duration="15045000" />
+      <workItem from="1733497062193" duration="16002000" />
     </task>
     <servers />
   </component>

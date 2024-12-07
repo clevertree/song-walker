@@ -157,15 +157,11 @@ export interface PresetFilter {
     title: RegExp
 }
 
+export type PresetBank = (presetFilter: PresetFilter) => Generator<InstrumentPreset> | AsyncGenerator<InstrumentPreset>
 
-export interface PresetBank {
-    title: string,
+export interface PresetBankBase {
+    listPresets: PresetBank,
 
-    listPresets(presetFilter: PresetFilter): Generator<InstrumentPreset> | AsyncGenerator<InstrumentPreset>
-
-}
-
-export interface PresetBankBase extends PresetBank {
     findPreset(presetFilter: PresetFilter): Promise<InstrumentPreset | null>,
 }
 
@@ -175,7 +171,7 @@ export type InstrumentPreset<Config = object> = {
     title: string,
     type?: InstrumentPresetType,
     // alias?: string,
-    instrument: InstrumentLoader,
+    loader: InstrumentLoader,
     config: Config
 }
 

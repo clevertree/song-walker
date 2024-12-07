@@ -18,7 +18,7 @@ export default async function PolyphonyInstrument(this: TrackState, config: Poly
     let aliases: { [key: string]: InstrumentInstance } = {}
     const voices: InstrumentInstance[] = await Promise.all(config.voices.map(voice => {
         const {
-            instrument: voiceLoader,
+            loader: voiceLoader,
             config: voiceConfig,
             title
         } = voice;

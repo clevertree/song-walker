@@ -12,12 +12,12 @@ describe('WebAudioFontLibrary', () => {
         velocityDivisor: 1,
         instrument: () => undefined
     }
-    it('lists all preset. load 3', async () => {
+    it('lists all presets. load 3', async () => {
         let count = 0;
         const lastPresetByType: { [k: string]: InstrumentPreset } = {}
         const startTime = Date.now();
 
-        for await (const preset of WebAudioFontLibrary.listPresets({type: 'any', title: /.*/})) {
+        for await (const preset of WebAudioFontLibrary({type: 'any', title: /.*/})) {
             console.log(preset);
             count++;
             if (preset.type && Math.random() > 0.8) {
@@ -30,12 +30,12 @@ describe('WebAudioFontLibrary', () => {
 
         const context = new AudioContext();
         for (const preset of Object.values(lastPresetByType)) {
-            const {config, instrument} = preset;
+            const {config, loader} = preset;
             const trackState: TrackState = {
                 ...defaultTrackState,
                 destination: context.destination,
             }
-            trackState.instrument = await instrument.bind(trackState)(config)
+            trackState.instrument = await loader.bind(trackState)(config)
         }
 
     })

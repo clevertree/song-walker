@@ -1,8 +1,4 @@
-import {InstrumentPreset, PresetBank} from "@songwalker/types";
+import {PresetBank} from "@songwalker/types";
 
-export const SongWalkerLibrary: PresetBank = {
-    title: 'SongWalker',
-    * listPresets(): Generator<InstrumentPreset> {
-
-    },
+export const SongWalkerLibrary: PresetBank = async function* listPresets(presetFilter) {
 }
