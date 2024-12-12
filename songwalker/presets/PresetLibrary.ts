@@ -8,12 +8,12 @@ const presetBanks: Array<PresetBank> = [
 
 const PresetLibrary: PresetBankBase = {
     async findPreset(presetID) {
-        const filter = new RegExp(presetID);
+        const filter = new RegExp(presetID, 'i');
         for await (const preset of PresetLibrary.listPresets()) {
             if (filter.test(preset.title))
                 return preset;
         }
-        return null;
+        throw new Error("Preset ID not found: " + presetID);
     },
     async* listPresets(): AsyncGenerator<Preset> {
         for (const presetBank of presetBanks) {

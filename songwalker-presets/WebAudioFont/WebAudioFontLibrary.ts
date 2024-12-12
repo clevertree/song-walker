@@ -3,16 +3,16 @@ import WebAudioFontInstrumentLoader, {
     WebAudioFontInstrumentLoaderConfig
 } from "@songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader";
 import {fetchJSONFromMirror} from "@songwalker-presets/WebAudioFont/mirrors";
-
-export const PRESET_PATH_INSTRUMENT_KEYS = '/instrumentKeys.json'
-export const PRESET_PATH_INSTRUMENT_NAMES = '/instrumentNames.json'
-export const PRESET_PATH_PERCUSSION_KEYS = '/percussionKeys.json'
-export const PRESET_PATH_PERCUSSION_NAMES = '/percussionNames.json'
-export const PRESET_PATH_DRUMSET_KEYS = '/drumSetKeys.json'
-export const PRESET_PATH_DRUMSET_NAMES = '/drumSetNames.json'
-export const PRESET_PATH_INSTRUMENT = '/i'
-export const PRESET_PATH_PERCUSSION = '/p'
-export const PRESET_PATH_DRUMSET = '/s'
+import {
+    PRESET_PATH_DRUMSET,
+    PRESET_PATH_DRUMSET_NAMES,
+    PRESET_PATH_INSTRUMENT,
+    PRESET_PATH_INSTRUMENT_KEYS,
+    PRESET_PATH_INSTRUMENT_NAMES,
+    PRESET_PATH_PERCUSSION,
+    PRESET_PATH_PERCUSSION_KEYS,
+    PRESET_PATH_PERCUSSION_NAMES
+} from "@songwalker-presets/WebAudioFont/constants";
 
 export const WebAudioFontLibrary = async function* listPresets() {
     yield* listInstruments()

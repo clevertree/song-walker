@@ -1,4 +1,5 @@
 import {InstrumentInstance, TrackState} from "@songwalker";
+import {CommandState} from "@songwalker/types";
 
 export interface ReverbEffectConfig {
     seconds?: number,
@@ -22,11 +23,20 @@ export default async function ReverbEffect(this: TrackState, config: ReverbEffec
 
     buildImpulse();
 
+
     // this.effects.push(analyzerEffect)
-    return function (this: TrackState, commandState) {
+    function connectReverbEffect(this: TrackState, commandState: CommandState) {
+        const destination = context.createGain();
         output.connect(commandState.destination);
-        commandState.destination = input;
+        // TODO: mixer value
+        destination.connect(input);
+        destination.connect(commandState.destination);
+        commandState.destination = destination;
     }
+
+    // Automatically append effect to track state
+    this.effects.push(connectReverbEffect)
+    return connectReverbEffect;
 
     function buildImpulse() {
         // based on https://github.com/clevertree/simple-reverb/

@@ -32,15 +32,9 @@ export const defaultSongFunctions: SongFunctions = {
         }
         const commandState: CommandState = {command, ...this, ...props};
         debugger;
-        if (this.effects) {
-            // Effects load in order
-            for (const effect of this.effects) {
-                // Modifies TrackState.destination to create processing effect (i.e. reverb)
-                effect.bind(this)(commandState);
-                // To modify or add notes, effects have to modify the CommandState
-
-            }
-        }
+        // Modifies TrackState.destination to create processing effect (i.e. reverb)
+        // To modify or add notes, effects have to modify the CommandState
+        this.effects.forEach(effect => effect.bind(this)(commandState));
         // TODO: check for track end time
         commandState.instrument.bind(this)(commandState);
     }
@@ -49,7 +43,7 @@ export const defaultSongFunctions: SongFunctions = {
 export const defaultEmptyInstrument: InstrumentInstance = () => {
     throw new Error("No instrument is loaded");
 }
-export const defaultTrackState: TrackState = {
+export const DefaultTrackState: TrackState = {
     beatsPerMinute: 60,
     bufferDuration: 0,
     currentTime: 0,

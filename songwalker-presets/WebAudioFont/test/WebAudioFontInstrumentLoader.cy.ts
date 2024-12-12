@@ -10,18 +10,20 @@ import {
     PRESET_PATH_INSTRUMENT_KEYS,
     PRESET_PATH_PERCUSSION,
     PRESET_PATH_PERCUSSION_KEYS
-} from "@songwalker-presets/WebAudioFont/WebAudioFontLibrary";
+} from "@songwalker-presets/WebAudioFont/constants";
 
 describe('WebAudioFontInstrument', () => {
 
 
-    const defaultTrackState = {
+    const defaultTrackState: TrackState = {
         beatsPerMinute: 240,
         bufferDuration: 0,
         currentTime: 0,
         noteDuration: 0,
         noteVelocity: 0,
         velocityDivisor: 1,
+        destination: {} as AudioNode,
+        effects: [],
         instrument: () => undefined
     }
 

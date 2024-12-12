@@ -120,12 +120,12 @@ export type InstrumentLoader<Config> = (config: Config) => Promise<InstrumentIns
 
 /** Presets */
 
-export type PresetBank<Config> = () => Generator<Preset<Config>> | AsyncGenerator<Preset<Config>>
+export type PresetBank = () => Generator<Preset<any>> | AsyncGenerator<Preset<any>>
 
 export interface PresetBankBase {
-    listPresets: PresetBank<any>,
+    listPresets: PresetBank,
 
-    findPreset(presetID: string): Promise<Preset | null>,
+    findPreset(presetID: string): Promise<Preset>,
 }
 
 // export type PresetType = 'instrument' | 'drum-kit' | 'effect'
