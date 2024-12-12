@@ -1,6 +1,6 @@
 const songSource =
     `lead=loadPreset("FluidR3/AcousticGrandPiano")
-osc=loadInstrument("Oscillator", {'type':'square'})
+osc=loadPreset("Oscillator", {'type':'square'})
 perc=loadPreset("FluidR3/DrumKitRoom1")
 
 @track1 @beat1 8

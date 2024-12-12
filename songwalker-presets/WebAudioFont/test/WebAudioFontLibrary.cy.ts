@@ -1,5 +1,5 @@
 import {WebAudioFontLibrary} from "@songwalker-presets/WebAudioFont/WebAudioFontLibrary";
-import {InstrumentPreset, TrackState} from "@songwalker/types";
+import {Preset, TrackState} from "@songwalker/types";
 
 describe('WebAudioFontLibrary', () => {
 
@@ -10,19 +10,20 @@ describe('WebAudioFontLibrary', () => {
         noteDuration: 0,
         noteVelocity: 0,
         velocityDivisor: 1,
+        effects: [],
         instrument: () => undefined
     }
     it('lists all presets. load 3', async () => {
         let count = 0;
-        const lastPresetByType: { [k: string]: InstrumentPreset } = {}
+        const lastPresetByType: { [k: string]: Preset } = {}
         const startTime = Date.now();
 
-        for await (const preset of WebAudioFontLibrary({type: 'any', title: /.*/})) {
+        for await (const preset of WebAudioFontLibrary()) {
             console.log(preset);
             count++;
-            if (preset.type && Math.random() > 0.8) {
-                lastPresetByType[preset.type] = preset;
-            }
+            // if (preset.type && Math.random() > 0.8) {
+            //     lastPresetByType[preset.type] = preset;
+            // }
         }
         console.log('Library iteration time:', `${Date.now() - startTime}ms`)
         expect(count).to.be.greaterThan(5000)

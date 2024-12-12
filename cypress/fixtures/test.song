@@ -1,6 +1,7 @@
-const lead=await loadInstrument("FluidR3/AcousticGrandPiano")
-const osc=await loadInstrument("Oscillator", {'type':'square'})
-const perc=await loadInstrument("FluidR3/DrumKitRoom1")
+const lead=await loadPreset("FluidR3/AcousticGrandPiano")
+const osc=await loadPreset("Oscillator", {'type':'square'})
+const perc=await loadPreset("FluidR3/DrumKitRoom1")
+const reverb=await loadPreset("Reverb")
 
 track1(lead); beat1(); 8;
 track1(osc) beat1() 8

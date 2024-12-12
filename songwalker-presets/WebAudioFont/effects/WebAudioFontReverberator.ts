@@ -1,13 +1,7 @@
 import {CommandState, InstrumentInstance, TrackState} from "@songwalker/types";
 import {parseNote} from "@songwalker";
-import WebAudioFontPlayer from "./src/player";
-import {Simulate} from "react-dom/test-utils";
-import {WavePreset} from "@songwalker-presets/WebAudioFont/src/otypes";
+import Reverberator, {WebAudioFontReverberatorConfig} from "../src/reverberator";
 
-
-export interface WebAudioFontInstrumentConfig extends WavePreset {
-    title?: string,
-}
 
 // export interface VoiceConfiguration {
 //     alias?: string
@@ -15,21 +9,32 @@ export interface WebAudioFontInstrumentConfig extends WavePreset {
 // }
 
 
-export default async function WebAudioFontInstrument(this: TrackState, config: WebAudioFontInstrumentConfig): Promise<InstrumentInstance> {
+export default async function WebAudioFontReverberatorEffect(this: TrackState, config: WebAudioFontReverberatorConfig): Promise<InstrumentInstance> {
     const {
         destination: {
             context
         }
     } = this;
     const startTime = context.currentTime;
-    const player = new WebAudioFontPlayer();
-    await player.adjustPreset(context, config);
+    const reverb = new Reverberator(context, config);
+    // Switch destination in track state
+
+    channelMaster.output.connect(reverberator.input);
+    var flanger=new flangerNode(audioContext,reverberator.output,audioContext.destination);
+    const oldDestination = this.destination;
+    this.destination =
 
     const loadingTime = context.currentTime - startTime;
     if (loadingTime > 0) {
         this.currentTime += loadingTime // Move track time forward to compensate for loading time
         console.log("WebAudioFont preset loading time: ", loadingTime)
     }
+
+    const reverbEffect: InstrumentInstance = () => {
+
+    }
+    // this.effects.push(analyzerEffect)
+    return reverbEffect;
 
     return function playWebAudioFontNote(commandState: CommandState) {
         const {

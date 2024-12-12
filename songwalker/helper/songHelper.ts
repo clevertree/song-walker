@@ -1,5 +1,5 @@
-import {CommandParams, SongFunctions, TrackState} from "@songwalker/types";
-import PresetLibrary from "../instruments/library";
+import {CommandParams, CommandState, InstrumentInstance, SongFunctions, TrackState} from "@songwalker/types";
+import PresetLibrary from "../presets/PresetLibrary";
 
 export const defaultSongFunctions: SongFunctions = {
     wait: async function defaultWaitCallback(this, duration) {
@@ -9,11 +9,12 @@ export const defaultSongFunctions: SongFunctions = {
             console.log(`Waiting ${waitTime} seconds`)
             await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
         }
+        // TODO: track position
     },
-    loadInstrument: async function defaultLoadInstrumentCallback(this: TrackState, presetID, config = {}) {
-        for await (const preset of PresetLibrary.listPresets()) {
-            if (preset.title === presetID)
-                return preset.instrument.bind(this)({...preset.config, ...config});
+    loadPreset: async function (this: TrackState, presetID, config = {}) {
+        const preset = await PresetLibrary.findPreset(presetID);
+        if (preset) {
+            return preset.loader.bind(this)({...preset.config, ...config});
         }
         throw new Error("Preset id not found: " + presetID);
     },
@@ -29,8 +30,33 @@ export const defaultSongFunctions: SongFunctions = {
                 command, currentTime, '<', audioContext.currentTime)
             return
         }
+        const commandState: CommandState = {command, ...this, ...props};
         debugger;
+        if (this.effects) {
+            // Effects load in order
+            for (const effect of this.effects) {
+                // Modifies TrackState.destination to create processing effect (i.e. reverb)
+                effect.bind(this)(commandState);
+                // To modify or add notes, effects have to modify the CommandState
+
+            }
+        }
         // TODO: check for track end time
-        return this.instrument.bind(this)({command, ...this, ...props});
+        commandState.instrument.bind(this)(commandState);
     }
+}
+
+export const defaultEmptyInstrument: InstrumentInstance = () => {
+    throw new Error("No instrument is loaded");
+}
+export const defaultTrackState: TrackState = {
+    beatsPerMinute: 60,
+    bufferDuration: 0,
+    currentTime: 0,
+    destination: {} as AudioNode,
+    noteDuration: 0,
+    noteVelocity: 0,
+    velocityDivisor: 1,
+    instrument: defaultEmptyInstrument,
+    effects: []
 }

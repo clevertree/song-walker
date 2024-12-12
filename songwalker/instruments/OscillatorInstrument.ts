@@ -1,10 +1,8 @@
-import {InstrumentInstance, TrackState, parseNote} from "@songwalker";
+import {InstrumentInstance, parseNote, TrackState} from "@songwalker";
 import {CommandState, ParsedNote} from "@songwalker/types";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
-import {
-    configFilterByKeyRange,
-    KeyRangeConfig
-} from "./common/filter";
+import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
+import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
@@ -16,12 +14,12 @@ export interface OscillatorInstrumentConfig extends EnvelopeConfig, KeyRangeConf
 
 export default function OscillatorInstrument(this: TrackState, config: OscillatorInstrumentConfig): InstrumentInstance {
     // console.log('OscillatorInstrument', config, config.type);
-
+    const {context} = this.destination;
     let createOscillator = configOscillator();
-    let createGain = configEnvelope(config);
+    let createGain = configEnvelope(context, config);
     let filterNote = configFilterByKeyRange(config)
 
-    return function parseCommand(this: TrackState, commandState: CommandState) {
+    const instrumentInstance = function parseCommand(this: TrackState, commandState: CommandState) {
         const {command} = commandState;
         const noteInfo = parseNote(command);
         if (!noteInfo)
@@ -30,6 +28,10 @@ export default function OscillatorInstrument(this: TrackState, config: Oscillato
             return
         return playOscillator(noteInfo, commandState)
     }
+    // Set instance to current instrument if no instrument is currently loaded
+    if (this.instrument === defaultEmptyInstrument)
+        this.instrument = instrumentInstance
+    return instrumentInstance;
 
     function playOscillator(noteInfo: ParsedNote, commandState: CommandState) {
         let {
@@ -66,7 +68,7 @@ export default function OscillatorInstrument(this: TrackState, config: Oscillato
                 case 'square':
                 case 'sawtooth':
                 case 'triangle':
-                    source = destination.context.createOscillator();
+                    source = context.createOscillator();
                     source.type = type;
                     source.detune.value = detune;
                     source.frequency.value = frequency;

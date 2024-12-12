@@ -23,14 +23,14 @@ export class DurationEvent implements SongTrackEvent {
 }
 
 export class PlayNoteEvent implements SongTrackEvent {
-    destination: AudioDestinationNode;
+    destination: AudioNode;
     startTime: number;
     duration: number | undefined;
     value: string;
     velocity: number | undefined;
     handlerPromise?: Promise<void>;
 
-    constructor(destination: AudioDestinationNode, value: string, startTime: number, duration?: number, velocity?: number) {
+    constructor(destination: AudioNode, value: string, startTime: number, duration?: number, velocity?: number) {
         this.destination = destination;
         this.startTime = startTime;
         this.duration = duration;

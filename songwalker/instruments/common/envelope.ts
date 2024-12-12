@@ -9,13 +9,13 @@ export interface EnvelopeConfig {
     release?: number
 }
 
-export function configEnvelope(config: EnvelopeConfig): (trackState: TrackState) => AudioNode {
+export function configEnvelope(context: BaseAudioContext, config: EnvelopeConfig): (trackState: TrackState) => AudioNode {
     // Attack is the time taken for initial run-up of level from nil to peak, beginning when the key is pressed.
     if (config.mixer || config.attack) {
         let {attack = 0, mixer = 1} = config;
         return (trackState: TrackState) => {
-            const {currentTime, noteVelocity, velocityDivisor = 1, destination} = trackState
-            let gainNode = destination.context.createGain();
+            const {currentTime, noteVelocity = 1, velocityDivisor = 1, destination} = trackState
+            let gainNode = context.createGain();
             gainNode.connect(destination);
             const amplitude = mixer * (noteVelocity / velocityDivisor);
             if (attack) {

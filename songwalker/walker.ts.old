@@ -61,7 +61,7 @@ class TrackWalker implements TrackRenderer {
     readonly getTrackName: () => string;
     readonly getTrackState: () => TrackState;
     readonly playNote: (noteString: string, duration?: number, velocity?: number) => void;
-    readonly loadInstrument: (instrumentPath: string | InstrumentLoader, config?: object) => Promise<InstrumentInstance>;
+    readonly loadPreset: (instrumentPath: string | InstrumentLoader, config?: object) => Promise<InstrumentInstance>;
     readonly loadPreset: (presetPath: string, config?: object) => Promise<InstrumentInstance>;
     readonly setVariable: (variablePath: string, variableValue: any) => void;
     // getVariable: (variablePath: string) => any;
@@ -99,10 +99,10 @@ class TrackWalker implements TrackRenderer {
             }: InstrumentPreset = PresetLibrary.getPreset(presetPath)
             if (typeof config === "object")
                 Object.assign(instrumentConfig, config);
-            return THIS.loadInstrument(instrumentPath, instrumentConfig);
+            return THIS.loadPreset(instrumentPath, instrumentConfig);
         }
 
-        this.loadInstrument = async function (instrumentPath: string | InstrumentLoader, config: object = {}): Promise<InstrumentInstance> {
+        this.loadPreset = async function (instrumentPath: string | InstrumentLoader, config: object = {}): Promise<InstrumentInstance> {
             if (!songInstance.isPlaying())
                 throw Error("Playback has ended");
             const startTime = audioContext.currentTime;

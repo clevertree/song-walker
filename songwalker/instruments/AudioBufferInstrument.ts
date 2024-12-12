@@ -1,7 +1,8 @@
-import {InstrumentInstance, ParsedNote, CommandState, TrackState} from "@songwalker/types";
+import {CommandState, InstrumentInstance, ParsedNote, TrackState} from "@songwalker/types";
 import {parseNote} from "..";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
+import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
 
 const DEFAULT_FREQUENCY_ROOT = 220;
 
@@ -18,12 +19,18 @@ export interface AudioBufferInstrumentConfig extends EnvelopeConfig, KeyRangeCon
 
 export default async function AudioBufferInstrument(this: TrackState, config: AudioBufferInstrumentConfig): Promise<InstrumentInstance> {
     // console.log('AudioBufferInstrument', config, title);
-
-    let createSourceNode = await configAudioBuffer(this.destination.context);
-    let createGain = configEnvelope(config);
+    const {context} = this.destination;
+    const startTime = context.currentTime;
+    let createSourceNode = await configAudioBuffer();
+    let createGain = configEnvelope(context, config);
     let filterNote = configFilterByKeyRange(config)
 
-    return function parseCommand(this: TrackState, commandState: CommandState) {
+    const loadingTime = context.currentTime - startTime;
+    if (loadingTime > 0) {
+        this.currentTime += loadingTime // Move track time forward to compensate for loading time
+        console.log("WebAudioFont preset loading time: ", loadingTime)
+    }
+    const instrumentInstance = function parseCommand(this: TrackState, commandState: CommandState) {
         const {command} = commandState;
         // TODO: check alias
         switch (command) {
@@ -37,6 +44,11 @@ export default async function AudioBufferInstrument(this: TrackState, config: Au
             return
         return playAudioBuffer(noteInfo, commandState)
     }
+
+    // Set instance to current instrument if no instrument is currently loaded
+    if (this.instrument === defaultEmptyInstrument)
+        this.instrument = instrumentInstance
+    return instrumentInstance;
 
 
     function playAudioBuffer(noteInfo: ParsedNote, commandState: CommandState) {
@@ -60,7 +72,7 @@ export default async function AudioBufferInstrument(this: TrackState, config: Au
         return bufferNode;
     }
 
-    async function configAudioBuffer(context: BaseAudioContext) {
+    async function configAudioBuffer() {
         let {
             src,
             loop = false,

@@ -1,10 +1,10 @@
-(async function rootTrack({loadInstrument, wait, playCommand}) {
+(async function rootTrack({loadPreset, wait, playCommand}) {
 const track = {...this};
 const _tw = wait.bind(track);
 const _tp = playCommand.bind(track);
-const lead=await loadInstrument.bind(track)("FluidR3/AcousticGrandPiano");
-const osc=await loadInstrument.bind(track)("Oscillator", {'type':'square'});
-const perc=await loadInstrument.bind(track)("FluidR3/DrumKitRoom1");
+const lead=await loadPreset.bind(track)("FluidR3/AcousticGrandPiano");
+const osc=await loadPreset.bind(track)("Oscillator", {'type':'square'});
+const perc=await loadPreset.bind(track)("FluidR3/DrumKitRoom1");
 
 track1.bind(track)(lead); beat1.bind(track)(); await _tw(8);
 track1.bind(track)(osc); beat1.bind(track)(); await _tw(8);

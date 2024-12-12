@@ -27,7 +27,7 @@
     "react-redux": "^9.0.2",
     "sass": "^1.69.5",
     "undoh": "^1.2.2",
-    "webaudiofont": "github:clevertree/webaudiofont"
+    "simple-reverb": "github:web-audio-components/simple-reverb"
   },
   "devDependencies": {
     "@types/node": "^20",

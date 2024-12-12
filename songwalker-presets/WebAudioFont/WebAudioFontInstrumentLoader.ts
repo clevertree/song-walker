@@ -1,4 +1,4 @@
-import {InstrumentInstance, TrackState} from "@songwalker/types";
+import {InstrumentLoader, TrackState} from "@songwalker/types";
 import WebAudioFontInstrument, {
     WebAudioFontInstrumentConfig
 } from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
@@ -16,7 +16,7 @@ export interface WebAudioFontInstrumentLoaderConfig {
 // }
 
 
-export default async function WebAudioFontInstrumentLoader(this: TrackState, config: WebAudioFontInstrumentLoaderConfig): Promise<InstrumentInstance> {
+const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoaderConfig> = async function (this: TrackState, config) {
     const {
         destination: {
             context: audioContext
@@ -37,3 +37,4 @@ export default async function WebAudioFontInstrumentLoader(this: TrackState, con
     return WebAudioFontInstrument.bind(this)(fontConfig)
 }
 
+export default WebAudioFontInstrumentLoader;

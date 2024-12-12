@@ -1,7 +1,7 @@
 import {ERRORS} from "./constants";
 import {InstrumentInstance, TrackRenderer, TrackState} from "@songwalker/types";
 import PolyphonyInstrument from "./instruments/PolyphonyInstrument";
-import {parseCommandValues, parseNote} from "./helper/commandHelper";
+import {parseCommandValues} from "./helper/commandHelper";
 
 describe('songPlayer', () => {
     it('plays sub-tracks', async () => {
@@ -46,8 +46,8 @@ describe('songPlayer', () => {
 
 
 async function testSong(trackRenderer: TrackRenderer) {
-    const {waitUntil: w, loadInstrument} = trackRenderer;
-    await loadInstrument(testMelodicInstrument)
+    const {waitUntil: w, loadPreset} = trackRenderer;
+    await loadPreset(testMelodicInstrument)
     trackRenderer.setVariable('beatsPerMinute', 160)
     trackRenderer.startTrack(testTrack)
     await w(2);
@@ -165,8 +165,8 @@ function testPercussionInstrument(config: object): InstrumentInstance {
 }
 
 async function testTrackPercussion(trackRenderer: TrackRenderer) {
-    const {playNote: n, waitUntil: w, setVariable: v, loadInstrument} = trackRenderer;
-    await loadInstrument(testPercussionInstrument)
+    const {playNote: n, waitUntil: w, setVariable: v, loadPreset} = trackRenderer;
+    await loadPreset(testPercussionInstrument)
     v('beatsPerMinute', 240)
     n("kick");
     n("hat");

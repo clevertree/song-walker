@@ -1,9 +1,10 @@
-import {CommandState, InstrumentInstance, InstrumentPreset, TrackState} from "@songwalker/types";
+import {CommandState, InstrumentInstance, Preset, TrackState} from "@songwalker/types";
+import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
 
 
 export interface PolyphonyInstrumentConfig {
     title?: string,
-    voices: Array<InstrumentPreset>
+    voices: Array<Preset>
 }
 
 // export interface VoiceConfiguration {
@@ -31,7 +32,7 @@ export default async function PolyphonyInstrument(this: TrackState, config: Poly
     }));
 
 
-    return function playPolyphonyNote(this: TrackState, commandState: CommandState) {
+    const instrumentInstance = function playPolyphonyNote(this: TrackState, commandState: CommandState) {
         const {command} = commandState;
         if (aliases[command]) {
             // if alias is found, execute directly
@@ -42,4 +43,9 @@ export default async function PolyphonyInstrument(this: TrackState, config: Poly
             }
         }
     }
+
+    // Set instance to current instrument if no instrument is currently loaded
+    if (this.instrument === defaultEmptyInstrument)
+        this.instrument = instrumentInstance
+    return instrumentInstance;
 }

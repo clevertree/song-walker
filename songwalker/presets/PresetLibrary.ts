@@ -1,41 +1,23 @@
-import {InstrumentPreset, PresetBank, PresetBankBase} from "@songwalker/types";
-import OscillatorInstrument from "@songwalker/instruments/OscillatorInstrument";
-import AudioBufferInstrument from "@songwalker/instruments/AudioBufferInstrument";
-import PolyphonyInstrument from "@songwalker/instruments/PolyphonyInstrument";
+import {Preset, PresetBank, PresetBankBase} from "@songwalker/types";
+import {InstrumentPresetBank} from "@songwalker/instruments/";
 
 
-const presetBanks: Array<PresetBank> = []
-
+const presetBanks: Array<PresetBank> = [
+    InstrumentPresetBank
+]
 
 const PresetLibrary: PresetBankBase = {
-    title: 'Default Library',
-    async findPreset(filter) {
-        for await (const preset of PresetLibrary.listPresets(filter)) {
-            if (filter.type === 'any' || filter.type == preset.type) {
-                if (filter.title.test(preset.title))
-                    return preset;
-            }
+    async findPreset(presetID) {
+        const filter = new RegExp(presetID);
+        for await (const preset of PresetLibrary.listPresets()) {
+            if (filter.test(preset.title))
+                return preset;
         }
         return null;
     },
-    async* listPresets(filter): AsyncGenerator<InstrumentPreset> {
-        yield {
-            title: 'Oscillator',
-            loader: OscillatorInstrument,
-            config: {}
-        }
-        yield {
-            title: 'AudioBuffer',
-            loader: AudioBufferInstrument,
-            config: {}
-        }
-        yield {
-            title: 'Polyphony',
-            loader: PolyphonyInstrument,
-            config: {}
-        }
+    async* listPresets(): AsyncGenerator<Preset> {
         for (const presetBank of presetBanks) {
-            yield* presetBank.listPresets(filter)
+            yield* presetBank()
         }
     },
 }
