@@ -10,23 +10,17 @@ describe('songPlayer', () => {
     const {destination} = audioContext;
     it('plays sub-tracks', async () => {
         // const logCallback = cy.stub();
-        const trackState: TrackState = {
-            ...getDefaultTrackState(destination),
-        }
-        await testSong.bind(trackState)()
+        const songState = await testSong.bind(getDefaultTrackState(destination))()
         // await songInstance.waitForSongToFinish();
         // expect(logCallback.callCount).to.eq(36)
-        expect(trackState.position).to.eq(4)
-        expect(trackState.currentTime).to.eq(2.25)
+        expect(songState.position).to.eq(4)
+        expect(songState.currentTime).to.eq(2.25)
     })
 
     it('plays percussion track', async () => {
-        const trackState: TrackState = {
-            ...getDefaultTrackState(destination),
-        }
-        await testTrackPercussion.bind(trackState)()
-        expect(trackState.position).to.eq(8)
-        expect(trackState.currentTime).to.eq(2)
+        const songState = await testTrackPercussion.bind(getDefaultTrackState(destination))()
+        expect(songState.position).to.eq(8)
+        expect(songState.currentTime).to.eq(2)
     })
 
     it('playing a song without an instrument throws an error ', async () => {
@@ -46,24 +40,22 @@ describe('songPlayer', () => {
 
 async function testSong(this: TrackState) {
     const track = {...this};
-    const wait = DefaultSongFunctions.wait.bind(track);
-    const config = {
-        addEventListener: cy.stub(),
-        stop: cy.stub(),
-    };
+    const waitAsync = DefaultSongFunctions.waitAsync.bind(track);
+    const config = cy.stub()
     track.instrument = await testMelodicInstrument.bind(this)(config)
 
     track.beatsPerMinute = 160;
     testTrack.bind(track)().then()
     testTrackNoInstrument.bind(track)().then()
 
-    await wait.bind(track)(2);
+    await waitAsync.bind(track)(2);
 
     track.beatsPerMinute = 80;
     testTrack.bind(track)().then()
     testTrackNoInstrument.bind(track)().then()
 
-    await wait.bind(track)(2);
+    await waitAsync.bind(track)(2);
+    return track;
 }
 
 // async function testSongNoInstrument(this: TrackState) {
@@ -72,36 +64,37 @@ async function testSong(this: TrackState) {
 
 async function testTrackNoInstrument(this: TrackState) {
     const track = {...this};
-    const wait = DefaultSongFunctions.wait.bind(track);
-    const playCommand = DefaultSongFunctions.playCommand.bind(track);
+    const waitAsync = DefaultSongFunctions.waitAsync.bind(track);
+    const play = DefaultSongFunctions.parseAndPlayCommand.bind(track);
     track.duration = 1 / 4;
-    playCommand('C5^2')
+    play('C5^2')
     // playCommand( 'config', {});
     // track.config = {} // no need for config objectrack
-    await wait((1 / 4));
+    await waitAsync(1 / 4);
     track.currentTime = 1
     track.velocity = 3
     track.duration = 1 / 4;
-    playCommand('C4@/3');
-    await wait((1 / 4));
-    playCommand('G4');
-    await wait((1 / 4));
-    playCommand('Eb4');
-    await wait((1 / 4));
-    playCommand('Eb5');
-    await wait((1 / 4));
-    playCommand('F5');
-    await wait((1 / 4));
-    playCommand('Eb5');
-    await wait((1 / 4));
-    playCommand('D5');
-    await wait((1 / 4));
+    play('C4@/3');
+    await waitAsync(1 / 4);
+    play('G4');
+    await waitAsync(1 / 4);
+    play('Eb4');
+    await waitAsync(1 / 4);
+    play('Eb5');
+    await waitAsync(1 / 4);
+    play('F5');
+    await waitAsync(1 / 4);
+    play('Eb5');
+    await waitAsync(1 / 4);
+    play('D5');
+    await waitAsync(1 / 4);
     testTrack.bind(track)().then();
+    return track;
 }
 
 async function testTrack(this: TrackState) {
     const track = {...this};
-    const w = DefaultSongFunctions.wait.bind(track);
+    const w = DefaultSongFunctions.waitAsync.bind(track);
     const n = DefaultSongFunctions.playCommand.bind(track);
     const _ = (tokenID: number) => {
     };
@@ -134,12 +127,13 @@ async function testTrack(this: TrackState) {
     n("D5", {duration: 1 / 4});
     await w(1 / 4);
     // n("C5", {duration: 1 / 4});
+    return track;
 }
 
 
 async function testTrackPercussion(this: TrackState) {
     const track = {...this};
-    const w = DefaultSongFunctions.wait.bind(track);
+    const w = DefaultSongFunctions.waitAsync.bind(track);
     const n = DefaultSongFunctions.playCommand.bind(track);
     track.instrument = await testPercussionInstrument.bind(this)(cy.stub())
     track.beatsPerMinute = 240;
@@ -164,6 +158,7 @@ async function testTrackPercussion(this: TrackState) {
     await w(1);
     n("hat");
     await w(1);
+    return track;
 }
 
 /** Instruments **/

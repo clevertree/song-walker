@@ -70,6 +70,7 @@ export default function OscillatorInstrument(this: TrackState, config: Oscillato
                 endTime += release * (60 / beatsPerMinute)
             }
             oscillator.stop(endTime);
+            // console.log({currentTime, endTime, duration, beatsPerMinute})
         }
         // TODO: add active notes to track state?
         return oscillator

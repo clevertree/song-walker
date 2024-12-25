@@ -9,11 +9,10 @@ import {generateRandomBuffer, testCommands} from "@songwalker/instruments/test/t
 describe('Polyphony', () => {
     it('Polyphony plays C#4^0.1d1/2', async () => {
         const context = new AudioContext();
-        const trackState: TrackState = {
+        const track: TrackState = {
             ...getDefaultTrackState(context.destination),
-            destination: context.destination,
         }
-        trackState.instrument = await PolyphonyInstrument.bind(trackState)({
+        track.instrument = await PolyphonyInstrument.bind(track)({
             voices: [{
                 title: 'osc',
                 loader: OscillatorInstrument,
@@ -25,18 +24,18 @@ describe('Polyphony', () => {
                 title: 'buffer',
                 loader: AudioBufferInstrument,
                 config: {
-                    mixer: 0.1,
+                    mixer: 0.8,
                     src: generateRandomBuffer(context)
                 }
             } as Preset<AudioBufferInstrumentConfig>]
         })
 
-        const {wait, playCommand} = testCommands(trackState);
+        const {wait, parseAndPlayCommand: play} = testCommands(track);
 
         for (let i = 0; i < 8; i++) {
-            playCommand('C#4^0.1@1/8')
+            play('C#4^0.1@1/8')
             wait(1 / 8)
-            playCommand('D#4^0.1@1/8')
+            play('D#4^0.1@1/8')
             wait(1 / 8)
         }
     })

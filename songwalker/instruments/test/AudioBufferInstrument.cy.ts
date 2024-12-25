@@ -8,21 +8,21 @@ describe('AudioBuffer', () => {
     it('AudioBuffer plays C#4^0.1d1/2', async () => {
         const context = new AudioContext();
         const src = generateRandomBuffer(context)
-        const trackState: TrackState = {
+        const track: TrackState = {
             ...getDefaultTrackState(context.destination),
-            destination: context.destination,
+            beatsPerMinute: 32
         }
-        trackState.instrument = await AudioBufferInstrument.bind(trackState)({
+        track.instrument = await AudioBufferInstrument.bind(track)({
             src,
             loop: true,
-            mixer: 0.1
+            mixer: 1
         })
-        const {wait, playCommand} = testCommands(trackState);
+        const {wait, parseAndPlayCommand: play} = testCommands(track);
 
         for (let i = 0; i < 8; i++) {
-            playCommand('C#4^0.1@1/8')
+            play('C#4^0.1@1/8')
             wait(1 / 8)
-            playCommand('D#4^0.1@1/8')
+            play('D#4^0.1@1/8')
             wait(1 / 8)
         }
     })

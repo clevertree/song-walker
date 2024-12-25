@@ -83,7 +83,8 @@ export interface CommandState extends TrackState {
 
 
 export interface SongFunctions {
-    wait: (this: TrackState, duration: number) => Promise<boolean>,
+    wait: (this: TrackState, duration: number) => boolean,
+    waitAsync: (this: TrackState, duration: number) => Promise<boolean>,
     loadPreset: (this: TrackState,
                  presetID: string,
                  config: object) => Promise<InstrumentInstance>,
