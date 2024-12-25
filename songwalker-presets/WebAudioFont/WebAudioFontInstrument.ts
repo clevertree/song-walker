@@ -1,7 +1,6 @@
 import {CommandState, InstrumentInstance, TrackState} from "@songwalker/types";
 import {parseNote} from "@songwalker";
 import WebAudioFontPlayer from "./src/player";
-import {Simulate} from "react-dom/test-utils";
 import {WavePreset} from "@songwalker-presets/WebAudioFont/src/otypes";
 
 
@@ -35,13 +34,13 @@ export default async function WebAudioFontInstrument(this: TrackState, config: W
         const {
             destination,
             currentTime,
-            noteDuration = 0,
+            duration = 0,
             beatsPerMinute
         } = commandState;
         const {frequency} = parseNote(commandState.command);
         const pitch = (Math.log(frequency) / Math.log(2)) * 12
         // const playbackRate = Math.pow(2, (100.0 * pitch) / 1200.0);
-        const duration = noteDuration * (60 / beatsPerMinute)
-        player.queueWaveTable(context, destination, config, currentTime, pitch, duration);
+        const durationSeconds = duration * (60 / beatsPerMinute)
+        player.queueWaveTable(context, destination, config, currentTime, pitch, durationSeconds);
     }
 }

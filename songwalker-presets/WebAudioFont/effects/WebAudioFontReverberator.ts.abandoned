@@ -40,13 +40,13 @@ export default async function WebAudioFontReverberatorEffect(this: TrackState, c
         const {
             destination,
             currentTime,
-            noteDuration = 0,
+            duration = 0,
             beatsPerMinute
         } = commandState;
         const {frequency} = parseNote(commandState.command);
         const pitch = (Math.log(frequency) / Math.log(2)) * 12
         // const playbackRate = Math.pow(2, (100.0 * pitch) / 1200.0);
-        const duration = noteDuration * (60 / beatsPerMinute)
+        const duration = duration * (60 / beatsPerMinute)
         player.queueWaveTable(context, destination, config, currentTime, pitch, duration);
     }
 }

@@ -6,11 +6,6 @@ export type TokenItem = [name: string, content: TokenList | string]
 export type TokenList = Array<TokenItem | string>
 
 
-/** @deprecated **/
-export type TrackSourceMap = {
-    [trackName: string]: string,
-}
-
 export type SongError = {
     message: string;
     tokenID?: number;
@@ -18,8 +13,8 @@ export type SongError = {
 }
 
 export interface CommandParams {
-    noteVelocity?: number,
-    noteDuration?: number
+    velocity?: number,
+    duration?: number
 }
 
 export type ParsedParams = {
@@ -65,17 +60,17 @@ export type SongHandler = {
 
 export interface TrackState {
     // context: AudioContext,
-    currentTime: number,
+    currentTime: number,    // Actual time
+    position: number,      // Positional time (in beats)
     beatsPerMinute: number,
     destination: AudioNode,
     instrument: InstrumentInstance,
     effects: Array<InstrumentInstance>,
-    noteDuration?: number,
-    noteVelocity?: number,
+    duration?: number,
+    velocity?: number,
     velocityDivisor?: number,
     // startTime: number,
     // duration?: number,
-    // position?: number,
     bufferDuration?: number,
     // durationDivisor?: number,
     // [key: string]: any
@@ -88,7 +83,7 @@ export interface CommandState extends TrackState {
 
 
 export interface SongFunctions {
-    wait: (this: TrackState, duration: number) => Promise<void>,
+    wait: (this: TrackState, duration: number) => Promise<boolean>,
     loadPreset: (this: TrackState,
                  presetID: string,
                  config: object) => Promise<InstrumentInstance>,
@@ -116,7 +111,7 @@ export interface NoteHandler {
 export type InstrumentInstance = (this: TrackState,
                                   commandState: CommandState) => NoteHandler | void;
 
-export type InstrumentLoader<Config> = (config: Config) => Promise<InstrumentInstance> | InstrumentInstance
+export type InstrumentLoader<Config = any> = (config: Config) => Promise<InstrumentInstance> | InstrumentInstance
 
 /** Presets */
 
@@ -125,12 +120,12 @@ export type PresetBank = () => Generator<Preset<any>> | AsyncGenerator<Preset<an
 export interface PresetBankBase {
     listPresets: PresetBank,
 
-    findPreset(presetID: string): Promise<Preset>,
+    findPreset(presetID: string): Promise<Preset<any>>,
 }
 
 // export type PresetType = 'instrument' | 'drum-kit' | 'effect'
 
-export type Preset<Config = object> = {
+export type Preset<Config> = {
     title: string,
     // type: PresetType,
     // alias?: string,

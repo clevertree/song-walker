@@ -3,14 +3,14 @@
 import {parseCommandValues, TrackState} from "@songwalker";
 import {CommandState} from "@songwalker/types";
 import PresetLibrary from "../../../../presets/PresetLibrary";
-import {DefaultTrackState} from "@songwalker/helper/songHelper";
+import {getDefaultTrackState} from "@songwalker/helper/songHelper";
 
 describe('Oscillator', () => {
     it('Oscillator with Reverb', async () => {
 
         const context = new AudioContext();
         const trackState: TrackState = {
-            ...DefaultTrackState,
+            ...getDefaultTrackState(context.destination),
             destination: context.destination,
         }
         const oscPreset = await PresetLibrary.findPreset("Oscillator");

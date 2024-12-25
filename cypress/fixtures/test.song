@@ -8,7 +8,7 @@ track1(osc) beat1() 8
 
 track track1(instrument) {
     track.instrument = instrument;
-    track.noteDuration=1/4
+    track.duration=1/4
     C5 /2
     track.pitchBend=-0.4
     track.config={var: 'wut'}

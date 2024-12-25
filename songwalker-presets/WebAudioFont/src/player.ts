@@ -1,6 +1,6 @@
 'use strict'
-import WebAudioFontChannel from "./channel";
-import WebAudioFontReverberator from "./reverberator";
+// import WebAudioFontChannel from "./channel";
+// import WebAudioFontReverberator from "./reverberator";
 import {WaveAHDSR, WaveEnvelope, WavePreset, WaveSlide, WaveZone} from "./otypes";
 
 // console.log(`WebAudioFont Engine v${packageJSON.version} GPL3 (SongWalker Fork)`, packageJSON);
@@ -16,13 +16,13 @@ export default class WebAudioFontPlayer {
     afterTime = 0.05;
     nearZero = 0.000001;
 
-    createChannel(audioContext: BaseAudioContext) {
-        return new WebAudioFontChannel(audioContext);
-    };
+    // createChannel(audioContext: BaseAudioContext) {
+    //     return new WebAudioFontChannel(audioContext);
+    // };
 
-    createReverberator(audioContext: BaseAudioContext) {
-        return new WebAudioFontReverberator(audioContext);
-    };
+    // createReverberator(audioContext: BaseAudioContext) {
+    //     return new WebAudioFontReverberator(audioContext);
+    // };
 
     limitVolume(volume: number | undefined): number {
         if (volume) {
@@ -165,11 +165,11 @@ export default class WebAudioFontPlayer {
         }
     };
 
-    setupEnvelope(audioContext: BaseAudioContext, envelope: WaveEnvelope, zone: WaveZone, volume: number, when: number, sampleDuration: number, noteDuration: number) {
+    setupEnvelope(audioContext: BaseAudioContext, envelope: WaveEnvelope, zone: WaveZone, volume: number, when: number, sampleDuration: number, duration: number) {
         ((envelope as any) as GainNode).gain.setValueAtTime(this.noZeroVolume(0), audioContext.currentTime);
         var lastTime = 0;
         var lastVolume = 0;
-        var duration = noteDuration;
+        var duration = duration;
         var zoneahdsr: undefined | boolean | WaveAHDSR[] = zone.ahdsr;
         if (sampleDuration < duration + this.afterTime) {
             duration = sampleDuration - this.afterTime;

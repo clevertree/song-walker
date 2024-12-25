@@ -11,27 +11,17 @@ import {
     PRESET_PATH_PERCUSSION,
     PRESET_PATH_PERCUSSION_KEYS
 } from "@songwalker-presets/WebAudioFont/constants";
+import {testCommands} from "@songwalker-presets/WebAudioFont/test/testHelper";
+import {getDefaultTrackState} from "@songwalker/helper/songHelper";
 
 describe('WebAudioFontInstrument', () => {
 
-
-    const defaultTrackState: TrackState = {
-        beatsPerMinute: 240,
-        bufferDuration: 0,
-        currentTime: 0,
-        noteDuration: 0,
-        noteVelocity: 0,
-        velocityDivisor: 1,
-        destination: {} as AudioNode,
-        effects: [],
-        instrument: () => undefined
-    }
 
     it('loads and plays instrument', async () => {
         let instrumentKeys = await fetchJSONFromMirror(PRESET_PATH_INSTRUMENT_KEYS);
         const context = new AudioContext();
         const trackState: TrackState = {
-            ...defaultTrackState,
+            ...getDefaultTrackState(context.destination),
             destination: context.destination,
         }
         trackState.instrument = await WebAudioFontInstrumentLoader.bind(trackState)({
@@ -59,21 +49,14 @@ describe('WebAudioFontInstrument', () => {
         let percussionKeys = await fetchJSONFromMirror(PRESET_PATH_PERCUSSION_KEYS);
         const context = new AudioContext();
         const trackState: TrackState = {
-            ...defaultTrackState,
+            ...getDefaultTrackState(context.destination),
             destination: context.destination,
         }
         trackState.instrument = await WebAudioFontInstrumentLoader.bind(trackState)({
             presetPath: `${PRESET_PATH_PERCUSSION}/${percussionKeys[Math.round(Math.random() * percussionKeys.length)]}.json`
         })
 
-        function wait(duration: number) {
-            trackState.currentTime += (duration) * (60 / trackState.beatsPerMinute);
-        }
-
-        function playCommand(commandString: string) {
-            const commandInfo = parseCommandValues(commandString);
-            trackState.instrument.bind(trackState)({...trackState, ...commandInfo.params, command: commandInfo.command})
-        }
+        const {wait, playCommand} = testCommands(trackState);
 
         for (let i = 0; i < 8; i++) {
             playCommand('C3^0.1@1/2')
@@ -85,21 +68,14 @@ describe('WebAudioFontInstrument', () => {
         let drumsetKeys = await fetchJSONFromMirror(PRESET_PATH_DRUMSET_KEYS);
         const context = new AudioContext();
         const trackState: TrackState = {
-            ...defaultTrackState,
+            ...getDefaultTrackState(context.destination),
             destination: context.destination,
         }
         trackState.instrument = await WebAudioFontInstrumentLoader.bind(trackState)({
             presetPath: `${PRESET_PATH_DRUMSET}/${drumsetKeys[Math.round(Math.random() * drumsetKeys.length)]}.json`
         })
 
-        function wait(duration: number) {
-            trackState.currentTime += (duration) * (60 / trackState.beatsPerMinute);
-        }
-
-        function playCommand(commandString: string) {
-            const commandInfo = parseCommandValues(commandString);
-            trackState.instrument.bind(trackState)({...trackState, ...commandInfo.params, command: commandInfo.command})
-        }
+        const {wait, playCommand} = testCommands(trackState);
 
         for (let o = 0; o <= 2; o++) {
             for (let i = 0; i < 6; i++) {

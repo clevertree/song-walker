@@ -36,6 +36,18 @@ export function configFilterByKeyRange({
     return filterCallback;
 }
 
+export function updateKeyRangeConfig(config: KeyRangeConfig, paramName: keyof KeyRangeConfig, commandState: CommandState) {
+    // switch (paramName) {
+    //     case 'keyRangeLow':
+    //         config.keyRangeLow =
+    //         return;
+    //     case 'keyRangeHigh':
+    //         config.keyRangeHigh =
+    //         return;
+    // }
+    throw new Error("Unknown config key: " + paramName);
+}
+
 // export function configFilterByCurrentTime(): FilterCallback {
 //     return (noteInfo: ParsedNote, commandState: CommandState) => {
 //         let {

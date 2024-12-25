@@ -1,21 +1,17 @@
 // noinspection DuplicatedCode
 
 import WebAudioFontInstrument from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
-import {parseCommandValues, TrackState} from "@songwalker";
+import {TrackState} from "@songwalker";
+import {getDefaultTrackState} from "@songwalker/helper/songHelper";
+import {testCommands} from "./testHelper";
 
 describe('WebAudioFontInstrument', () => {
 
     it('loads and plays', async () => {
         const context = new AudioContext();
         const trackState: TrackState = {
-            beatsPerMinute: 240,
-            bufferDuration: 0,
-            currentTime: 0,
+            ...getDefaultTrackState(context.destination),
             destination: context.destination,
-            noteDuration: 0,
-            noteVelocity: 0,
-            velocityDivisor: 1,
-            instrument: () => undefined
         }
         trackState.instrument = await WebAudioFontInstrument.bind(trackState)({
             zones: [
@@ -36,14 +32,7 @@ describe('WebAudioFontInstrument', () => {
             ]
         })
 
-        function wait(duration: number) {
-            trackState.currentTime += (duration) * (60 / trackState.beatsPerMinute);
-        }
-
-        function playCommand(commandString: string) {
-            const commandInfo = parseCommandValues(commandString);
-            trackState.instrument.bind(trackState)({...trackState, ...commandInfo.params, command: commandInfo.command})
-        }
+        const {wait, playCommand} = testCommands(trackState);
 
         for (let i = 0; i < 4; i++) {
             playCommand('C3^0.1@1/2')

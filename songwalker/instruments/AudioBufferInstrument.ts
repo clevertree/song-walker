@@ -55,7 +55,7 @@ export default async function AudioBufferInstrument(this: TrackState, config: Au
         let {
             beatsPerMinute,
             currentTime,
-            noteDuration,
+            duration,
         } = commandState;
 
         // Envelope
@@ -64,8 +64,8 @@ export default async function AudioBufferInstrument(this: TrackState, config: Au
         const bufferNode = createSourceNode(noteInfo, gainNode)
 
         bufferNode.start(currentTime);
-        if (noteDuration) {
-            const endTime = currentTime + (noteDuration * (60 / beatsPerMinute));
+        if (duration) {
+            const endTime = currentTime + (duration * (60 / beatsPerMinute));
             bufferNode.stop(endTime);
         }
         // TODO: add active notes to track state?

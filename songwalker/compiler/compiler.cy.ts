@@ -1,11 +1,13 @@
 import {
     compileSongToCallback,
     compileSongToJavascript,
-    EXPORT_JS, F_TRACK_PLAY, F_TRACK_WAIT,
+    EXPORT_JS,
+    F_TRACK_PLAY,
+    F_TRACK_WAIT,
     sourceToTokens
 } from './compiler'
 import {TrackState} from "@songwalker";
-import {defaultSongFunctions} from "../helper/songHelper"
+import {getDefaultSongFunctions, getDefaultTrackState} from "../helper/songHelper"
 
 describe('compiler', () => {
     const emptyTemplate = (s: string) => s;
@@ -16,7 +18,7 @@ describe('compiler', () => {
             [["command-statement", "C5@3/8^.2;"]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(`${F_TRACK_PLAY}('C5', {noteDuration:3/8,noteVelocity:.2});`)
+        expect(javascriptContent).to.eq(`${F_TRACK_PLAY}('C5', {duration:3/8,velocity:.2});`)
     })
 
     it('wait statement - 1/6; /5', () => {
@@ -65,7 +67,7 @@ describe('compiler', () => {
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
         expect(javascriptContent).to.eq(
             EXPORT_JS.trackDefinition("function myTrack() {")
-            + " _tp('C4', {noteVelocity:2}); _tp('D4', {noteDuration:2}); }")
+            + " _tp('C4', {velocity:2}); _tp('D4', {duration:2}); }")
 
     })
 
@@ -100,17 +102,12 @@ describe('compiler', () => {
     it('executes song', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             const javascriptContent = compileSongToCallback(SONG_SOURCE);
+            const context = new AudioContext();
             const trackState: TrackState = {
-                beatsPerMinute: 0,
-                currentTime: 0,
-                destination: new AudioContext().destination,
-                instrument: () => {
-                    throw new Error("No instrument loaded")
-                }
-
+                ...getDefaultTrackState(context.destination),
             }
             const song = javascriptContent.bind(trackState);
-            cy.wrap(song(defaultSongFunctions)).then(() => {
+            cy.wrap(song(getDefaultSongFunctions)).then(() => {
             });
         })
     })

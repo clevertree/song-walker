@@ -35,7 +35,7 @@ export const EXPORT_JS = {
         return `${F_TRACK_PLAY}('${commandString}'${paramString});`
     },
     // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
-    wait: (durationStatement: string) => `await ${F_TRACK_WAIT}(${durationStatement});`,
+    wait: (durationStatement: string) => `if(await ${F_TRACK_WAIT}(${durationStatement}))return;`,
     trackDefinition: (functionDefinition: string) => `async ${(functionDefinition).replace(/^track/i, 'function')}`
         + JS_TRACK_SETUP('\t'),
     function: (functionStatement: string) => {
@@ -47,8 +47,8 @@ export const EXPORT_JS = {
     }
 }
 export const PARAM_ALIAS: CommandParamsAliases = {
-    '@': 'noteDuration',
-    '^': 'noteVelocity'
+    '@': 'duration',
+    '^': 'velocity'
 };
 
 export const LANGUAGE = {

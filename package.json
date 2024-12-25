@@ -26,8 +26,7 @@
     "react-dom": "^18",
     "react-redux": "^9.0.2",
     "sass": "^1.69.5",
-    "undoh": "^1.2.2",
-    "simple-reverb": "github:web-audio-components/simple-reverb"
+    "undoh": "^1.2.2"
   },
   "devDependencies": {
     "@types/node": "^20",

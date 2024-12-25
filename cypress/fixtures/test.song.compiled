@@ -15,11 +15,11 @@ async function track1(instrument) {
 	const _tp = playCommand.bind(track);
 
     track.instrument = instrument;
-    track.noteDuration=1/4
+    track.duration=1/4
     _tp('C5'); await _tw(1/2);
     track.pitchBend=-0.4
     track.config={var: 'wut'}
-    _tp('C4', {noteDuration:1/4,noteVelocity:82}); await _tw(1/2);  // override duration and velocity
+    _tp('C4', {duration:1/4,velocity:82}); await _tw(1/2);  // override duration and velocity
     _tp('G4'); await _tw(1/2);
     _tp('Eb4'); await _tw(1/2);
     _tp('Eb5'); await _tw(1/2);
@@ -43,22 +43,22 @@ async function beat1() {
     track.instrument=perc
     track.velocityDivisor=10
     _tp('chh');     _tp('abd');     await _tw(1/2);
-    _tp('chh', {noteVelocity:3});           await _tw(1/2);
-    _tp('chh', {noteVelocity:3});           await _tw(1/2);
+    _tp('chh', {velocity:3});           await _tw(1/2);
+    _tp('chh', {velocity:3});           await _tw(1/2);
     _tp('chh');     _tp('as');      await _tw(1/2);
-    _tp('chh', {noteVelocity:3,noteDuration:1/8});        await _tw(1/2);
+    _tp('chh', {velocity:3,duration:1/8});        await _tw(1/2);
     _tp('chh');     _tp('abd');     await _tw(1/2);
-    _tp('chh', {noteVelocity:3});   _tp('abd', {noteVelocity:6});   await _tw(1/2);
+    _tp('chh', {velocity:3});   _tp('abd', {velocity:6});   await _tw(1/2);
     _tp('chh');     _tp('as');      await _tw(1/2);
-    _tp('chh', {noteVelocity:3});           await _tw(1/4);
-    _tp('chh', {noteVelocity:3});           await _tw(1/4);
+    _tp('chh', {velocity:3});           await _tw(1/4);
+    _tp('chh', {velocity:3});           await _tw(1/4);
     _tp('chh');     _tp('abd');     await _tw(1/2);
-    _tp('chh', {noteVelocity:3});           await _tw(1/2);
+    _tp('chh', {velocity:3});           await _tw(1/2);
     _tp('chh');     _tp('as');      await _tw(1/2);
-    _tp('chh', {noteVelocity:3});           await _tw(1/2);
+    _tp('chh', {velocity:3});           await _tw(1/2);
     _tp('chh');     _tp('abd');     await _tw(1/2);
-    _tp('chh', {noteVelocity:3});   _tp('abd', {noteVelocity:6});   await _tw(1/2);
+    _tp('chh', {velocity:3});   _tp('abd', {velocity:6});   await _tw(1/2);
     _tp('chh');     _tp('as');      await _tw(1/2);
-    _tp('ohh', {noteVelocity:3});           await _tw(1/2);
+    _tp('ohh', {velocity:3});           await _tw(1/2);
 }
 })

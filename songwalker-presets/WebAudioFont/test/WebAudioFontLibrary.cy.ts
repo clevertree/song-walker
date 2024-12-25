@@ -7,8 +7,8 @@ describe('WebAudioFontLibrary', () => {
         beatsPerMinute: 240,
         bufferDuration: 0,
         currentTime: 0,
-        noteDuration: 0,
-        noteVelocity: 0,
+        duration: 0,
+        velocity: 0,
         velocityDivisor: 1,
         effects: [],
         instrument: () => undefined
