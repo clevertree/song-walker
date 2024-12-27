@@ -1,4 +1,4 @@
-import {ParsedCommand, CommandParams, ParsedNote, ParsedParams, CommandParamsAliases} from "@songwalker/types";
+import {CommandParams, CommandParamsAliases, ParsedCommand, ParsedNote, ParsedParams} from "@songwalker/types";
 import {LANGUAGE, PARAM_ALIAS} from "@songwalker/compiler/compiler";
 
 const DEFAULT_FREQUENCY_A4 = 440; // 432;
@@ -38,8 +38,14 @@ export function parseCommandValues(fullCommandString: string): ParsedCommand {
     const paramNames = Object.keys(parsedParams) as (keyof ParsedParams)[]
     for (let paramName of paramNames) {
         const paramValue = parsedParams[paramName]
-        if (paramValue)
-            params[paramName] = parseNumeric(paramValue);
+        if (paramValue) {
+            switch (paramName) {
+                case 'duration':
+                case 'velocity':
+                    params[paramName] = parseNumeric(paramValue);
+                    break;
+            }
+        }
     }
     return {
         command,

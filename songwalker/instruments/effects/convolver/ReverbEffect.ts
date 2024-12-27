@@ -16,7 +16,7 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
     const {
         seconds = 3,
         decay = 2,
-        reverse = 0
+        reverse = false
     } = config;
     const input = context.createConvolver();
     const output = input;
@@ -26,12 +26,13 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
 
     // this.effects.push(analyzerEffect)
     function connectReverbEffect(track: TrackState, command: string, params: CommandParams) {
-        const destination = context.createGain();
-        output.connect(track.destination);
+        const {destination} = {...track, ...params};
+        const effectDestination = context.createGain();
+        output.connect(destination);
         // TODO: mixer value
-        destination.connect(input);
-        destination.connect(track.destination);
-        track.destination = destination;
+        effectDestination.connect(input);
+        effectDestination.connect(track.destination);
+        params.destination = effectDestination;
     }
 
     // Automatically append effect to track state

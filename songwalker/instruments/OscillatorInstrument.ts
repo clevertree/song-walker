@@ -56,7 +56,7 @@ export default function OscillatorInstrument(track: TrackState, config: Oscillat
         } = trackAndParams;
 
         // Envelope
-        const gainNode = createGain(track);
+        const gainNode = createGain(trackAndParams);
         // Oscillator
         const oscillator = createOscillator(noteInfo, gainNode);
 

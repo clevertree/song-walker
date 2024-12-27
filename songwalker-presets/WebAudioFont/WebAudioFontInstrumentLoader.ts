@@ -21,7 +21,7 @@ const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoade
         destination: {
             context: audioContext
         }
-    } = this;
+    } = track;
     const startTime = audioContext.currentTime;
     const {
         presetPath
@@ -30,7 +30,7 @@ const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoade
 
     const loadingTime = audioContext.currentTime - startTime;
     if (loadingTime > 0) {
-        this.currentTime += loadingTime // Move track time forward to compensate for loading time
+        track.currentTime += loadingTime // Move track time forward to compensate for loading time
         console.log("WebAudioFont preset loading time: ", loadingTime)
     }
 

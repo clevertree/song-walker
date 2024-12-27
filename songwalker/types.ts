@@ -14,7 +14,8 @@ export type SongError = {
 
 export interface CommandParams {
     velocity?: number,
-    duration?: number
+    duration?: number,
+    destination?: AudioNode,
 }
 
 export type ParsedParams = {
@@ -121,17 +122,17 @@ export type InstrumentLoader<Config = any> = (track: TrackState, config: Config)
 
 /** Presets */
 
-export type PresetBank = () => Generator<Preset<any>> | AsyncGenerator<Preset<any>>
+export type PresetBank = () => Generator<Preset> | AsyncGenerator<Preset>
 
 export interface PresetBankBase {
     listPresets: PresetBank,
 
-    findPreset(presetID: string): Promise<Preset<any>>,
+    findPreset(presetID: string | RegExp): Promise<Preset>,
 }
 
 // export type PresetType = 'instrument' | 'drum-kit' | 'effect'
 
-export type Preset<Config> = {
+export type Preset<Config = any> = {
     title: string,
     // type: PresetType,
     // alias?: string,

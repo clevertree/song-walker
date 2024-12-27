@@ -4,7 +4,7 @@ import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
 
 export interface PolyphonyInstrumentConfig {
     title?: string,
-    voices: Array<Preset<any>>
+    voices: Array<Preset>
 }
 
 // export interface VoiceConfiguration {

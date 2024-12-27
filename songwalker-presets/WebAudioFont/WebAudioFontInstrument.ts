@@ -1,4 +1,4 @@
-import {InstrumentInstance, TrackState} from "@songwalker/types";
+import {CommandParams, InstrumentInstance, TrackState} from "@songwalker/types";
 import {parseNote} from "@songwalker";
 import WebAudioFontPlayer from "./src/player";
 import {WavePreset} from "@songwalker-presets/WebAudioFont/src/otypes";
@@ -19,25 +19,25 @@ export default async function WebAudioFontInstrument(track: TrackState, config: 
         destination: {
             context
         }
-    } = this;
+    } = track;
     const startTime = context.currentTime;
     const player = new WebAudioFontPlayer();
     await player.adjustPreset(context, config);
 
     const loadingTime = context.currentTime - startTime;
     if (loadingTime > 0) {
-        this.currentTime += loadingTime // Move track time forward to compensate for loading time
+        track.currentTime += loadingTime // Move track time forward to compensate for loading time
         console.log("WebAudioFont preset loading time: ", loadingTime)
     }
 
-    return function playWebAudioFontNote(command: string, params: CommandParams) {
+    return function playWebAudioFontNote(track: TrackState, command: string, params: CommandParams) {
         const {
             destination,
             currentTime,
             duration,
             beatsPerMinute
-        } = commandState;
-        const {frequency} = parseNote(commandState.command);
+        } = {...track, ...params};
+        const {frequency} = parseNote(command);
         const pitch = (Math.log(frequency) / Math.log(2)) * 12
         // const playbackRate = Math.pow(2, (100.0 * pitch) / 1200.0);
         const durationSeconds = duration * (60 / beatsPerMinute)

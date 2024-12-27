@@ -2,18 +2,17 @@
 
 import WebAudioFontInstrument from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
 import {TrackState} from "@songwalker";
-import {getDefaultTrackState} from "@songwalker/helper/songHelper";
-import {testCommands} from "./testHelper";
+import {getDefaultSongFunctions, getDefaultTrackState} from "@songwalker/helper/songHelper";
 
 describe('WebAudioFontInstrument', () => {
 
     it('loads and plays', async () => {
         const context = new AudioContext();
-        const trackState: TrackState = {
+        const track: TrackState = {
             ...getDefaultTrackState(context.destination),
             destination: context.destination,
         }
-        trackState.instrument = await WebAudioFontInstrument.bind(trackState)({
+        track.instrument = await WebAudioFontInstrument(track, {
             zones: [
                 {
                     ahdsr: false,
@@ -32,13 +31,13 @@ describe('WebAudioFontInstrument', () => {
             ]
         })
 
-        const {wait, playCommand} = testCommands(trackState);
+        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
 
         for (let i = 0; i < 4; i++) {
-            playCommand('C3^0.1@1/2')
-            wait(1 / 2)
-            playCommand('D#3^0.1@1/2')
-            wait(1 / 2)
+            play(track, 'C3^0.1@1/2')
+            wait(track, 1 / 2)
+            play(track, 'D#3^0.1@1/2')
+            wait(track, 1 / 2)
         }
     })
 })

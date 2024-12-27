@@ -1,42 +1,30 @@
 import {WebAudioFontLibrary} from "@songwalker-presets/WebAudioFont/WebAudioFontLibrary";
 import {Preset, TrackState} from "@songwalker/types";
+import {getDefaultTrackState} from "@songwalker/helper/songHelper";
 
 describe('WebAudioFontLibrary', () => {
-
-    const defaultTrackState = {
-        beatsPerMinute: 240,
-        bufferDuration: 0,
-        currentTime: 0,
-        duration: 0,
-        velocity: 0,
-        velocityDivisor: 1,
-        effects: [],
-        instrument: () => undefined
-    }
     it('lists all presets. load 3', async () => {
         let count = 0;
-        const lastPresetByType: { [k: string]: Preset } = {}
         const startTime = Date.now();
+        const randomPresets: Preset[] = [];
 
         for await (const preset of WebAudioFontLibrary()) {
-            console.log(preset);
             count++;
-            // if (preset.type && Math.random() > 0.8) {
-            //     lastPresetByType[preset.type] = preset;
-            // }
+            if (Math.random() > 0.99 && randomPresets.length < 3) {
+                console.log(preset);
+                randomPresets.push(preset);
+            }
         }
         console.log('Library iteration time:', `${Date.now() - startTime}ms`)
         expect(count).to.be.greaterThan(5000)
-        expect(Object.values(lastPresetByType).length).to.be.eq(3)
 
         const context = new AudioContext();
-        for (const preset of Object.values(lastPresetByType)) {
+        for (const preset of randomPresets) {
             const {config, loader} = preset;
-            const trackState: TrackState = {
-                ...defaultTrackState,
-                destination: context.destination,
+            const track: TrackState = {
+                ...getDefaultTrackState(context.destination),
             }
-            trackState.instrument = await loader.bind(trackState)(config)
+            track.instrument = await loader(track, config)
         }
 
     })

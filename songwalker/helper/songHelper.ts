@@ -4,7 +4,7 @@ import Errors from '../constants/errors'
 import {parseCommandValues} from "@songwalker";
 
 interface SongFunctionsExtended extends SongFunctions {
-    parseAndPlayCommand: (track: TrackState, commandString: string) => void
+    parseAndPlayCommand: (track: TrackState, commandString: string, additionalParams?: CommandParams) => void
 }
 
 export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLibrary) {
@@ -70,9 +70,9 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
         //     }
         //     callback(subTrack, ...args);
         // },
-        parseAndPlayCommand: function (track: TrackState, commandString: string) {
+        parseAndPlayCommand: function (track: TrackState, commandString: string, additionalParams: CommandParams = {}) {
             const {command, params} = parseCommandValues(commandString);
-            functions.playCommand(track, command, params);
+            functions.playCommand(track, command, {...params, ...additionalParams});
         }
     };
     return functions;
