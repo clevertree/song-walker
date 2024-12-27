@@ -1,5 +1,5 @@
 import {TrackState} from "@songwalker";
-import {CommandState} from "@songwalker/types";
+import {CommandParams} from "@songwalker/types";
 
 export interface EnvelopeConfig {
     mixer?: number,
@@ -10,14 +10,14 @@ export interface EnvelopeConfig {
     release?: number
 }
 
-export function updateEnvelopeConfig(config: EnvelopeConfig, paramName: keyof EnvelopeConfig, commandState: CommandState) {
-    const {duration = 0, beatsPerMinute} = commandState;
+export function updateEnvelopeConfig(config: EnvelopeConfig, paramName: keyof EnvelopeConfig, track: TrackState, params: CommandParams) {
+    const {duration = 0} = params;
     switch (paramName) {
         case 'attack':
-            config.attack = duration * (60 / beatsPerMinute)
+            config.attack = duration * (60 / track.beatsPerMinute)
             return;
         case 'release':
-            config.release = duration * (60 / beatsPerMinute)
+            config.release = duration * (60 / track.beatsPerMinute)
             return;
     }
     throw new Error("Unknown config key: " + paramName);
@@ -28,7 +28,7 @@ export function configEnvelope(context: BaseAudioContext, config: EnvelopeConfig
     // if (config.mixer || config.attack) {
     return (trackState: TrackState) => {
         let {attack = 0, mixer = 1, release = 0} = config;
-        const {currentTime, velocity = 1, velocityDivisor = 1, destination} = trackState
+        const {currentTime, velocity, velocityDivisor, destination} = trackState
         let gainNode = context.createGain();
         gainNode.connect(destination);
         const amplitude = mixer * (velocity / velocityDivisor);

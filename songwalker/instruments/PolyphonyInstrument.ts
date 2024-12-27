@@ -1,4 +1,4 @@
-import {CommandState, InstrumentInstance, Preset, TrackState} from "@songwalker/types";
+import {CommandParams, InstrumentInstance, Preset, TrackState} from "@songwalker/types";
 import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
 
 
@@ -13,7 +13,7 @@ export interface PolyphonyInstrumentConfig {
 // }
 
 
-export default async function PolyphonyInstrument(this: TrackState, config: PolyphonyInstrumentConfig): Promise<InstrumentInstance> {
+export default async function PolyphonyInstrument(track: TrackState, config: PolyphonyInstrumentConfig): Promise<InstrumentInstance> {
     // console.log('PolyphonyInstrument', config, config.title);
 
     let aliases: { [key: string]: InstrumentInstance } = {}
@@ -25,27 +25,26 @@ export default async function PolyphonyInstrument(this: TrackState, config: Poly
         } = voice;
         // const voiceLoader = InstrumentLibrary.getInstrumentLoader(instrumentPath)
         return new Promise<InstrumentInstance>(async (resolve) => {
-            const voiceInstance = await voiceLoader.bind(this)(voiceConfig);
+            const voiceInstance = await voiceLoader(track, voiceConfig);
             aliases[title] = voiceInstance;
             resolve(voiceInstance);
         })
     }));
 
 
-    const instrumentInstance = function playPolyphonyNote(this: TrackState, commandState: CommandState) {
-        const {command} = commandState;
+    const instrumentInstance = function playPolyphonyNote(track: TrackState, command: string, params: CommandParams) {
         if (aliases[command]) {
             // if alias is found, execute directly
-            return aliases[command].bind(this)(commandState);
+            return aliases[command](track, command, params);
         } else {
             for (let i = 0; i < voices.length; i++) {
-                voices[i].bind(this)(commandState);
+                voices[i](track, command, params);
             }
         }
     }
 
     // Set instance to current instrument if no instrument is currently loaded
-    if (this.instrument === defaultEmptyInstrument)
-        this.instrument = instrumentInstance
+    if (track.instrument === defaultEmptyInstrument)
+        track.instrument = instrumentInstance
     return instrumentInstance;
 }

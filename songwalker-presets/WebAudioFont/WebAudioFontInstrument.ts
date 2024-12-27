@@ -1,4 +1,4 @@
-import {CommandState, InstrumentInstance, TrackState} from "@songwalker/types";
+import {InstrumentInstance, TrackState} from "@songwalker/types";
 import {parseNote} from "@songwalker";
 import WebAudioFontPlayer from "./src/player";
 import {WavePreset} from "@songwalker-presets/WebAudioFont/src/otypes";
@@ -14,7 +14,7 @@ export interface WebAudioFontInstrumentConfig extends WavePreset {
 // }
 
 
-export default async function WebAudioFontInstrument(this: TrackState, config: WebAudioFontInstrumentConfig): Promise<InstrumentInstance> {
+export default async function WebAudioFontInstrument(track: TrackState, config: WebAudioFontInstrumentConfig): Promise<InstrumentInstance> {
     const {
         destination: {
             context
@@ -30,11 +30,11 @@ export default async function WebAudioFontInstrument(this: TrackState, config: W
         console.log("WebAudioFont preset loading time: ", loadingTime)
     }
 
-    return function playWebAudioFontNote(commandState: CommandState) {
+    return function playWebAudioFontNote(command: string, params: CommandParams) {
         const {
             destination,
             currentTime,
-            duration = 0,
+            duration,
             beatsPerMinute
         } = commandState;
         const {frequency} = parseNote(commandState.command);

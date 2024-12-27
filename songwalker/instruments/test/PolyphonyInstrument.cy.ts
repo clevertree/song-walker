@@ -3,8 +3,8 @@ import {TrackState} from "@songwalker";
 import OscillatorInstrument, {OscillatorInstrumentConfig} from "@songwalker/instruments/OscillatorInstrument";
 import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBufferInstrument";
 import {Preset} from "@songwalker/types";
-import {getDefaultTrackState} from "@songwalker/helper/songHelper";
-import {generateRandomBuffer, testCommands} from "@songwalker/instruments/test/testHelper";
+import {getDefaultSongFunctions, getDefaultTrackState} from "@songwalker/helper/songHelper";
+import {generateRandomBuffer} from "@songwalker/instruments/test/testHelper";
 
 describe('Polyphony', () => {
     it('Polyphony plays C#4^0.1d1/2', async () => {
@@ -12,7 +12,7 @@ describe('Polyphony', () => {
         const track: TrackState = {
             ...getDefaultTrackState(context.destination),
         }
-        track.instrument = await PolyphonyInstrument.bind(track)({
+        track.instrument = await PolyphonyInstrument(track, {
             voices: [{
                 title: 'osc',
                 loader: OscillatorInstrument,
@@ -30,13 +30,13 @@ describe('Polyphony', () => {
             } as Preset<AudioBufferInstrumentConfig>]
         })
 
-        const {wait, parseAndPlayCommand: play} = testCommands(track);
+        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
 
         for (let i = 0; i < 8; i++) {
-            play('C#4^0.1@1/8')
-            wait(1 / 8)
-            play('D#4^0.1@1/8')
-            wait(1 / 8)
+            play(track, 'C#4^0.1@1/8')
+            wait(track, 1 / 8)
+            play(track, 'D#4^0.1@1/8')
+            wait(track, 1 / 8)
         }
     })
 })

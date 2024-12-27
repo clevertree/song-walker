@@ -1,65 +1,78 @@
-import {
-    CommandParams,
-    CommandState,
-    InstrumentInstance,
-    PresetBankBase,
-    SongFunctions,
-    TrackState
-} from "@songwalker/types";
+import {CommandParams, InstrumentInstance, PresetBankBase, SongFunctions, TrackState} from "@songwalker/types";
 import PresetLibrary from "../presets/PresetLibrary";
 import Errors from '../constants/errors'
 import {parseCommandValues} from "@songwalker";
 
-interface SongFunctionsWithParser extends SongFunctions {
-    parseAndPlayCommand: (this: TrackState, commandString: string) => void
+interface SongFunctionsExtended extends SongFunctions {
+    parseAndPlayCommand: (track: TrackState, commandString: string) => void
 }
 
 export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLibrary) {
-    const functions: SongFunctionsWithParser = {
-        wait: function defaultWaitCallback(this, duration) {
-            this.position += duration;
-            this.currentTime += duration * (60 / this.beatsPerMinute);
+    const functions: SongFunctionsExtended = {
+        waitForTrackToFinish: async function (track) {
+            const waitTime = track.currentTime - track.destination.context.currentTime;
+            if (waitTime > 0) {
+                console.log(`Waiting ${waitTime} for track to finish ${track.destination.context.currentTime} => ${track.currentTime}`)
+                await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+            }
+        },
+        wait: function defaultWaitCallback(track, duration) {
+            track.position += duration;
+            track.currentTime += duration * (60 / track.beatsPerMinute);
+            if (track.parentTrack) {
+                const {minimumEndTime} = track.parentTrack;
+                if (!minimumEndTime || minimumEndTime < track.currentTime)
+                    track.parentTrack.minimumEndTime = track.currentTime;
+            }
+            console.info('wait', duration, track.currentTime, track.beatsPerMinute);
             // TODO: check for track end duration and potentially return 'true'
             return false;
         },
-        waitAsync: async function defaultWaitCallback(this, duration) {
-            const trackEnded = functions.wait.bind(this)(duration);
-            const waitTime = this.currentTime - this.destination.context.currentTime;
+        waitAsync: async function defaultWaitCallback(track, duration) {
+            const trackEnded = functions.wait(track, duration);
+            const waitTime = track.currentTime - track.destination.context.currentTime - track.bufferDuration;
             if (waitTime > 0) {
-                console.log(`Waiting ${waitTime} seconds`)
+                console.log(`Waiting ${waitTime} seconds for ${track.destination.context.currentTime} => ${track.currentTime} - ${track.bufferDuration}`)
                 await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
             }
             return trackEnded;
         },
-        loadPreset: async function (this: TrackState, presetID, config = {}) {
+        loadPreset: async function (track: TrackState, presetID, config = {}) {
             const preset = await presetLibrary.findPreset(presetID);
             if (preset) {
-                return preset.loader.bind(this)({...preset.config, ...config});
+                return preset.loader(track, {...preset.config, ...config});
             }
             throw new Error("Preset id not found: " + presetID);
         },
-        playCommand: function (this: TrackState, command: string, props: CommandParams = {}) {
+        playCommand: function (track: TrackState, command: string, params: CommandParams = {}) {
             let {
                 destination: {
                     context: audioContext
                 },
                 currentTime,
-            } = this;
+            } = track;
             if (currentTime < audioContext.currentTime) {
                 console.warn("skipping note that occurs in the past: ",
-                    command, currentTime, '<', audioContext.currentTime)
+                    command, 'currentTime:', currentTime, '<', 'audioContext.currentTime', audioContext.currentTime)
                 return
             }
-            const commandState: CommandState = {command, ...this, ...props};
+            // const command: string, params: CommandParams = {command, ...track, ...props};
             // Modifies TrackState.destination to create processing effect (i.e. reverb)
             // To modify or add notes, effects have to modify the CommandState
-            this.effects.forEach(effect => effect.bind(this)(commandState));
+            track.effects.forEach(effect => effect(track, command, params));
             // TODO: check for track end time
-            commandState.instrument.bind(this)(commandState);
+            track.instrument(track, command, params);
         },
-        parseAndPlayCommand: function (this: TrackState, commandString: string) {
+        // executeCallback: function (track: TrackState, callback, ...args) {
+        //     const subTrack = {
+        //         ...track,
+        //         parentTrack: track,
+        //     }
+        //     callback(subTrack, ...args);
+        // },
+        parseAndPlayCommand: function (track: TrackState, commandString: string) {
             const {command, params} = parseCommandValues(commandString);
-            functions.playCommand.bind(this)(command, params);
+            functions.playCommand(track, command, params);
         }
     };
     return functions;
@@ -72,9 +85,12 @@ export const defaultEmptyInstrument: InstrumentInstance = () => {
 export function getDefaultTrackState(destination: AudioNode): TrackState {
     return {
         beatsPerMinute: 60,
-        bufferDuration: 0,
-        currentTime: 0,
+        bufferDuration: 1,
+        currentTime: destination.context.currentTime,
         position: 0,
+        duration: 1,
+        velocity: 1,
+        velocityDivisor: 1,
         instrument: defaultEmptyInstrument,
         effects: [],
         destination

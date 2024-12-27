@@ -63,35 +63,40 @@ export interface TrackState {
     currentTime: number,    // Actual time
     position: number,      // Positional time (in beats)
     beatsPerMinute: number,
+    bufferDuration: number,
+    duration: number,
+    velocity: number,
+    velocityDivisor: number,
     destination: AudioNode,
     instrument: InstrumentInstance,
     effects: Array<InstrumentInstance>,
-    duration?: number,
-    velocity?: number,
-    velocityDivisor?: number,
+    minimumEndTime?: number,    // Actual time
+    parentTrack?: TrackState
     // startTime: number,
     // duration?: number,
-    bufferDuration?: number,
     // durationDivisor?: number,
     // [key: string]: any
     // promise: Promise<void> | null
 }
 
+/** @deprecated **/
 export interface CommandState extends TrackState {
     command: string
 }
 
 
 export interface SongFunctions {
-    wait: (this: TrackState, duration: number) => boolean,
-    waitAsync: (this: TrackState, duration: number) => Promise<boolean>,
-    loadPreset: (this: TrackState,
+    wait: (track: TrackState, duration: number) => boolean,
+    waitAsync: (track: TrackState, duration: number) => Promise<boolean>,
+    waitForTrackToFinish: (track: TrackState) => Promise<void>,
+    loadPreset: (track: TrackState,
                  presetID: string,
                  config: object) => Promise<InstrumentInstance>,
-    playCommand: (this: TrackState, command: string, props?: CommandParams) => void
+    playCommand: (track: TrackState, command: string, props?: CommandParams) => void,
+    // executeCallback: (track: TrackState, callback: (...args: any[]) => any, ...args: any[]) => void
 }
 
-export type SongCallback = (this: TrackState, functions: SongFunctions) => Promise<void>;
+export type SongCallback = (track: TrackState, functions: SongFunctions) => Promise<void>;
 
 export interface SongTrackEvent {
     waitForEventStart: () => Promise<void>,
@@ -109,10 +114,10 @@ export interface NoteHandler {
 
 
 // export type InstrumentInstance = (trackState: TrackState, command: string) => NoteHandler;
-export type InstrumentInstance = (this: TrackState,
-                                  commandState: CommandState) => NoteHandler | void;
+export type InstrumentInstance = (track: TrackState,
+                                  command: string, params: CommandParams) => NoteHandler | void;
 
-export type InstrumentLoader<Config = any> = (config: Config) => Promise<InstrumentInstance> | InstrumentInstance
+export type InstrumentLoader<Config = any> = (track: TrackState, config: Config) => Promise<InstrumentInstance> | InstrumentInstance
 
 /** Presets */
 

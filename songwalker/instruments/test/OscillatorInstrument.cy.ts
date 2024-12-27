@@ -1,7 +1,6 @@
 import OscillatorInstrument from "@songwalker/instruments/OscillatorInstrument";
 import {TrackState} from "@songwalker";
-import {getDefaultTrackState} from "@songwalker/helper/songHelper";
-import {testCommands} from "@songwalker/instruments/test/testHelper";
+import {getDefaultSongFunctions, getDefaultTrackState} from "@songwalker/helper/songHelper";
 
 describe('Oscillator', () => {
     it('Oscillator plays notes', async () => {
@@ -10,25 +9,25 @@ describe('Oscillator', () => {
         const track: TrackState = {
             ...getDefaultTrackState(context.destination),
         }
-        track.instrument = OscillatorInstrument.bind(track)({
+        track.instrument = OscillatorInstrument(track, {
             mixer: 1.1
         })
-        const {wait, parseAndPlayCommand: play} = testCommands(track);
+        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
 
-        play("release@0")
+        play(track, "release@0")
         for (let i = 0; i < 4; i++) {
-            play('C#4^0.1@1/8')
-            wait(1 / 8)
-            play('D#4^0.1@1/8')
-            wait(1 / 8)
+            play(track, 'C#4^0.1@1/8')
+            wait(track, 1 / 8)
+            play(track, 'D#4^0.1@1/8')
+            wait(track, 1 / 8)
         }
-        play("release@/2")
-        play("attack@1")
+        play(track, "release@/2")
+        play(track, "attack@1")
         for (let i = 0; i < 2; i++) {
-            play('C#4^0.1@1')
-            wait(1)
-            play('D#4^0.1@1')
-            wait(1)
+            play(track, 'C#4^0.1@1')
+            wait(track, 1)
+            play(track, 'D#4^0.1@1')
+            wait(track, 1)
         }
     })
 

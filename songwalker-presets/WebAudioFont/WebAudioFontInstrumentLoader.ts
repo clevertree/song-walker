@@ -16,7 +16,7 @@ export interface WebAudioFontInstrumentLoaderConfig {
 // }
 
 
-const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoaderConfig> = async function (this: TrackState, config) {
+const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoaderConfig> = async function (track: TrackState, config) {
     const {
         destination: {
             context: audioContext
@@ -34,7 +34,7 @@ const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoade
         console.log("WebAudioFont preset loading time: ", loadingTime)
     }
 
-    return WebAudioFontInstrument.bind(this)(fontConfig)
+    return WebAudioFontInstrument(track, fontConfig)
 }
 
 export default WebAudioFontInstrumentLoader;

@@ -106,8 +106,7 @@ describe('compiler', () => {
             const trackState: TrackState = {
                 ...getDefaultTrackState(context.destination),
             }
-            const song = javascriptContent.bind(trackState);
-            cy.wrap(song(getDefaultSongFunctions)).then(() => {
+            cy.wrap(javascriptContent(trackState, getDefaultSongFunctions())).then(() => {
             });
         })
     })

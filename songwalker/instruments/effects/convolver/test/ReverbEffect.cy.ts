@@ -1,7 +1,6 @@
 // noinspection DuplicatedCode
 
 import {parseCommandValues, TrackState} from "@songwalker";
-import {CommandState} from "@songwalker/types";
 import PresetLibrary from "../../../../presets/PresetLibrary";
 import {getDefaultTrackState} from "@songwalker/helper/songHelper";
 
@@ -24,7 +23,8 @@ describe('Oscillator', () => {
 
         function playCommand(commandString: string) {
             const commandInfo = parseCommandValues(commandString);
-            const commandState: CommandState = {...trackState, ...commandInfo.params, command: commandInfo.command};
+            const command: string,
+                params: CommandParams = {...trackState, ...commandInfo.params, command: commandInfo.command};
             trackState.effects.forEach(effect => effect.bind(trackState)(commandState));
             trackState.instrument.bind(trackState)(commandState)
         }

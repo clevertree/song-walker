@@ -9,7 +9,7 @@ import Reverberator, {WebAudioFontReverberatorConfig} from "../src/reverberator"
 // }
 
 
-export default async function WebAudioFontReverberatorEffect(this: TrackState, config: WebAudioFontReverberatorConfig): Promise<InstrumentInstance> {
+export default async function WebAudioFontReverberatorEffect(track: TrackState, config: WebAudioFontReverberatorConfig): Promise<InstrumentInstance> {
     const {
         destination: {
             context
@@ -36,7 +36,7 @@ export default async function WebAudioFontReverberatorEffect(this: TrackState, c
     // this.effects.push(analyzerEffect)
     return reverbEffect;
 
-    return function playWebAudioFontNote(commandState: CommandState) {
+    return function playWebAudioFontNote(command: string, params: CommandParams) {
         const {
             destination,
             currentTime,

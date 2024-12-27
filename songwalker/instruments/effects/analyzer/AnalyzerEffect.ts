@@ -2,7 +2,7 @@ import {InstrumentInstance, TrackState} from "@songwalker";
 import {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBufferInstrument";
 
 
-export default async function AnalyzerEffect(this: TrackState, config: AudioBufferInstrumentConfig): Promise<InstrumentInstance> {
+export default async function AnalyzerEffect(track: TrackState, config: AudioBufferInstrumentConfig): Promise<InstrumentInstance> {
     // TODO: switch destination out
     // TODO: send all commands to trackState.instrument() in case effect is loaded as instrument
 

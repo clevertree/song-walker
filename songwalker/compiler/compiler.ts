@@ -10,32 +10,39 @@ import {
 import {parseCommand, parseCommandParams, parseWait} from "@songwalker/helper/commandHelper";
 import Prism, {Token} from "prismjs";
 
-export const ROOT_TRACK = 'rootTrack';
-export const VAR_TRACK_STATE = 'track';
-export const VAR_CURRENT_TIME: keyof TrackState = 'currentTime';
-export const VAR_DESTINATION: keyof TrackState = 'destination';
-export const VAR_BPM: keyof TrackState = 'beatsPerMinute';
-export const F_WAIT: keyof SongFunctions = "wait";
-export const F_LOAD: keyof SongFunctions = "loadPreset";
-export const F_PLAY: keyof SongFunctions = "playCommand";
-export const F_TRACK_WAIT = '_tw';
-export const F_TRACK_PLAY = '_tp';
-const JS_TRACK_SETUP = (tab = '\t') => `\n${tab}const ${VAR_TRACK_STATE} = {...this};`
-    + `\n${tab}const ${F_TRACK_WAIT} = ${F_WAIT}.bind(${VAR_TRACK_STATE});`
-    + `\n${tab}const ${F_TRACK_PLAY} = ${F_PLAY}.bind(${VAR_TRACK_STATE});`
+const ROOT_TRACK = 'rootTrack';
+const VAR_TRACK_STATE = 'track';
+const F_WAIT = "_w";
+const F_LOAD = "_lp";
+const F_PLAY = "_p";
+const F_EXPORT = `{${
+    'wait' as keyof SongFunctions
+}:${F_WAIT}, ${
+    'play' as keyof SongFunctions
+}:${F_PLAY}, ${
+    'loadPreset' as keyof SongFunctions
+}:${F_LOAD}}`
+const JS_TRACK_SETUP = (tab = '\t') => ``
+    + `\n${tab}${VAR_TRACK_STATE} = {...${VAR_TRACK_STATE}, ${
+        'parentTrack' as keyof TrackState}:${VAR_TRACK_STATE}, ${
+        'position' as keyof TrackState
+    }:0}`
+    // + `\n${tab}const ${F_WAIT} = ${F_WAIT}.bind(${VAR_TRACK_STATE});`
+    // + `\n${tab}const ${F_PLAY} = ${F_PLAY}.bind(${VAR_TRACK_STATE});`
     + `\n${tab}`;
 export const EXPORT_JS = {
     // songTemplate: (sourceCode: string) => `(() => {return ${sourceCode}})()`,
-    songTemplate: (sourceCode: string) => `(async function ${ROOT_TRACK}({${F_LOAD}, ${F_WAIT}, ${F_PLAY}}) {${JS_TRACK_SETUP('')}${sourceCode}})`,
+    songTemplate: (sourceCode: string) =>
+        `(async function ${ROOT_TRACK}(track, ${F_EXPORT}) {${sourceCode}})`,
 
     command: (commandString: string, params: ParsedParams) => {
         const propStrings: string[] = Object.keys(params).map(
             (paramName) => `${paramName}:${params[paramName as keyof ParsedParams]}`)
         let paramString = Object.values(params).length > 0 ? `, {${propStrings.join(',')}}` : '';
-        return `${F_TRACK_PLAY}('${commandString}'${paramString});`
+        return `${F_PLAY}('${commandString}'${paramString});`
     },
     // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
-    wait: (durationStatement: string) => `if(await ${F_TRACK_WAIT}(${durationStatement}))return;`,
+    wait: (durationStatement: string) => `if(await ${F_WAIT}(${durationStatement}))return;`,
     trackDefinition: (functionDefinition: string) => `async ${(functionDefinition).replace(/^track/i, 'function')}`
         + JS_TRACK_SETUP('\t'),
     function: (functionStatement: string) => {

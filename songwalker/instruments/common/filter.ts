@@ -1,12 +1,12 @@
 import {parseNote} from "@songwalker";
-import {CommandState, ParsedNote} from "@songwalker/types";
+import {ParsedNote} from "@songwalker/types";
 
 export interface KeyRangeConfig {
     keyRangeLow?: string,
     keyRangeHigh?: string,
 }
 
-type FilterCallback = (noteInfo: ParsedNote, commandState: CommandState) => boolean;
+type FilterCallback = (noteInfo: ParsedNote) => boolean;
 
 export function configFilterByKeyRange({
                                            keyRangeHigh,
@@ -16,40 +16,40 @@ export function configFilterByKeyRange({
     if (typeof keyRangeLow !== 'undefined') {
         const keyRangeLowFrequency = parseNote(keyRangeLow).frequency;
         const refCallback = filterCallback
-        filterCallback = (noteInfo, commandState) => {
+        filterCallback = (noteInfo) => {
             if (keyRangeLowFrequency > noteInfo.frequency) {
                 return true;
             }
-            return refCallback(noteInfo, commandState)
+            return refCallback(noteInfo)
         }
     }
     if (typeof keyRangeHigh !== 'undefined') {
         const keyRangeHighFrequency = parseNote(keyRangeHigh).frequency;
         const refCallback = filterCallback
-        filterCallback = (noteInfo, commandState) => {
+        filterCallback = (noteInfo) => {
             if (keyRangeHighFrequency < noteInfo.frequency) {
                 return true;
             }
-            return refCallback(noteInfo, commandState)
+            return refCallback(noteInfo)
         }
     }
     return filterCallback;
 }
 
-export function updateKeyRangeConfig(config: KeyRangeConfig, paramName: keyof KeyRangeConfig, commandState: CommandState) {
-    // switch (paramName) {
-    //     case 'keyRangeLow':
-    //         config.keyRangeLow =
-    //         return;
-    //     case 'keyRangeHigh':
-    //         config.keyRangeHigh =
-    //         return;
-    // }
-    throw new Error("Unknown config key: " + paramName);
-}
+// export function updateKeyRangeConfig(config: KeyRangeConfig, paramName: keyof KeyRangeConfig, command: string, params: CommandParams) {
+//     // switch (paramName) {
+//     //     case 'keyRangeLow':
+//     //         config.keyRangeLow =
+//     //         return;
+//     //     case 'keyRangeHigh':
+//     //         config.keyRangeHigh =
+//     //         return;
+//     // }
+//     throw new Error("Unknown config key: " + paramName);
+// }
 
 // export function configFilterByCurrentTime(): FilterCallback {
-//     return (noteInfo: ParsedNote, commandState: CommandState) => {
+//     return (noteInfo: ParsedNote, command: string, params: CommandParams) => {
 //         let {
 //             destination: {
 //                 context: audioContext

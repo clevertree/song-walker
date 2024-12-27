@@ -1,5 +1,5 @@
 import {InstrumentInstance, TrackState} from "@songwalker";
-import {CommandState} from "@songwalker/types";
+import {CommandParams} from "@songwalker/types";
 
 export interface ReverbEffectConfig {
     seconds?: number,
@@ -7,12 +7,12 @@ export interface ReverbEffectConfig {
     reverse?: boolean
 }
 
-export default async function ReverbEffect(this: TrackState, config: ReverbEffectConfig): Promise<InstrumentInstance> {
+export default async function ReverbEffect(track: TrackState, config: ReverbEffectConfig): Promise<InstrumentInstance> {
     const {
         destination: {
             context
         }
-    } = this;
+    } = track;
     const {
         seconds = 3,
         decay = 2,
@@ -25,22 +25,22 @@ export default async function ReverbEffect(this: TrackState, config: ReverbEffec
 
 
     // this.effects.push(analyzerEffect)
-    function connectReverbEffect(this: TrackState, commandState: CommandState) {
+    function connectReverbEffect(track: TrackState, command: string, params: CommandParams) {
         const destination = context.createGain();
-        output.connect(commandState.destination);
+        output.connect(track.destination);
         // TODO: mixer value
         destination.connect(input);
-        destination.connect(commandState.destination);
-        commandState.destination = destination;
+        destination.connect(track.destination);
+        track.destination = destination;
     }
 
     // Automatically append effect to track state
-    this.effects.push(connectReverbEffect)
+    track.effects.push(connectReverbEffect)
     return connectReverbEffect;
 
     function buildImpulse() {
         // based on https://github.com/clevertree/simple-reverb/
-        var rate = context.sampleRate
+        let rate = context.sampleRate
             , length = rate * seconds
             // , decay = this.decay
             , impulse = context.createBuffer(2, length, rate)

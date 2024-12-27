@@ -1,16 +1,16 @@
 (async function rootTrack({loadPreset, wait, playCommand}) {
-const track = {...this};
+const track = {...this, position:0};
 const _tw = wait.bind(track);
 const _tp = playCommand.bind(track);
-const lead=await loadPreset.bind(track)("FluidR3/AcousticGrandPiano");
-const osc=await loadPreset.bind(track)("Oscillator", {'type':'square'});
-const perc=await loadPreset.bind(track)("FluidR3/DrumKitRoom1");
+const lead=await loadPreset(track, "FluidR3/AcousticGrandPiano");
+const osc=await loadPreset(track, "Oscillator", {'type':'square'});
+const perc=await loadPreset(track, "FluidR3/DrumKitRoom1");
 
-track1.bind(track)(lead); beat1.bind(track)(); await _tw(8);
-track1.bind(track)(osc); beat1.bind(track)(); await _tw(8);
+track1(track, lead); beat1(track, ); await _tw(8);
+track1(track, osc); beat1(track, ); await _tw(8);
 
 async function track1(instrument) {
-	const track = {...this};
+	const track = {...this, position:0};
 	const _tw = wait.bind(track);
 	const _tp = playCommand.bind(track);
 
@@ -36,7 +36,7 @@ async function track1(instrument) {
 }
 
 async function beat1() {
-	const track = {...this};
+	const track = {...this, position:0};
 	const _tw = wait.bind(track);
 	const _tp = playCommand.bind(track);
 
