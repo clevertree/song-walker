@@ -93,7 +93,7 @@ export interface SongFunctions {
     loadPreset: (track: TrackState,
                  presetID: string,
                  config: object) => Promise<InstrumentInstance>,
-    playCommand: (track: TrackState, command: string, props?: CommandParams) => void,
+    execute: (track: TrackState, command: string, props?: CommandParams) => void,
     // executeCallback: (track: TrackState, callback: (...args: any[]) => any, ...args: any[]) => void
 }
 

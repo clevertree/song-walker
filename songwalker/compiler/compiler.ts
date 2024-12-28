@@ -12,16 +12,16 @@ import Prism, {Token} from "prismjs";
 
 const ROOT_TRACK = 'rootTrack';
 const VAR_TRACK_STATE = 'track';
-const F_WAIT = "_w";
-const F_LOAD = "_lp";
-const F_PLAY = "_p";
-const F_EXPORT = `{${
+// export const F_WAIT = "_w";
+// export const F_LOAD = "_lp";
+// export const F_EXECUTE = "_e";
+export const F_EXPORT = `{${
     'wait' as keyof SongFunctions
-}:${F_WAIT}, ${
-    'play' as keyof SongFunctions
-}:${F_PLAY}, ${
+}, ${
+    'execute' as keyof SongFunctions
+}, ${
     'loadPreset' as keyof SongFunctions
-}:${F_LOAD}}`
+}}`
 const JS_TRACK_SETUP = (tab = '\t') => ``
     + `\n${tab}${VAR_TRACK_STATE} = {...${VAR_TRACK_STATE}, ${
         'parentTrack' as keyof TrackState}:${VAR_TRACK_STATE}, ${
@@ -39,10 +39,10 @@ export const EXPORT_JS = {
         const propStrings: string[] = Object.keys(params).map(
             (paramName) => `${paramName}:${params[paramName as keyof ParsedParams]}`)
         let paramString = Object.values(params).length > 0 ? `, {${propStrings.join(',')}}` : '';
-        return `${F_PLAY}('${commandString}'${paramString});`
+        return `${'execute' as keyof SongFunctions}('${commandString}'${paramString});`
     },
     // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
-    wait: (durationStatement: string) => `if(await ${F_WAIT}(${durationStatement}))return;`,
+    wait: (durationStatement: string) => `if(await ${'wait' as keyof SongFunctions}(${durationStatement})) return;`,
     trackDefinition: (functionDefinition: string) => `async ${(functionDefinition).replace(/^track/i, 'function')}`
         + JS_TRACK_SETUP('\t'),
     function: (functionStatement: string) => {

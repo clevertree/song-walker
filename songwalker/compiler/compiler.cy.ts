@@ -1,11 +1,4 @@
-import {
-    compileSongToCallback,
-    compileSongToJavascript,
-    EXPORT_JS,
-    F_TRACK_PLAY,
-    F_TRACK_WAIT,
-    sourceToTokens
-} from './compiler'
+import {compileSongToCallback, compileSongToJavascript, EXPORT_JS, sourceToTokens} from './compiler'
 import {TrackState} from "@songwalker";
 import {getDefaultSongFunctions, getDefaultTrackState} from "../helper/songHelper"
 
@@ -18,7 +11,7 @@ describe('compiler', () => {
             [["command-statement", "C5@3/8^.2;"]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(`${F_TRACK_PLAY}('C5', {duration:3/8,velocity:.2});`)
+        expect(javascriptContent).to.eq(EXPORT_JS.command('C5', {duration: '3/8', velocity: '.2'}))
     })
 
     it('wait statement - 1/6; /5', () => {
@@ -28,7 +21,7 @@ describe('compiler', () => {
             [["wait-statement", "1/6;"], " ", ["wait-statement", "/5"]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(`await ${F_TRACK_WAIT}(1/6); await ${F_TRACK_WAIT}(1/5);`)
+        expect(javascriptContent).to.eq(EXPORT_JS.wait(`1/6`) + ' ' + EXPORT_JS.wait(`1/5`))
     })
 
     it('set track variable', () => {
@@ -67,7 +60,7 @@ describe('compiler', () => {
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
         expect(javascriptContent).to.eq(
             EXPORT_JS.trackDefinition("function myTrack() {")
-            + " _tp('C4', {velocity:2}); _tp('D4', {duration:2}); }")
+            + ` ${EXPORT_JS.command('C4', {velocity: '2'})} ${EXPORT_JS.command('D4', {duration: '2'})} }`)
 
     })
 

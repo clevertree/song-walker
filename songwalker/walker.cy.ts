@@ -94,7 +94,7 @@ async function testTrackNoInstrument(track: TrackState) {
 async function testTrack(track: TrackState) {
     track = {...track, position: 0, parentTrack: track};
     const w = DefaultSongFunctions.waitAsync;
-    const n = DefaultSongFunctions.playCommand;
+    const n = DefaultSongFunctions.execute;
     const _ = (tokenID: number) => {
     };
 
@@ -133,7 +133,7 @@ async function testTrack(track: TrackState) {
 async function testTrackPercussion(track: TrackState) {
     track = {...track, position: 0, parentTrack: track};
     const w = DefaultSongFunctions.waitAsync;
-    const n = DefaultSongFunctions.playCommand;
+    const n = DefaultSongFunctions.execute;
     track.instrument = await testPercussionInstrument(track, cy.stub())
     track.beatsPerMinute = 240;
     n(track, "kick");

@@ -1,64 +1,105 @@
-(async function rootTrack({loadPreset, wait, playCommand}) {
-const track = {...this, position:0};
-const _tw = wait.bind(track);
-const _tp = playCommand.bind(track);
-const lead=await loadPreset(track, "FluidR3/AcousticGrandPiano");
-const osc=await loadPreset(track, "Oscillator", {'type':'square'});
-const perc=await loadPreset(track, "FluidR3/DrumKitRoom1");
+(async function rootTrack(track, {wait, execute, loadPreset}) {
+    const lead = await loadPreset.bind(track)("FluidR3/AcousticGrandPiano");
+    const osc = await loadPreset.bind(track)("Oscillator", {'type': 'square'});
+    const perc = await loadPreset.bind(track)("FluidR3/DrumKitRoom1");
+    const reverb = await loadPreset.bind(track)("Reverb");
 
-track1(track, lead); beat1(track, ); await _tw(8);
-track1(track, osc); beat1(track, ); await _tw(8);
+    track1.bind(track)(lead);
+    beat1.bind(track)();
+    if (await wait(8)) return;
+    track1.bind(track)(osc);
+    beat1.bind(track)();
+    if (await wait(8)) return;
 
-async function track1(instrument) {
-	const track = {...this, position:0};
-	const _tw = wait.bind(track);
-	const _tp = playCommand.bind(track);
+    async function track1(instrument) {
+        track = {...track, parentTrack: track, position: 0}
 
-    track.instrument = instrument;
-    track.duration=1/4
-    _tp('C5'); await _tw(1/2);
-    track.pitchBend=-0.4
-    track.config={var: 'wut'}
-    _tp('C4', {duration:1/4,velocity:82}); await _tw(1/2);  // override duration and velocity
-    _tp('G4'); await _tw(1/2);
-    _tp('Eb4'); await _tw(1/2);
-    _tp('Eb5'); await _tw(1/2);
-    _tp('F5'); await _tw(1/2);
-    _tp('Eb5'); await _tw(1/2);
-    _tp('D5'); await _tw(1/2);
-    _tp('C5'); await _tw(1/2);
-    _tp('C4'); await _tw(1/2);
-    _tp('G4'); await _tw(1/2);
-    _tp('Eb4'); await _tw(1/2);
-    _tp('D5'); await _tw(1/2);
-    _tp('C4'); await _tw(1/2);
-    _tp('Bb4'); await _tw(1/2);
-}
+        track.instrument = instrument;
+        track.duration = 1 / 4
+        execute('C5');
+        if (await wait(1 / 2)) return;
+        track.pitchBend = -0.4
+        track.config = {var: 'wut'}
+        execute('C4', {duration: 1 / 4, velocity: 82});
+        if (await wait(1 / 2)) return;  // override duration and velocity
+        execute('G4');
+        if (await wait(1 / 2)) return;
+        execute('Eb4');
+        if (await wait(1 / 2)) return;
+        execute('Eb5');
+        if (await wait(1 / 2)) return;
+        execute('F5');
+        if (await wait(1 / 2)) return;
+        execute('Eb5');
+        if (await wait(1 / 2)) return;
+        execute('D5');
+        if (await wait(1 / 2)) return;
+        execute('C5');
+        if (await wait(1 / 2)) return;
+        execute('C4');
+        if (await wait(1 / 2)) return;
+        execute('G4');
+        if (await wait(1 / 2)) return;
+        execute('Eb4');
+        if (await wait(1 / 2)) return;
+        execute('D5');
+        if (await wait(1 / 2)) return;
+        execute('C4');
+        if (await wait(1 / 2)) return;
+        execute('Bb4');
+        if (await wait(1 / 2)) return;
+    }
 
-async function beat1() {
-	const track = {...this, position:0};
-	const _tw = wait.bind(track);
-	const _tp = playCommand.bind(track);
+    async function beat1() {
+        track = {...track, parentTrack: track, position: 0}
 
-    track.instrument=perc
-    track.velocityDivisor=10
-    _tp('chh');     _tp('abd');     await _tw(1/2);
-    _tp('chh', {velocity:3});           await _tw(1/2);
-    _tp('chh', {velocity:3});           await _tw(1/2);
-    _tp('chh');     _tp('as');      await _tw(1/2);
-    _tp('chh', {velocity:3,duration:1/8});        await _tw(1/2);
-    _tp('chh');     _tp('abd');     await _tw(1/2);
-    _tp('chh', {velocity:3});   _tp('abd', {velocity:6});   await _tw(1/2);
-    _tp('chh');     _tp('as');      await _tw(1/2);
-    _tp('chh', {velocity:3});           await _tw(1/4);
-    _tp('chh', {velocity:3});           await _tw(1/4);
-    _tp('chh');     _tp('abd');     await _tw(1/2);
-    _tp('chh', {velocity:3});           await _tw(1/2);
-    _tp('chh');     _tp('as');      await _tw(1/2);
-    _tp('chh', {velocity:3});           await _tw(1/2);
-    _tp('chh');     _tp('abd');     await _tw(1/2);
-    _tp('chh', {velocity:3});   _tp('abd', {velocity:6});   await _tw(1/2);
-    _tp('chh');     _tp('as');      await _tw(1/2);
-    _tp('ohh', {velocity:3});           await _tw(1/2);
-}
+        track.instrument = perc
+        track.velocityDivisor = 10
+        execute('chh');
+        execute('abd');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('as');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3, duration: 1 / 8});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('abd');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        execute('abd', {velocity: 6});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('as');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 4)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 4)) return;
+        execute('chh');
+        execute('abd');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('as');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('abd');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        execute('abd', {velocity: 6});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('as');
+        if (await wait(1 / 2)) return;
+        execute('ohh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+    }
 })

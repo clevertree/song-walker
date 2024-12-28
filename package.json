@@ -9,9 +9,7 @@
     "start": "next start",
     "cypress:component": "cypress run --component",
     "cypress:e2e": "cypress run --e2e",
-    "cypress:e2e:prod": "CYPRESS_BASE_URL=http://localhost:8081 cypress run --e2e",
     "cypress:open": "cypress open",
-    "cypress-prod:run": "CYPRESS_BASE_URL=https://paradigmthreat.net cypress run",
     "lint": "next lint",
     "lint-fix": "eslint --fix .",
     "electron": "electron ./scripts/runElectron.js"

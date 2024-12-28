@@ -44,7 +44,7 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
             }
             throw new Error("Preset id not found: " + presetID);
         },
-        playCommand: function (track: TrackState, command: string, params: CommandParams = {}) {
+        execute: function (track: TrackState, command: string, params: CommandParams = {}) {
             let {
                 destination: {
                     context: audioContext
@@ -72,7 +72,7 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
         // },
         parseAndPlayCommand: function (track: TrackState, commandString: string, additionalParams: CommandParams = {}) {
             const {command, params} = parseCommandValues(commandString);
-            functions.playCommand(track, command, {...params, ...additionalParams});
+            functions.execute(track, command, {...params, ...additionalParams});
         }
     };
     return functions;
