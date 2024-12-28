@@ -2,6 +2,7 @@ import {CommandParams, InstrumentInstance, TrackState} from "@songwalker/types";
 import {parseNote} from "@songwalker";
 import WebAudioFontPlayer from "./src/player";
 import {WavePreset} from "@songwalker-presets/WebAudioFont/src/otypes";
+import DrumToMIDI from "@songwalker/constants/drumToMIDI";
 
 
 export interface WebAudioFontInstrumentConfig extends WavePreset {
@@ -17,17 +18,16 @@ export interface WebAudioFontInstrumentConfig extends WavePreset {
 export default async function WebAudioFontInstrument(track: TrackState, config: WebAudioFontInstrumentConfig): Promise<InstrumentInstance> {
     const {
         destination: {
-            context
+            context: audioContext
         }
     } = track;
-    const startTime = context.currentTime;
     const player = new WebAudioFontPlayer();
-    await player.adjustPreset(context, config);
+    await player.adjustPreset(audioContext, config);
 
-    const loadingTime = context.currentTime - startTime;
-    if (loadingTime > 0) {
-        track.currentTime += loadingTime // Move track time forward to compensate for loading time
-        console.log("WebAudioFont preset loading time: ", loadingTime)
+    const syncTime = audioContext.currentTime - track.currentTime;
+    if (syncTime > 0) {
+        track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
+        console.log("WebAudioFont loading syncs currentTime to ", track.currentTime)
     }
 
     return function playWebAudioFontNote(track: TrackState, command: string, params: CommandParams) {
@@ -37,10 +37,15 @@ export default async function WebAudioFontInstrument(track: TrackState, config: 
             duration,
             beatsPerMinute
         } = {...track, ...params};
-        const {frequency} = parseNote(command);
-        const pitch = (Math.log(frequency) / Math.log(2)) * 12
+        let pitch: number;
+        if (typeof DrumToMIDI[command] !== 'undefined') {
+            pitch = DrumToMIDI[command]
+        } else {
+            const {frequency} = parseNote(command);
+            pitch = (Math.log(frequency) / Math.log(2)) * 12
+        }
         // const playbackRate = Math.pow(2, (100.0 * pitch) / 1200.0);
         const durationSeconds = duration * (60 / beatsPerMinute)
-        player.queueWaveTable(context, destination, config, currentTime, pitch, durationSeconds);
+        player.queueWaveTable(audioContext, destination, config, currentTime, pitch, durationSeconds);
     }
 }

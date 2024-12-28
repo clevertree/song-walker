@@ -82,11 +82,11 @@ export const defaultEmptyInstrument: InstrumentInstance = () => {
     throw new Error(Errors.ERR_NO_INSTRUMENT);
 }
 
-export function getDefaultTrackState(destination: AudioNode): TrackState {
+export function getDefaultTrackState(destination: AudioNode, bufferDuration: number = 1): TrackState {
     return {
         beatsPerMinute: 60,
-        bufferDuration: 1,
-        currentTime: destination.context.currentTime,
+        bufferDuration,
+        currentTime: destination.context.currentTime, //  + bufferDuration, // Plus buffer duration
         position: 0,
         duration: 1,
         velocity: 1,

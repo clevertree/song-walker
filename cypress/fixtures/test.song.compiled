@@ -1,19 +1,18 @@
 (async function rootTrack(track, {wait, execute, loadPreset}) {
-    const lead = await loadPreset.bind(track)("FluidR3/AcousticGrandPiano");
-    const osc = await loadPreset.bind(track)("Oscillator", {'type': 'square'});
-    const perc = await loadPreset.bind(track)("FluidR3/DrumKitRoom1");
-    const reverb = await loadPreset.bind(track)("Reverb");
+    const lead = await loadPreset(track, "FluidR3/AcousticGrandPiano");
+    const osc = await loadPreset(track, "Oscillator", {'type': 'square'});
+    const perc = await loadPreset(track, "FluidR3/DrumKitRoom1");
+    const reverb = await loadPreset(track, "Reverb");
 
-    track1.bind(track)(lead);
-    beat1.bind(track)();
+    track1(track, lead);
+    beat1(track,);
     if (await wait(8)) return;
-    track1.bind(track)(osc);
-    beat1.bind(track)();
+    track1(track, osc);
+    beat1(track,);
     if (await wait(8)) return;
 
-    async function track1(instrument) {
+    async function track1(track, instrument) {
         track = {...track, parentTrack: track, position: 0}
-
         track.instrument = instrument;
         track.duration = 1 / 4
         execute('C5');
@@ -50,9 +49,8 @@
         if (await wait(1 / 2)) return;
     }
 
-    async function beat1() {
+    async function beat1(track) {
         track = {...track, parentTrack: track, position: 0}
-
         track.instrument = perc
         track.velocityDivisor = 10
         execute('chh');

@@ -22,18 +22,16 @@ const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoade
             context: audioContext
         }
     } = track;
-    const startTime = audioContext.currentTime;
     const {
         presetPath
     } = config;
     let fontConfig: WebAudioFontInstrumentConfig = await fetchJSONFromMirror(presetPath);
 
-    const loadingTime = audioContext.currentTime - startTime;
-    if (loadingTime > 0) {
-        track.currentTime += loadingTime // Move track time forward to compensate for loading time
-        console.log("WebAudioFont preset loading time: ", loadingTime)
+    const syncTime = audioContext.currentTime - track.currentTime;
+    if (syncTime > 0) {
+        track.currentTime = audioContext.currentTime  // Move track time forward to compensate for loading time
+        console.log("WebAudioFontLoader loading syncs currentTime to ", track.currentTime)
     }
-
     return WebAudioFontInstrument(track, fontConfig)
 }
 

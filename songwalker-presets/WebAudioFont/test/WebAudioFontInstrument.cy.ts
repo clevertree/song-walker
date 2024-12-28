@@ -8,10 +8,7 @@ describe('WebAudioFontInstrument', () => {
 
     it('loads and plays', async () => {
         const context = new AudioContext();
-        const track: TrackState = {
-            ...getDefaultTrackState(context.destination),
-            destination: context.destination,
-        }
+        const track: TrackState = getDefaultTrackState(context.destination)
         track.instrument = await WebAudioFontInstrument(track, {
             zones: [
                 {

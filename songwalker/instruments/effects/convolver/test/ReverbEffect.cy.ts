@@ -9,9 +9,8 @@ describe('Oscillator', () => {
     it('Oscillator with Reverb', async () => {
 
         const context = new AudioContext();
-        const track: TrackState = {
-            ...getDefaultTrackState(context.destination),
-        }
+        const track: TrackState = getDefaultTrackState(context.destination)
+
         OscillatorInstrument(track, {mixer: 1.1});
         await ReverbEffect(track, {reverse: true});
 

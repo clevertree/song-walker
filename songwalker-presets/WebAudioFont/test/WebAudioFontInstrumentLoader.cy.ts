@@ -19,10 +19,7 @@ describe('WebAudioFontInstrument', () => {
     it('loads and plays instrument', async () => {
         let instrumentKeys = await fetchJSONFromMirror(PRESET_PATH_INSTRUMENT_KEYS);
         const context = new AudioContext();
-        const track: TrackState = {
-            ...getDefaultTrackState(context.destination),
-            destination: context.destination,
-        }
+        const track: TrackState = getDefaultTrackState(context.destination)
         track.instrument = await WebAudioFontInstrumentLoader(track, {
             presetPath: `${PRESET_PATH_INSTRUMENT}/${instrumentKeys[Math.round(Math.random() * instrumentKeys.length)]}.json`
         })
@@ -40,10 +37,8 @@ describe('WebAudioFontInstrument', () => {
     it('loads and plays percussion', async () => {
         let percussionKeys = await fetchJSONFromMirror(PRESET_PATH_PERCUSSION_KEYS);
         const context = new AudioContext();
-        const track: TrackState = {
-            ...getDefaultTrackState(context.destination),
-            destination: context.destination,
-        }
+        const track: TrackState = getDefaultTrackState(context.destination)
+
         track.instrument = await WebAudioFontInstrumentLoader(track, {
             presetPath: `${PRESET_PATH_PERCUSSION}/${percussionKeys[Math.round(Math.random() * percussionKeys.length)]}.json`
         })
@@ -59,10 +54,8 @@ describe('WebAudioFontInstrument', () => {
     it('loads and plays drumset', async () => {
         let drumsetKeys = await fetchJSONFromMirror(PRESET_PATH_DRUMSET_KEYS);
         const context = new AudioContext();
-        const track: TrackState = {
-            ...getDefaultTrackState(context.destination),
-            destination: context.destination,
-        }
+        const track: TrackState = getDefaultTrackState(context.destination)
+
         track.instrument = await WebAudioFontInstrumentLoader(track, {
             presetPath: `${PRESET_PATH_DRUMSET}/${drumsetKeys[Math.round(Math.random() * drumsetKeys.length)]}.json`
         })

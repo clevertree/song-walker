@@ -10,24 +10,30 @@ export interface ReverbEffectConfig {
 export default async function ReverbEffect(track: TrackState, config: ReverbEffectConfig): Promise<InstrumentInstance> {
     const {
         destination: {
-            context
+            context: audioContext
         }
     } = track;
+    const startTime = audioContext.currentTime;
     const {
         seconds = 3,
         decay = 2,
         reverse = false
     } = config;
-    const input = context.createConvolver();
+    const input = audioContext.createConvolver();
     const output = input;
 
     buildImpulse();
 
+    const syncTime = audioContext.currentTime - track.currentTime;
+    if (syncTime > 0) {
+        track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
+        console.log("ReverbEffect loading syncs currentTime to ", track.currentTime)
+    }
 
     // this.effects.push(analyzerEffect)
     function connectReverbEffect(track: TrackState, command: string, params: CommandParams) {
         const {destination} = {...track, ...params};
-        const effectDestination = context.createGain();
+        const effectDestination = audioContext.createGain();
         output.connect(destination);
         // TODO: mixer value
         effectDestination.connect(input);
@@ -41,10 +47,10 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
 
     function buildImpulse() {
         // based on https://github.com/clevertree/simple-reverb/
-        let rate = context.sampleRate
+        let rate = audioContext.sampleRate
             , length = rate * seconds
             // , decay = this.decay
-            , impulse = context.createBuffer(2, length, rate)
+            , impulse = audioContext.createBuffer(2, length, rate)
             , impulseL = impulse.getChannelData(0)
             , impulseR = impulse.getChannelData(1)
             , n, i;

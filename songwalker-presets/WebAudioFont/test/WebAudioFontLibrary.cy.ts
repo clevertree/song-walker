@@ -21,9 +21,7 @@ describe('WebAudioFontLibrary', () => {
         const context = new AudioContext();
         for (const preset of randomPresets) {
             const {config, loader} = preset;
-            const track: TrackState = {
-                ...getDefaultTrackState(context.destination),
-            }
+            const track: TrackState = getDefaultTrackState(context.destination);
             track.instrument = await loader(track, config)
         }
 

@@ -19,16 +19,16 @@ export interface AudioBufferInstrumentConfig extends EnvelopeConfig, KeyRangeCon
 
 export default async function AudioBufferInstrument(track: TrackState, config: AudioBufferInstrumentConfig): Promise<InstrumentInstance> {
     // console.log('AudioBufferInstrument', config, title);
-    const {context} = track.destination;
-    const startTime = context.currentTime;
+    const {context: audioContext} = track.destination;
     let createSourceNode = await configAudioBuffer();
-    let createGain = configEnvelope(context, config);
+    let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)
 
-    const loadingTime = context.currentTime - startTime;
-    if (loadingTime > 0) {
-        track.currentTime += loadingTime // Move track time forward to compensate for loading time
-        console.log("WebAudioFont preset loading time: ", loadingTime)
+
+    const syncTime = audioContext.currentTime - track.currentTime;
+    if (syncTime > 0) {
+        track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
+        console.log("AudioBufferInstrument loading syncs currentTime to ", track.currentTime)
     }
     const instrumentInstance = function parseCommand(track: TrackState, command: string, params: CommandParams) {
         // TODO: check alias
@@ -79,14 +79,14 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
         } = config;
         let audioBuffer: AudioBuffer;
         if (typeof src === "string") {
-            audioBuffer = await getCachedAudioBuffer(context, src);
+            audioBuffer = await getCachedAudioBuffer(audioContext, src);
         } else {
             audioBuffer = src;
         }
         const parsedFrequencyRoot = getFrequencyRoot(frequencyRoot);
         return (noteInfo: ParsedNote, destination: AudioNode) => {
             const {frequency} = noteInfo;
-            const bufferNode = context.createBufferSource();
+            const bufferNode = audioContext.createBufferSource();
             bufferNode.buffer = audioBuffer;
             bufferNode.detune.value = detune
             bufferNode.loop = loop;

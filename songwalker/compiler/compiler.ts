@@ -22,35 +22,36 @@ export const F_EXPORT = `{${
 }, ${
     'loadPreset' as keyof SongFunctions
 }}`
-const JS_TRACK_SETUP = (tab = '\t') => ``
-    + `\n${tab}${VAR_TRACK_STATE} = {...${VAR_TRACK_STATE}, ${
-        'parentTrack' as keyof TrackState}:${VAR_TRACK_STATE}, ${
-        'position' as keyof TrackState
-    }:0}`
-    // + `\n${tab}const ${F_WAIT} = ${F_WAIT}.bind(${VAR_TRACK_STATE});`
-    // + `\n${tab}const ${F_PLAY} = ${F_PLAY}.bind(${VAR_TRACK_STATE});`
-    + `\n${tab}`;
 export const EXPORT_JS = {
     // songTemplate: (sourceCode: string) => `(() => {return ${sourceCode}})()`,
     songTemplate: (sourceCode: string) =>
-        `(async function ${ROOT_TRACK}(track, ${F_EXPORT}) {${sourceCode}})`,
+        `(async function ${ROOT_TRACK}(track, ${F_EXPORT}) {\n${sourceCode}})`,
 
     command: (commandString: string, params: ParsedParams) => {
         const propStrings: string[] = Object.keys(params).map(
             (paramName) => `${paramName}:${params[paramName as keyof ParsedParams]}`)
         let paramString = Object.values(params).length > 0 ? `, {${propStrings.join(',')}}` : '';
-        return `${'execute' as keyof SongFunctions}('${commandString}'${paramString});`
+        return `${'execute' as keyof SongFunctions}(${VAR_TRACK_STATE}, '${commandString}'${paramString});`
     },
     // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
-    wait: (durationStatement: string) => `if(await ${'wait' as keyof SongFunctions}(${durationStatement})) return;`,
-    trackDefinition: (functionDefinition: string) => `async ${(functionDefinition).replace(/^track/i, 'function')}`
-        + JS_TRACK_SETUP('\t'),
+    wait: (durationStatement: string) => `if(await ${'wait' as keyof SongFunctions}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`,
+    trackDefinition: (trackDefinition: string) => {
+        const match = (trackDefinition).match(LANGUAGE["track-definition"]);
+        if (!match)
+            throw new Error("Invalid track definition: " + trackDefinition)
+        const [, trackName, trackArgs] = match;
+        return `async function ${trackName}(track${trackArgs ? ', ' + trackArgs : ''}){`
+            + `\n\t${VAR_TRACK_STATE} = {...${VAR_TRACK_STATE}, ${
+                'parentTrack' as keyof TrackState}:${VAR_TRACK_STATE}, ${
+                'position' as keyof TrackState
+            }:0}`
+    },
     function: (functionStatement: string) => {
         const functionMatch = (functionStatement).match(LANGUAGE["function-statement"]);
         if (!functionMatch)
             throw new Error("Invalid function: " + functionStatement)
         const [, fsVarStatement = "", fsAwaitStatement = "", fsMethodName, fsParamString] = functionMatch;
-        return `${fsVarStatement}${fsAwaitStatement}${fsMethodName}.bind(${VAR_TRACK_STATE})(${fsParamString});`
+        return `${fsVarStatement}${fsAwaitStatement}${fsMethodName}(${VAR_TRACK_STATE}${fsParamString ? ', ' + fsParamString : ''});`
     }
 }
 export const PARAM_ALIAS: CommandParamsAliases = {
@@ -60,7 +61,7 @@ export const PARAM_ALIAS: CommandParamsAliases = {
 
 export const LANGUAGE = {
     'comment': /(\/\/).*$/m,
-    'track-definition': /(?=async\s+)?\b(track)\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{/,
+    'track-definition': /(?=async\s+)?\btrack\b\s*([$\w][$\w]+)\(((?:[^()]|\([^()]*\))*)\)\s*{/,
     'function-definition': /(?=async\s+)?\bfunction\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{/,
     'function-statement': /\b((?:(?:const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?(await\s+)?\b([$\w][$\w]+)\(((?:[^()]|\([^()]*\))*)\);?/,
     // 'function-statement': /\b(function|track)[ \t]+([\w.]+)[ \t]*\(([^)]*)\)\s*{/,
