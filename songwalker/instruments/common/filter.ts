@@ -36,7 +36,7 @@ export function configFilterByKeyRange({
     return filterCallback;
 }
 
-// export function updateKeyRangeConfig(config: KeyRangeConfig, paramName: keyof KeyRangeConfig, command: string, params: CommandParams) {
+// export function updateKeyRangeConfig(config: KeyRangeConfig, paramName: keyof KeyRangeConfig, command: CommandWithParams) {
 //     // switch (paramName) {
 //     //     case 'keyRangeLow':
 //     //         config.keyRangeLow =
@@ -49,7 +49,7 @@ export function configFilterByKeyRange({
 // }
 
 // export function configFilterByCurrentTime(): FilterCallback {
-//     return (noteInfo: ParsedNote, command: string, params: CommandParams) => {
+//     return (noteInfo: ParsedNote, command: CommandWithParams) => {
 //         let {
 //             destination: {
 //                 context: audioContext

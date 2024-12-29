@@ -1,5 +1,5 @@
 import {InstrumentInstance, TrackState} from "@songwalker";
-import {CommandParams} from "@songwalker/types";
+import {CommandWithParams} from "@songwalker/types";
 
 export interface ReverbEffectConfig {
     seconds?: number,
@@ -13,7 +13,6 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
             context: audioContext
         }
     } = track;
-    const startTime = audioContext.currentTime;
     const {
         seconds = 3,
         decay = 2,
@@ -24,25 +23,25 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
 
     buildImpulse();
 
-    const syncTime = audioContext.currentTime - track.currentTime;
+    const syncTime = audioContext.currentTime - (track.currentTime + track.bufferDuration);
     if (syncTime > 0) {
         track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
-        console.log("ReverbEffect loading syncs currentTime to ", track.currentTime)
+        console.error(`ReverbEffect continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)
     }
 
     // this.effects.push(analyzerEffect)
-    function connectReverbEffect(track: TrackState, command: string, params: CommandParams) {
-        const {destination} = {...track, ...params};
+    function connectReverbEffect(track: TrackState, commandWithParams: CommandWithParams) {
+        const {destination} = {...track, ...commandWithParams};
         const effectDestination = audioContext.createGain();
         output.connect(destination);
         // TODO: mixer value
         effectDestination.connect(input);
         effectDestination.connect(track.destination);
-        params.destination = effectDestination;
+        commandWithParams.destination = effectDestination;
     }
 
-    // Automatically append effect to track state
-    track.effects.push(connectReverbEffect)
+    // Don't automatically append effect to track state
+    // track.effects.push(connectReverbEffect)
     return connectReverbEffect;
 
     function buildImpulse() {

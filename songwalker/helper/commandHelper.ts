@@ -63,7 +63,7 @@ export function parseCommandParams(paramString: string): ParsedParams {
     return parsedParams;
 }
 
-export function parseNote(noteCommand: string): ParsedNote {
+export function parseNote(noteCommand: string, baseFrequency: number = DEFAULT_FREQUENCY_A4): ParsedNote {
     const match = noteCommand.match(REGEX_NOTE_COMMAND);
     if (!match)
         throw new Error("Invalid note command string: " + noteCommand);
@@ -76,7 +76,7 @@ export function parseNote(noteCommand: string): ParsedNote {
         keyNumber = keyNumber + 24 + ((octave - 1) * 24) + 2;
     else
         keyNumber = keyNumber + ((octave - 1) * 24) + 2;
-    let frequency = DEFAULT_FREQUENCY_A4 * Math.pow(2, (keyNumber - 98) / 24);
+    let frequency = baseFrequency * Math.pow(2, (keyNumber - 98) / 24);
     return {
         note,
         octave,

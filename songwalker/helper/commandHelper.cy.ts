@@ -10,7 +10,7 @@ describe('noteHelper', () => {
                 "duration": 0.5
             }
         })
-        const noteInfo = parseNote(commandInfo.command)
+        const noteInfo = parseNote(commandInfo.command, 432)
         expect(noteInfo).to.deep.eq({
             "note": "C#",
             "octave": 4,
@@ -26,7 +26,7 @@ describe('noteHelper', () => {
                 "duration": 0.5
             }
         })
-        const noteInfo = parseNote(commandInfo.command)
+        const noteInfo = parseNote(commandInfo.command, 432)
         expect(noteInfo).to.deep.eq({
             "note": "C#q",
             "octave": 4,

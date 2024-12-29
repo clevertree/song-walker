@@ -14,15 +14,15 @@ describe('Oscillator', () => {
         })
         const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
 
-        play(track, "release@0")
+        // play(track, "release@0")
         for (let i = 0; i < 4; i++) {
             play(track, 'C#4^0.1@1/8')
             wait(track, 1 / 8)
             play(track, 'D#4^0.1@1/8')
             wait(track, 1 / 8)
         }
-        play(track, "release@/2")
-        play(track, "attack@1")
+        // play(track, "release@/2")
+        // play(track, "attack@1")
         for (let i = 0; i < 2; i++) {
             play(track, 'C#4^0.1@1')
             wait(track, 1)

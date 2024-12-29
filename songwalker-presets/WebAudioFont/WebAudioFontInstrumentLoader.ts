@@ -27,10 +27,10 @@ const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoade
     } = config;
     let fontConfig: WebAudioFontInstrumentConfig = await fetchJSONFromMirror(presetPath);
 
-    const syncTime = audioContext.currentTime - track.currentTime;
+    const syncTime = audioContext.currentTime - (track.currentTime + track.bufferDuration);
     if (syncTime > 0) {
-        track.currentTime = audioContext.currentTime  // Move track time forward to compensate for loading time
-        console.log("WebAudioFontLoader loading syncs currentTime to ", track.currentTime)
+        track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
+        console.error(`WebAudioFontInstrumentLoader continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)
     }
     return WebAudioFontInstrument(track, fontConfig)
 }

@@ -1,7 +1,7 @@
 import {createSlice} from "@reduxjs/toolkit";
 import {WritableDraft} from "immer/src/types/types-external";
 import {DocumentState} from "@songwalker-editor/types";
-import {parseTrackList} from "@songwalker/compiler";
+// import {parseTrackList} from "@songwalker/compiler";
 import {SongError} from "@songwalker/types";
 
 

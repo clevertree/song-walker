@@ -18,6 +18,11 @@ export interface CommandParams {
     destination?: AudioNode,
 }
 
+export interface CommandWithParams extends CommandParams {
+    commandString: string,
+    startTime: number,
+}
+
 export type ParsedParams = {
     [paramName in keyof CommandParams]?: string;
 }
@@ -93,7 +98,7 @@ export interface SongFunctions {
     loadPreset: (track: TrackState,
                  presetID: string,
                  config: object) => Promise<InstrumentInstance>,
-    execute: (track: TrackState, command: string, props?: CommandParams) => void,
+    execute: (track: TrackState, command: string, params?: CommandParams) => void,
     // executeCallback: (track: TrackState, callback: (...args: any[]) => any, ...args: any[]) => void
 }
 
@@ -116,7 +121,7 @@ export interface NoteHandler {
 
 // export type InstrumentInstance = (trackState: TrackState, command: string) => NoteHandler;
 export type InstrumentInstance = (track: TrackState,
-                                  command: string, params: CommandParams) => NoteHandler | void;
+                                  command: CommandWithParams) => NoteHandler | void;
 
 export type InstrumentLoader<Config = any> = (track: TrackState, config: Config) => Promise<InstrumentInstance> | InstrumentInstance
 

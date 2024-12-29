@@ -23,7 +23,7 @@ export async function fetchJSONFromMirror(jsonPath: string, random: boolean = tr
     for (const mirrorURL of iterator) {
         const fetchURL = mirrorURL + jsonPath;
         try {
-            const request = await fetch(fetchURL);
+            const request = await fetch(fetchURL, {signal: AbortSignal.timeout(5000)});
             return await request.json();
         } catch (e) {
             console.error("Unable to fetch: " + fetchURL);

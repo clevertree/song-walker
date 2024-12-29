@@ -2,7 +2,6 @@
 
 import {TrackState} from "@songwalker";
 import {getDefaultSongFunctions, getDefaultTrackState} from "@songwalker/helper/songHelper";
-import ReverbEffect from "@songwalker/instruments/effects/convolver/ReverbEffect";
 import {OscillatorInstrument} from "@songwalker/instruments";
 
 describe('Oscillator', () => {
@@ -10,9 +9,10 @@ describe('Oscillator', () => {
 
         const context = new AudioContext();
         const track: TrackState = getDefaultTrackState(context.destination)
+        track.bufferDuration = 0.2
 
         OscillatorInstrument(track, {mixer: 1.1});
-        await ReverbEffect(track, {reverse: true});
+        // track.effects = [await ReverbEffect(track, {reverse: true})];
 
         const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
 

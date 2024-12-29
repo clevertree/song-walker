@@ -1,4 +1,4 @@
-import {CommandParams, InstrumentInstance, ParsedNote, TrackState} from "@songwalker/types";
+import {CommandWithParams, InstrumentInstance, ParsedNote, TrackState} from "@songwalker/types";
 import {parseNote} from "..";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
@@ -24,25 +24,24 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
     let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)
 
-
-    const syncTime = audioContext.currentTime - track.currentTime;
+    const syncTime = audioContext.currentTime - (track.currentTime + track.bufferDuration);
     if (syncTime > 0) {
         track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
-        console.log("AudioBufferInstrument loading syncs currentTime to ", track.currentTime)
+        console.error(`AudioBufferInstrument continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)
     }
-    const instrumentInstance = function parseCommand(track: TrackState, command: string, params: CommandParams) {
+    const instrumentInstance = function parseCommand(track: TrackState, commandWithParams: CommandWithParams) {
         // TODO: check alias
-        switch (command) {
+        switch (commandWithParams.commandString) {
             case 'play':
             case 'stop':
                 throw 'todo';
         }
-        const noteInfo = parseNote(command);
+        const noteInfo = parseNote(commandWithParams.commandString);
         if (!noteInfo)
-            throw new Error("Unrecognized note: " + command);
+            throw new Error("Unrecognized note: " + commandWithParams);
         if (filterNote(noteInfo))
             return
-        return playAudioBuffer({...track, ...params}, command, noteInfo)
+        return playAudioBuffer(noteInfo, {...track, ...commandWithParams})
     }
 
     // Set instance to current instrument if no instrument is currently loaded
@@ -51,10 +50,10 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
     return instrumentInstance;
 
 
-    function playAudioBuffer(trackAndParams: TrackState, command: string, noteInfo: ParsedNote) {
+    function playAudioBuffer(noteInfo: ParsedNote, trackAndParams: TrackState & CommandWithParams) {
         let {
             beatsPerMinute,
-            currentTime,
+            startTime,
             duration,
         } = trackAndParams;
 
@@ -63,8 +62,8 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
         // Audio Buffer
         const bufferNode = createSourceNode(noteInfo, gainNode)
 
-        bufferNode.start(currentTime);
-        const endTime = currentTime + (duration * (60 / beatsPerMinute));
+        bufferNode.start(startTime);
+        const endTime = startTime + (duration * (60 / beatsPerMinute));
         bufferNode.stop(endTime);
         // TODO: add active notes to track state?
         return bufferNode;
@@ -105,7 +104,7 @@ let cache = new Map<string, AudioBuffer>();
 async function getCachedAudioBuffer(context: BaseAudioContext, src: string): Promise<AudioBuffer> {
     if (cache.has(src))
         return cache.get(src) as AudioBuffer;
-    const response = await fetch(src);
+    const response = await fetch(src, {signal: AbortSignal.timeout(5000)});
     if (response.status !== 200)
         throw new Error(`Failed to fetch audio file (${response.status} ${response.statusText}): ${src}`);
     const arrayBuffer = await response.arrayBuffer();

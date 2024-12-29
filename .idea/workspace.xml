@@ -5,21 +5,26 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e87670a7-8e55-4d3a-9cd9-39fed29fbd42" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/songwalker/constants/drumToMIDI.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cypress/fixtures/test.song" beforeDir="false" afterPath="$PROJECT_DIR$/cypress/fixtures/test.song" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/cypress/fixtures/test.song.compiled" beforeDir="false" afterPath="$PROJECT_DIR$/cypress/fixtures/test.song.compiled" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-editor/document/documentActions.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/document/documentActions.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrument.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrument.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrumentLoader.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrumentLoader.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontLibrary.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontLibrary.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/compiler/compiler.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/compiler/compiler.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/effects/WebAudioFontReverberator.ts.abandoned" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/effects/WebAudioFontReverberator.ts.abandoned" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/mirrors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/mirrors.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/compiler/compiler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/compiler/compiler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/helper/commandHelper.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/helper/commandHelper.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/helper/commandHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/helper/commandHelper.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/helper/songHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/helper/songHelper.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/instruments/AudioBufferInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/AudioBufferInstrument.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/OscillatorInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/OscillatorInstrument.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/PolyphonyInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/PolyphonyInstrument.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/common/envelope.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/common/envelope.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/common/filter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/common/filter.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/convolver/ReverbEffect.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/effects/convolver/ReverbEffect.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/convolver/test/ReverbEffect.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/effects/convolver/test/ReverbEffect.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/OscillatorInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/OscillatorInstrument.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/types.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -149,7 +154,7 @@
       <workItem from="1734464343494" duration="111000" />
       <workItem from="1734464599708" duration="1197000" />
       <workItem from="1734713193544" duration="2095000" />
-      <workItem from="1734963755165" duration="37328000" />
+      <workItem from="1734963755165" duration="45879000" />
     </task>
     <servers />
   </component>

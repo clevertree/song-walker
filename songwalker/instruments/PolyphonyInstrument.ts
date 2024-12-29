@@ -1,4 +1,4 @@
-import {CommandParams, InstrumentInstance, Preset, TrackState} from "@songwalker/types";
+import {CommandWithParams, InstrumentInstance, Preset, TrackState} from "@songwalker/types";
 import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
 
 
@@ -32,13 +32,13 @@ export default async function PolyphonyInstrument(track: TrackState, config: Pol
     }));
 
 
-    const instrumentInstance = function playPolyphonyNote(track: TrackState, command: string, params: CommandParams) {
-        if (aliases[command]) {
+    const instrumentInstance = function playPolyphonyNote(track: TrackState, command: CommandWithParams) {
+        if (aliases[command.commandString]) {
             // if alias is found, execute directly
-            return aliases[command](track, command, params);
+            return aliases[command.commandString](track, command);
         } else {
             for (let i = 0; i < voices.length; i++) {
-                voices[i](track, command, params);
+                voices[i](track, command);
             }
         }
     }
