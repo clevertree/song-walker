@@ -1,4 +1,4 @@
-import {SongPlayer,} from "@songwalker/walker";
+import {SongWalker,} from "@songwalker/walker";
 import {HandlesTrackEvents, SongTrackEvent, TrackEventHandler} from "@songwalker/types";
 import {compileSongToCallback} from "@songwalker/compiler";
 
@@ -11,7 +11,7 @@ export class PlaybackManager implements HandlesTrackEvents {
 
     loadSong(songSource: string) {
         const callback = compileSongToCallback(songSource)
-        return new SongPlayer(callback, this);
+        return new SongWalker(callback, this);
     }
 
 

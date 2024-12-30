@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="e87670a7-8e55-4d3a-9cd9-39fed29fbd42" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/cypress/fixtures/test.song" beforeDir="false" afterPath="$PROJECT_DIR$/cypress/fixtures/test.song" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrument.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrumentLoader.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrumentLoader.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/helper/songHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/helper/songHelper.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/OscillatorInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/OscillatorInstrument.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/convolver/test/ReverbEffect.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/effects/convolver/test/ReverbEffect.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/AudioBufferInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/AudioBufferInstrument.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/OscillatorInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/OscillatorInstrument.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/PolyphonyInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/PolyphonyInstrument.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/walker.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/walker.cy.ts" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="FormatOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="OptimizeOnSaveOptions">
+    <option name="myRunOnSave" value="true" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 7
+}</component>
+  <component name="ProjectId" id="2pqcUPl61Emj82ho4tRdwJ7DCCw" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;refactor&quot;,
+    &quot;javascript.nodejs.core.library.configured.version&quot;: &quot;18.20.4&quot;,
+    &quot;javascript.nodejs.core.library.typings.version&quot;: &quot;18.19.67&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/ari.asulin/dev/p/song-walker/songwalker-presets/WebAudioFont/test&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.standard&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.standard&quot;: &quot;&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;actions.on.save&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/ari.asulin/dev/p/song-walker/node_modules/typescript/lib&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test" />
+      <recent name="$PROJECT_DIR$/songwalker/instruments/effects/convolver/test" />
+      <recent name="$PROJECT_DIR$/songwalker/instruments" />
+      <recent name="$PROJECT_DIR$/songwalker/instruments/effects" />
+      <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioComponents" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/songwalker/presets/test" />
+      <recent name="$PROJECT_DIR$/songwalker/presets" />
+      <recent name="$PROJECT_DIR$/../webaudiofontdata/public" />
+      <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test" />
+    </key>
+    <key name="es6.move.members.recent.items">
+      <recent name="$PROJECT_DIR$/songwalker/instruments/test/testHelper.ts" />
+      <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioFont/constants.ts" />
+      <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioFont/mirrors.ts" />
+    </key>
+  </component>
+  <component name="RunManager" selected="npm.cypress:component">
+    <configuration name="convert.mjs" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$PROJECT_DIR$/../webaudiofontdata/convert.mjs" working-dir="$PROJECT_DIR$/../webaudiofontdata">
+      <method v="2" />
+    </configuration>
+    <configuration name="cypress:component" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="cypress:component" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="cypress:e2e" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="cypress:e2e" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="cypress:open" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="cypress:open" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="npm.cypress:component" />
+        <item itemvalue="npm.cypress:e2e" />
+        <item itemvalue="npm.cypress:open" />
+        <item itemvalue="Node.js.convert.mjs" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="e87670a7-8e55-4d3a-9cd9-39fed29fbd42" name="Changes" comment="" />
+      <created>1733497061171</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1733497061171</updated>
+      <workItem from="1733497062193" duration="16111000" />
+      <workItem from="1733593585562" duration="13714000" />
+      <workItem from="1733946025531" duration="18503000" />
+      <workItem from="1734052326162" duration="9034000" />
+      <workItem from="1734464343494" duration="111000" />
+      <workItem from="1734464599708" duration="1197000" />
+      <workItem from="1734713193544" duration="2095000" />
+      <workItem from="1734963755165" duration="50714000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="javascript">
+          <url>file://$PROJECT_DIR$/songwalker/helper/songHelper.ts</url>
+          <option name="timeStamp" value="1" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+</project>

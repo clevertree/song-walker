@@ -1,35 +1,103 @@
-(() => {return async function rootTrack(trackRenderer) {
-	const {loadInstrument, setVariable, startTrack, trackState, wait} = trackRenderer;
-	setVariable('lead', await loadInstrument("oscillator", {wait: (1/8)*1.5}));
-	setVariable('lead2', await loadInstrument("oscillator", {'type':'square'}));
+(async function rootTrack(track, {wait, execute, loadPreset}) {
+    const lead = await loadPreset(track, "FluidR3/AcousticGrandPiano");
+    const osc = await loadPreset(track, "Oscillator", {'type': 'square'});
+    const perc = await loadPreset(track, "FluidR3/DrumKitRoom1");
+    const reverb = await loadPreset(track, "Reverb");
 
-	setVariable('currentInstrument', trackState.lead2);
-	setVariable('waitTime', (1/4)/1.5);
+    track1(track, lead);
+    beat1(track,);
+    if (await wait(8)) return;
+    track1(track, osc);
+    beat1(track,);
+    if (await wait(8)) return;
 
+    async function track1(track, instrument) {
+        track = {...track, parentTrack: track, position: 0}
+        track.instrument = instrument;
+        track.duration = 1 / 4
+        execute('C5');
+        if (await wait(1 / 2)) return;
+        track.pitchBend = -0.4
+        track.config = {var: 'wut'}
+        execute('C4', {duration: 1 / 4, velocity: 82});
+        if (await wait(1 / 2)) return;  // override duration and velocity
+        execute('G4');
+        if (await wait(1 / 2)) return;
+        execute('Eb4');
+        if (await wait(1 / 2)) return;
+        execute('Eb5');
+        if (await wait(1 / 2)) return;
+        execute('F5');
+        if (await wait(1 / 2)) return;
+        execute('Eb5');
+        if (await wait(1 / 2)) return;
+        execute('D5');
+        if (await wait(1 / 2)) return;
+        execute('C5');
+        if (await wait(1 / 2)) return;
+        execute('C4');
+        if (await wait(1 / 2)) return;
+        execute('G4');
+        if (await wait(1 / 2)) return;
+        execute('Eb4');
+        if (await wait(1 / 2)) return;
+        execute('D5');
+        if (await wait(1 / 2)) return;
+        execute('C4');
+        if (await wait(1 / 2)) return;
+        execute('Bb4');
+        if (await wait(1 / 2)) return;
+    }
 
-	setVariable('wut', 'ohok');	setVariable('omfg', '1230WUT2of'); 	setVariable('rully', 'yup');	setVariable('bpm', 120);
-	setVariable('currentInstrument', trackState.lead);
-	startTrack(track1); 	await wait(3/8);
-	setVariable('currentInstrument', trackState.lead2);
-	startTrack(track1); 	await wait(5/8); 	await wait((3)/1.5);
-
-}
-
-async function track1(trackRenderer) {
-	const {playNote, wait} = trackRenderer;
-	playNote('C5', (1/4)*1.5); 	await wait(1/4);
-	playNote('C4', (1/4)*1.5, 0.8);	await wait(1/4);
-	playNote('G4', 1/4); 	await wait(1/4);
-	playNote('Eb4', (1/4)*1.5, 0.8); 	await wait(1/4);
-	playNote('Eb5', (1/4)/1.5); 	await wait(1/4);
-	playNote('F5', (1/4)/1.5); 	await wait(1/4);
-	playNote('Eb5', (1/4)/1.5); 	await wait(1/4);
-	playNote('D5', (1/4)/1.5); 	await wait(1/4);
-	playNote('C5', (1/4)*1.5); 	await wait(1/4);
-	playNote('C4', (1/4)*1.5, 0.8); 	await wait(1/4);
-	playNote('G4', 1/4); 	await wait(1/4);
-	playNote('Eb4', (1/4)*1.5, 0.8); 	await wait(1/4);
-	playNote('D5', 1/4); 	await wait(1/4);
-	playNote('C4', 1/4, .8); 	await wait(1/4);
-	playNote('Bb4', 1/4); 	await wait(1/4);
-}})()
+    async function beat1(track) {
+        track = {...track, parentTrack: track, position: 0}
+        track.instrument = perc
+        track.velocityDivisor = 10
+        execute('chh');
+        execute('abd');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('as');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3, duration: 1 / 8});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('abd');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        execute('abd', {velocity: 6});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('as');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 4)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 4)) return;
+        execute('chh');
+        execute('abd');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('as');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('abd');
+        if (await wait(1 / 2)) return;
+        execute('chh', {velocity: 3});
+        execute('abd', {velocity: 6});
+        if (await wait(1 / 2)) return;
+        execute('chh');
+        execute('as');
+        if (await wait(1 / 2)) return;
+        execute('ohh', {velocity: 3});
+        if (await wait(1 / 2)) return;
+    }
+})

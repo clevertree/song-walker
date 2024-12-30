@@ -1,28 +1,48 @@
 lead=loadPreset("FluidR3/AcousticGrandPiano")
-lead2=loadInstrument("Oscillator", {'type':'square'})
+osc=loadPreset("Oscillator", {'type':'square'})
 perc=loadPreset("FluidR3/DrumKitRoom1")
 
-
-instrument=lead
-@track1 3/8
-instrument=lead2
-@track1 5/8
+@track1 @beat1 8
+@track1 @beat1 8
 
 [track1]
+instrument=lead
+durationDefault=1/4
+C5 /2
+C4 /2
+G4 /2
+Eb4 /2
+Eb5 /2
+F5 /2
+Eb5 /2
+D5 /2
+C5 /2
+C4 /2
+G4 /2
+Eb4 /2
+D5 /2
+C4 /2
+Bb4 /2
 
-noteDuration=1/6
-C5 1/4
-C4 1/4
-G4 1/4
-Eb4 1/4
-Eb5 1/4
-F5 1/4
-Eb5 1/4
-D5 1/4
-C5 1/4
-C4 1/4
-G4 1/4
-Eb4 1/4
-D5 1/4
-C4 1/4
-Bb4 1/4
+[beat1]
+instrument=perc
+velocityDivisor=10
+chh     abd     /2
+chh:3           /2
+chh     as      /2
+chh:3           /2
+chh     abd     /2
+chh:3   abd:6   /2
+chh     as      /2
+chh:3           /4
+chh:3           /4
+chh     abd     /2
+chh:3           /2
+chh     as      /2
+chh:3           /2
+chh     abd     /2
+chh:3   abd:6   /2
+chh     as      /2
+ohh:3           /2
+
+

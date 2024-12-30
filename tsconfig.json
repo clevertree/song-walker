@@ -26,17 +26,26 @@
       "@app/*": [
         "./app/*"
       ],
+      "@songwalker": [
+        "./songwalker"
+      ],
       "@songwalker/*": [
         "./songwalker/*"
+      ],
+      "@songwalker-presets": [
+        "./songwalker-presets"
+      ],
+      "@songwalker-presets/*": [
+        "./songwalker-presets/*"
       ],
       "@songwalker-editor/*": [
         "./songwalker-editor/*"
       ],
+      "@samples/*": [
+        "./samples/*"
+      ],
       "@samples": [
         "./samples"
-      ],
-      "@/*": [
-        "./*"
       ]
     }
   },

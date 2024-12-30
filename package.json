@@ -1,6 +1,6 @@
 {
-  "name": "music-app-nextjs",
-  "version": "0.1.0",
+  "name": "song-walker",
+  "version": "0.2.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,10 +9,9 @@
     "start": "next start",
     "cypress:component": "cypress run --component",
     "cypress:e2e": "cypress run --e2e",
-    "cypress:e2e:prod": "CYPRESS_BASE_URL=http://localhost:8081 cypress run --e2e",
     "cypress:open": "cypress open",
-    "cypress-prod:run": "CYPRESS_BASE_URL=https://paradigmthreat.net cypress run",
     "lint": "next lint",
+    "lint-fix": "eslint --fix .",
     "electron": "electron ./scripts/runElectron.js"
   },
   "dependencies": {
@@ -24,16 +23,16 @@
     "react": "^18",
     "react-dom": "^18",
     "react-redux": "^9.0.2",
-    "undoh": "^1.2.2",
-    "sass": "^1.69.5"
+    "sass": "^1.69.5",
+    "undoh": "^1.2.2"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
     "@types/prismjs": "^1.26.3",
+    "@types/react": "^18",
     "@types/react-dom": "^18",
     "autoprefixer": "^10",
-    "cypress": "^13.3.0",
+    "cypress": "^13.16.0",
     "eslint": "^8",
     "eslint-config-next": "14.0.0",
     "postcss": "^8",

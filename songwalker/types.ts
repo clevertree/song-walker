@@ -1,19 +1,10 @@
-import {PlayNoteEvent} from "@songwalker/events";
+export type TokenItem = [name: string, content: TokenList | string]
 
-export type TokenItem = {
-    type: string,
-    content: TokenList | string,
-}
-
-export type TokenItemOrString = TokenItem | string
+// export type TokenItemOrString = TokenItem | string
 
 
-export type TokenList = Array<TokenItemOrString>
+export type TokenList = Array<TokenItem | string>
 
-
-export type TrackSourceMap = {
-    [trackName: string]: string,
-}
 
 export type SongError = {
     message: string;
@@ -21,13 +12,44 @@ export type SongError = {
     trackName?: string;
 }
 
+export interface CommandParams {
+    velocity?: number,
+    duration?: number,
+    destination?: AudioNode,
+}
 
-export type TrackEventHandler = (trackEvent: SongTrackEvent, tokenID: number) => void;
-export type SongState = {
-    isPlaying: boolean,
-    // trackEventHandler: HandlesTrackEvents
-    // playFrequency: (trackState: TrackState, frequency: string, duration: number, ...args: any[]) => void;
-};
+export interface CommandWithParams extends CommandParams {
+    commandString: string,
+    startTime: number,
+}
+
+export type ParsedParams = {
+    [paramName in keyof CommandParams]?: string;
+}
+
+export interface CommandParamsAliases {
+    '@': keyof CommandParams,
+    '^': keyof CommandParams
+}
+
+export interface ParsedCommand {
+    command: string,
+    params: CommandParams
+}
+
+export interface ParsedNote {
+    note: string,
+    octave: number,
+    frequency: number,
+}
+
+
+// export type TrackEventHandler = (trackEvent: SongTrackEvent, tokenID: number) => void;
+// export type SongState = {
+//     isPlaying: boolean,
+//     // trackEventHandler: HandlesTrackEvents
+//     // playFrequency: (trackState: TrackState, frequency: string, duration: number, ...args: any[]) => void;
+// };
 
 export interface HandlesTrackEvents {
     handleTrackEvent(trackName: string, trackEvent: SongTrackEvent, tokenID: number): void;
@@ -35,52 +57,53 @@ export interface HandlesTrackEvents {
 
 export type SongHandler = {
     isPlaying(): boolean,
-    startPlayback(): TrackHandler,
+    // startPlayback(): TrackHandler,
     stopPlayback(): void,
     // addEventCallback: (trackName: string, callback: TrackEventHandler) => void,
     waitForSongToFinish: () => Promise<void>
     // getRootTrackState: () => TrackState
 }
 
-export type TrackHandler = {
-    waitForTrackToFinish: () => Promise<void>,
-    getTrackState: () => TrackState,
-    getTrackName: () => string
-}
-
-export type TrackState = {
-    context: AudioContext,
-    destination?: AudioDestinationNode,
-    instrument: InstrumentInstance,
-    // startTime: number,
-    startTime: number,
-    position: number,
-    // noteDuration: number,
-    // noteVelocity: number,
+export interface TrackState {
+    // context: AudioContext,
+    currentTime: number,    // Actual time
+    position: number,      // Positional time (in beats)
     beatsPerMinute: number,
     bufferDuration: number,
+    duration: number,
+    velocity: number,
+    velocityDivisor: number,
+    destination: AudioNode,
+    instrument: InstrumentInstance,
+    effects: Array<InstrumentInstance>,
+    /** @deprecated **/
+    minimumEndTime?: number,    // What's this for?
+    parentTrack?: TrackState
+    // startTime: number,
+    // duration?: number,
     // durationDivisor?: number,
-    durationDefault?: number,
-    velocityDivisor?: number,
-    [key: string]: any
+    // [key: string]: any
     // promise: Promise<void> | null
 }
 
-export type TrackRenderer = {
-    trackState: TrackState,
-    playNote: (noteString: string, duration?: number, velocity?: number) => void;
-    loadInstrument: (instrumentPath: string | InstrumentLoader, config?: object) => Promise<InstrumentInstance>;
-    loadPreset: (presetPath: string, config?: object) => Promise<InstrumentInstance>;
-    setVariable: (variablePath: string, variableValue: any) => void;
-    // getVariable: (variablePath: string) => any;
-    startTrack: (trackCallback: TrackCallback) => void;
-    wait: (duration: number) => Promise<void>;
-    setCurrentToken: (tokenID: number) => void;
-    // setCurrentInstrument: (instrument:Instrument) => void
-    // promise: Promise<void> | null
+/** @deprecated **/
+export interface CommandState extends TrackState {
+    command: string
 }
 
-export type TrackCallback = (trackRenderer: TrackRenderer) => Promise<void> | void;
+
+export interface SongFunctions {
+    wait: (track: TrackState, duration: number) => boolean,
+    waitAsync: (track: TrackState, duration: number) => Promise<boolean>,
+    waitForTrackToFinish: (track: TrackState) => Promise<void>,
+    loadPreset: (track: TrackState,
+                 presetID: string,
+                 config: object) => Promise<InstrumentInstance>,
+    execute: (track: TrackState, command: string, params?: CommandParams) => void,
+    // executeCallback: (track: TrackState, callback: (...args: any[]) => any, ...args: any[]) => void
+}
+
+export type SongCallback = (track: TrackState, functions: SongFunctions) => Promise<void>;
 
 export interface SongTrackEvent {
     waitForEventStart: () => Promise<void>,
@@ -88,11 +111,7 @@ export interface SongTrackEvent {
 }
 
 
-// Instrument
-
-// export interface InstrumentConfig {
-//     // destination: AudioNode
-// }
+/** Instrument */
 
 export interface NoteHandler {
     addEventListener(type: string, listener: (evt: Event) => void, options?: boolean | AddEventListenerOptions): void;
@@ -100,42 +119,29 @@ export interface NoteHandler {
     stop(when?: number): void;
 }
 
-export type InstrumentInstance = (noteEvent: PlayNoteEvent) => NoteHandler;
 
-export type InstrumentLoader = (config: object) => Promise<InstrumentInstance> | InstrumentInstance
+// export type InstrumentInstance = (trackState: TrackState, command: string) => NoteHandler;
+export type InstrumentInstance = (track: TrackState,
+                                  command: CommandWithParams) => NoteHandler | void;
 
-// export type PresetList = {
-//     [presetName: string]: (relativeURL: string) => InstrumentPreset
-// }
-// export type PresetBankList = {
-//     [presetName: string]: PresetBank
-// }
+export type InstrumentLoader<Config = any> = (track: TrackState, config: Config) => Promise<InstrumentInstance> | InstrumentInstance
 
-export interface PresetBank {
-    title: string,
+/** Presets */
 
-    getPreset(presetPath: string): InstrumentPreset,
+export type PresetBank = () => Generator<Preset> | AsyncGenerator<Preset>
 
-    listPresets(presetPath: string): Generator<InstrumentPreset>
+export interface PresetBankBase {
+    listPresets: PresetBank,
 
+    findPreset(presetID: string | RegExp): Promise<Preset>,
 }
 
+// export type PresetType = 'instrument' | 'drum-kit' | 'effect'
 
-export type InstrumentPreset<Config = object> = {
-    title?: string,
-    instrument: string,
+export type Preset<Config = any> = {
+    title: string,
+    // type: PresetType,
+    // alias?: string,
+    loader: InstrumentLoader<Config>,
     config: Config
 }
-
-export type InstrumentBank = {
-    getInstrumentLoader(instrumentPath: string): InstrumentLoader
-}
-
-// export type InstrumentList = {
-//     [instrumentName: string]: InstrumentLoader
-// }
-//
-// export type InstrumentPreset<IConfig> = {
-//     instrument: string,
-//     config: IConfig
-// }

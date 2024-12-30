@@ -7,7 +7,7 @@ import {addError, stopPlayback} from "@songwalker-editor/document/documentAction
 import {SongError, SongHandler} from "@songwalker/types";
 import {compileSongToCallback} from "@songwalker/compiler";
 import {loadSongAssets} from "@songwalker/songLoader";
-import {SongPlayer} from "@songwalker/walker";
+import {SongWalker} from "@songwalker/walker";
 
 interface PlaybackProviderProps {
     children: string | React.JSX.Element | React.JSX.Element[]
@@ -32,7 +32,7 @@ export function PlaybackProvider(props: PlaybackProviderProps) {
                 (async () => {
                     try {
                         const callback = compileSongToCallback(documentValue)
-                        const songPlayer = new SongPlayer(callback, playbackManager);
+                        const songPlayer = new SongWalker(callback, playbackManager);
 
                         setSongPlayer(songPlayer);
                         songPlayer.startPlayback();
