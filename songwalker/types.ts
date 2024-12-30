@@ -76,7 +76,8 @@ export interface TrackState {
     destination: AudioNode,
     instrument: InstrumentInstance,
     effects: Array<InstrumentInstance>,
-    minimumEndTime?: number,    // Actual time
+    /** @deprecated **/
+    minimumEndTime?: number,    // What's this for?
     parentTrack?: TrackState
     // startTime: number,
     // duration?: number,

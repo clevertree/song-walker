@@ -24,12 +24,12 @@ describe('WebAudioFontInstrument', () => {
             presetPath: `${PRESET_PATH_INSTRUMENT}/${instrumentKeys[Math.round(Math.random() * instrumentKeys.length)]}.json`
         })
 
-        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
+        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
 
         for (let i = 0; i < 4; i++) {
-            play(track, 'C3^0.1@1/2')
+            play(track, 'C3^10@1/2')
             wait(track, 1 / 2)
-            play(track, 'D#3^0.1@1/2')
+            play(track, 'D#3^10@1/2')
             wait(track, 1 / 2)
         }
     })
@@ -43,10 +43,10 @@ describe('WebAudioFontInstrument', () => {
             presetPath: `${PRESET_PATH_PERCUSSION}/${percussionKeys[Math.round(Math.random() * percussionKeys.length)]}.json`
         })
 
-        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
+        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
 
         for (let i = 0; i < 8; i++) {
-            play(track, 'C3^0.1@1/2')
+            play(track, 'C3^10@1/2')
             wait(track, 1 / 4)
         }
     })
@@ -60,12 +60,12 @@ describe('WebAudioFontInstrument', () => {
             presetPath: `${PRESET_PATH_DRUMSET}/${drumsetKeys[Math.round(Math.random() * drumsetKeys.length)]}.json`
         })
 
-        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
+        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
 
         for (let o = 0; o <= 2; o++) {
             for (let i = 0; i < 6; i++) {
                 const note = String.fromCharCode(65 + i)
-                play(track, `${note}${o}^0.1@1/2`)
+                play(track, `${note}${o}^10@1/2`)
                 wait(track, 1 / 4)
             }
         }

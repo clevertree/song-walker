@@ -11,7 +11,7 @@ import Errors from '../constants/errors'
 import {parseCommandValues} from "@songwalker";
 
 interface SongFunctionsExtended extends SongFunctions {
-    parseAndPlayCommand: (track: TrackState, commandString: string, additionalParams?: CommandParams) => void
+    parseAndExecute: (track: TrackState, commandString: string, additionalParams?: CommandParams) => void
 }
 
 export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLibrary) {
@@ -39,7 +39,7 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
             const trackEnded = functions.wait(track, duration);
             const waitTime = track.currentTime - track.destination.context.currentTime - track.bufferDuration;
             if (waitTime > 0) {
-                console.log(`Waiting ${waitTime} seconds for ${track.destination.context.currentTime} => ${track.currentTime} - ${track.bufferDuration}`)
+                // console.log(`Waiting ${waitTime} seconds for ${track.destination.context.currentTime} => ${track.currentTime} - ${track.bufferDuration}`)
                 await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
             }
             return trackEnded;
@@ -84,7 +84,7 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
         //     }
         //     callback(subTrack, ...args);
         // },
-        parseAndPlayCommand: function (track: TrackState, commandString: string, additionalParams: CommandParams = {}) {
+        parseAndExecute: function (track: TrackState, commandString: string, additionalParams: CommandParams = {}) {
             const {command, params} = parseCommandValues(commandString);
             functions.execute(track, command, {...params, ...additionalParams});
         }
@@ -103,8 +103,8 @@ export function getDefaultTrackState(destination: AudioNode, bufferDuration: num
         currentTime: destination.context.currentTime, // Plus buffer duration? no.
         position: 0,
         duration: 1,
-        velocity: 100,
-        velocityDivisor: 100,
+        velocity: 128,
+        velocityDivisor: 128,
         instrument: defaultEmptyInstrument,
         effects: [],
         destination

@@ -14,13 +14,13 @@ describe('Oscillator', () => {
         OscillatorInstrument(track, {mixer: 1.1});
         // track.effects = [await ReverbEffect(track, {reverse: true})];
 
-        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
+        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
 
 
         for (let o = 2; o <= 6; o++) {
             for (let i = 0; i < 6; i++) {
                 const note = String.fromCharCode(65 + i)
-                play(track, `${note}${o}^0.1@1/8`)
+                play(track, `${note}${o}^10@1/8`)
                 wait(track, 1 / 8)
             }
         }

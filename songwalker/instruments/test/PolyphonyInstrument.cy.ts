@@ -7,7 +7,7 @@ import {getDefaultSongFunctions, getDefaultTrackState} from "@songwalker/helper/
 import {generateRandomBuffer} from "@songwalker/instruments/test/testHelper";
 
 describe('Polyphony', () => {
-    it('Polyphony plays C#4^0.1d1/2', async () => {
+    it('Polyphony plays C#4^10d1/2', async () => {
         const context = new AudioContext();
         const track: TrackState = {
             ...getDefaultTrackState(context.destination),
@@ -30,12 +30,12 @@ describe('Polyphony', () => {
             } as Preset<AudioBufferInstrumentConfig>]
         })
 
-        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
+        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
 
         for (let i = 0; i < 8; i++) {
-            play(track, 'C#4^0.1@1/8')
+            play(track, 'C#4^10@1/8')
             wait(track, 1 / 8)
-            play(track, 'D#4^0.1@1/8')
+            play(track, 'D#4^10@1/8')
             wait(track, 1 / 8)
         }
     })

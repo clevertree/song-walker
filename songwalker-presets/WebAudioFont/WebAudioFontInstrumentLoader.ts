@@ -25,7 +25,9 @@ const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoade
     const {
         presetPath
     } = config;
+    await (track.destination.context as AudioContext).suspend()
     let fontConfig: WebAudioFontInstrumentConfig = await fetchJSONFromMirror(presetPath);
+    await (track.destination.context as AudioContext).resume()
 
     const syncTime = audioContext.currentTime - (track.currentTime + track.bufferDuration);
     if (syncTime > 0) {

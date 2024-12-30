@@ -9,6 +9,7 @@ describe('WebAudioFontInstrument', () => {
     it('loads and plays', async () => {
         const context = new AudioContext();
         const track: TrackState = getDefaultTrackState(context.destination)
+        track.beatsPerMinute = 160;
         track.instrument = await WebAudioFontInstrument(track, {
             zones: [
                 {
@@ -28,12 +29,12 @@ describe('WebAudioFontInstrument', () => {
             ]
         })
 
-        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
+        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
 
         for (let i = 0; i < 4; i++) {
-            play(track, 'C3^0.1@1/2')
+            play(track, 'C3^10@1/2')
             wait(track, 1 / 2)
-            play(track, 'D#3^0.1@1/2')
+            play(track, 'D#3^10@1/4')
             wait(track, 1 / 2)
         }
     })

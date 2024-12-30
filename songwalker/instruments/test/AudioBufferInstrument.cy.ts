@@ -5,7 +5,7 @@ import {getDefaultSongFunctions, getDefaultTrackState} from "@songwalker/helper/
 
 
 describe('AudioBuffer', () => {
-    it('AudioBuffer plays C#4^0.1d1/2', async () => {
+    it('AudioBuffer plays C#4^10d1/2', async () => {
         const context = new AudioContext();
         const src = generateRandomBuffer(context)
         const track: TrackState = {
@@ -17,12 +17,12 @@ describe('AudioBuffer', () => {
             loop: true,
             mixer: 1
         })
-        const {wait, parseAndPlayCommand: play} = getDefaultSongFunctions();
+        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
 
         for (let i = 0; i < 8; i++) {
-            play(track, 'C#4^0.1@1/8')
+            play(track, 'C#4^10@1/8')
             wait(track, 1 / 8)
-            play(track, 'D#4^0.1@1/8')
+            play(track, 'D#4^10@1/8')
             wait(track, 1 / 8)
         }
     })

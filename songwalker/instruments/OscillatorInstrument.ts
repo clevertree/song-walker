@@ -52,7 +52,8 @@ export default function OscillatorInstrument(track: TrackState, config: Oscillat
         let {
             startTime,
             duration,
-            beatsPerMinute
+            beatsPerMinute,
+            currentTime
         } = trackAndParams;
 
         // Envelope
@@ -66,7 +67,13 @@ export default function OscillatorInstrument(track: TrackState, config: Oscillat
             endTime += release * (60 / beatsPerMinute)
         }
         oscillator.stop(endTime);
-        // console.log({currentTime, endTime, duration, beatsPerMinute})
+        console.log({
+            currentTime,
+            startTime,
+            endTime,
+            duration,
+            beatsPerMinute
+        }, trackAndParams.destination.context.currentTime)
         // TODO: add active notes to track state?
         return oscillator
     }

@@ -1,4 +1,4 @@
-track.bufferDuration=0
+track.bufferDuration=1
 const lead=await loadPreset(/FluidR3.*\/.*Guitar/i)
 const osc=await loadPreset("Oscillator", {'type':'square'})
 const perc=await loadPreset("FluidR3_GM/Room 1")
@@ -33,9 +33,9 @@ track track1(instrument) {
 
 track beat1() {
 // console.log(track.destination.context.currentTime, track.currentTime);
+   // track.effects = [reverb];
     track.instrument=perc
     track.velocityDivisor=10
-    chh     abd     /2
     chh^3           /2
     chh^3           /2
     chh     as      /2
@@ -52,5 +52,5 @@ track beat1() {
     chh     abd     /2
     chh^3   abd^6   /2
     chh     as      /2
-    ohh^3           /2
+    ohh^3@/3           /2
 }
