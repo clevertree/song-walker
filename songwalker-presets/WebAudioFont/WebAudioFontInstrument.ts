@@ -24,7 +24,7 @@ export default async function WebAudioFontInstrument(track: TrackState, config: 
     const player = new WebAudioFontPlayer();
     await player.adjustPreset(audioContext, config);
 
-    const syncTime = audioContext.currentTime - (track.currentTime + track.bufferDuration);
+    const syncTime = audioContext.currentTime - track.currentTime;
     if (syncTime > 0) {
         track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
         console.error(`WebAudioFontInstrument continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)
@@ -34,8 +34,8 @@ export default async function WebAudioFontInstrument(track: TrackState, config: 
         const {
             commandString,
             destination,
-            startTime,
-            duration,
+            currentTime,
+            duration = 0,
             beatsPerMinute
         } = {...track, ...commandWithParams};
         let pitch: number;
@@ -47,6 +47,6 @@ export default async function WebAudioFontInstrument(track: TrackState, config: 
         }
         // const playbackRate = Math.pow(2, (100.0 * pitch) / 1200.0);
         const durationSeconds = duration * (60 / beatsPerMinute)
-        player.queueWaveTable(audioContext, destination, config, startTime, pitch, durationSeconds);
+        player.queueWaveTable(audioContext, destination, config, currentTime, pitch, durationSeconds);
     }
 }

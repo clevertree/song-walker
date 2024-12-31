@@ -12,7 +12,6 @@ describe('songPlayer', () => {
         // const logCallback = cy.stub();
         const instrumentCallback = cy.stub();
         const songState = getDefaultTrackState(destination);
-        songState.bufferDuration = 0.1;
         await testSong(songState, instrumentCallback)
         await DefaultSongFunctions.waitForTrackToFinish(songState);
         // await songInstance.waitForSongToFinish();

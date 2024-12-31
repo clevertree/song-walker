@@ -51,37 +51,33 @@ export default function OscillatorInstrument(track: TrackState, config: Oscillat
 
     function playOscillator(noteInfo: ParsedNote, command: OscillatorInstrumentConfig & TrackState & CommandWithParams) {
         let {
-            startTime,
-            duration,
-            beatsPerMinute,
             currentTime,
+            duration = 0,
+            beatsPerMinute,
             pan = 0
         } = command;
 
         // Envelope
         const gainNode = createGain(command);
+        let destination = gainNode;
 
         // Panning
-        const panNode = audioContext.createStereoPanner();
-        panNode.pan.value = pan;
-        panNode.connect(gainNode);
+        if (pan) {
+            const panNode = audioContext.createStereoPanner();
+            panNode.pan.value = pan;
+            panNode.connect(gainNode);
+            destination = panNode;
+        }
 
         // Oscillator
-        const oscillator = createOscillator(noteInfo, panNode);
-        oscillator.start(startTime);
+        const oscillator = createOscillator(noteInfo, destination);
+        oscillator.start(currentTime);
         const {release = 0} = config;
-        let endTime = startTime + (duration * (60 / beatsPerMinute));
+        let endTime = currentTime + (duration * (60 / beatsPerMinute));
         if (release) {
             endTime += release * (60 / beatsPerMinute)
         }
         oscillator.stop(endTime);
-        console.log({
-            currentTime,
-            startTime,
-            endTime,
-            duration,
-            beatsPerMinute
-        }, command.destination.context.currentTime)
         // TODO: add active notes to track state?
         return oscillator
     }

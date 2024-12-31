@@ -9,8 +9,9 @@ describe('Oscillator', () => {
     it('Oscillator with Reverb', async () => {
 
         const context = new AudioContext();
+        await context.suspend()
         const track: TrackState = getDefaultTrackState(context.destination)
-        track.bufferDuration = 0.2
+        // track.bufferDuration = 0.2
 
         OscillatorInstrument(track, {
             mixer: .1,
@@ -22,14 +23,14 @@ describe('Oscillator', () => {
             decay: 10
         })];
 
-        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
+        const {waitAsync, parseAndExecute: play} = getDefaultSongFunctions();
 
 
         for (let o = 2; o <= 6; o++) {
             for (let i = 0; i < 6; i++) {
                 const note = String.fromCharCode(65 + i)
                 play(track, `${note}${o}^32@1/9`)
-                wait(track, 1 / 8)
+                await waitAsync(track, 1 / 8)
             }
         }
     })

@@ -1,6 +1,5 @@
 import {compileSongToCallback, compileSongToJavascript, EXPORT_JS, sourceToTokens} from './compiler'
-import {TrackState} from "@songwalker";
-import {getDefaultSongFunctions, getDefaultTrackState} from "../helper/songHelper"
+import {playSong} from "../helper/songHelper"
 
 describe('compiler', () => {
     const emptyTemplate = (s: string) => s;
@@ -94,13 +93,9 @@ describe('compiler', () => {
 
     it('executes song', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
-            const javascriptContent = compileSongToCallback(SONG_SOURCE);
-            const context = new AudioContext();
-            const track: TrackState = getDefaultTrackState(context.destination);
-            const DefaultSongFunctions = getDefaultSongFunctions();
+            const song = compileSongToCallback(SONG_SOURCE);
             cy.wrap((async () => {
-                await javascriptContent(track, DefaultSongFunctions)
-                await DefaultSongFunctions.waitForTrackToFinish(track);
+                await playSong(song);
             })()).then(() => {
             });
         })

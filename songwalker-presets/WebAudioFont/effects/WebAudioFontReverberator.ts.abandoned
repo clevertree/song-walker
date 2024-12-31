@@ -15,7 +15,7 @@ export default async function WebAudioFontReverberatorEffect(track: TrackState, 
             context
         }
     } = this;
-    const startTime = context.currentTime;
+    const currentTime = context.currentTime;
     const reverb = new Reverberator(context, config);
     // Switch destination in track state
 
@@ -24,7 +24,7 @@ export default async function WebAudioFontReverberatorEffect(track: TrackState, 
     const oldDestination = this.destination;
     this.destination =
 
-    const loadingTime = context.currentTime - startTime;
+    const loadingTime = context.currentTime - currentTime;
     if (loadingTime > 0) {
         this.currentTime += loadingTime // Move track time forward to compensate for loading time
         console.log("WebAudioFont preset loading time: ", loadingTime)

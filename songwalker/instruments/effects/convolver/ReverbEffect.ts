@@ -23,7 +23,7 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
 
     buildImpulse();
 
-    const syncTime = audioContext.currentTime - (track.currentTime + track.bufferDuration);
+    const syncTime = audioContext.currentTime - track.currentTime;
     if (syncTime > 0) {
         track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
         console.error(`ReverbEffect continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)

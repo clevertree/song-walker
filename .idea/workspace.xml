@@ -7,17 +7,8 @@
     <list default="true" id="e87670a7-8e55-4d3a-9cd9-39fed29fbd42" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/cypress/fixtures/test.song.compiled" beforeDir="false" afterPath="$PROJECT_DIR$/cypress/fixtures/test.song.compiled" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/document/documentActions.cy.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/compiler/compiler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/compiler/compiler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/compiler/compiler.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/compiler/compiler.cy.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/helper/songHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/helper/songHelper.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/AudioBufferInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/AudioBufferInstrument.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/OscillatorInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/OscillatorInstrument.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/convolver/test/ReverbEffect.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/effects/convolver/test/ReverbEffect.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/AudioBufferInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/AudioBufferInstrument.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/OscillatorInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/OscillatorInstrument.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/PolyphonyInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/PolyphonyInstrument.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/types.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/walker.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/walker.cy.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -148,7 +139,7 @@
       <workItem from="1734464599708" duration="1197000" />
       <workItem from="1734713193544" duration="2095000" />
       <workItem from="1734963755165" duration="52633000" />
-      <workItem from="1735589656530" duration="2810000" />
+      <workItem from="1735589656530" duration="7745000" />
     </task>
     <servers />
   </component>

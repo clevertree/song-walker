@@ -26,7 +26,7 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
     let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)
 
-    const syncTime = audioContext.currentTime - (track.currentTime + track.bufferDuration);
+    const syncTime = audioContext.currentTime - track.currentTime;
     if (syncTime > 0) {
         track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
         console.error(`AudioBufferInstrument continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)
@@ -55,8 +55,8 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
     function playAudioBuffer(noteInfo: ParsedNote, command: OscillatorInstrumentConfig & TrackState & CommandWithParams) {
         let {
             beatsPerMinute,
-            startTime,
-            duration,
+            currentTime,
+            duration = 0,
             pan = 0
         } = command;
 
@@ -71,8 +71,8 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
         // Audio Buffer
         const bufferNode = createSourceNode(noteInfo, panNode)
 
-        bufferNode.start(startTime);
-        const endTime = startTime + (duration * (60 / beatsPerMinute));
+        bufferNode.start(currentTime);
+        const endTime = currentTime + (duration * (60 / beatsPerMinute));
         bufferNode.stop(endTime);
         // TODO: add active notes to track state?
         return bufferNode;

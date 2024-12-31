@@ -3,18 +3,29 @@ import {
     CommandWithParams,
     InstrumentInstance,
     PresetBankBase,
+    SongCallback,
     SongFunctions,
     TrackState
 } from "@songwalker/types";
 import PresetLibrary from "../presets/PresetLibrary";
 import Errors from '../constants/errors'
 import {parseCommandValues} from "@songwalker";
+import {BUFFER_DURATION} from "@songwalker/constants/buffer";
 
 interface SongFunctionsExtended extends SongFunctions {
     parseAndExecute: (track: TrackState, commandString: string, additionalParams?: CommandParams) => void
 }
 
+export async function playSong(song: SongCallback, context: AudioContext = new AudioContext()) {
+    const SongFunctions = getDefaultSongFunctions();
+    const track: TrackState = getDefaultTrackState(context.destination);
+    await context.suspend();
+    await song(track, SongFunctions)
+    await SongFunctions.waitForTrackToFinish(track);
+}
+
 export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLibrary) {
+    let didAutoResume = false;
     const functions: SongFunctionsExtended = {
         waitForTrackToFinish: async function (track) {
             const waitTime = track.currentTime - track.destination.context.currentTime;
@@ -37,11 +48,15 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
         },
         waitAsync: async function defaultWaitCallback(track, duration) {
             const trackEnded = functions.wait(track, duration);
-            const waitTime = track.currentTime - track.destination.context.currentTime - track.bufferDuration;
+            const waitTime = track.currentTime - track.destination.context.currentTime - BUFFER_DURATION
             if (waitTime > 0) {
-                // console.log(`Waiting ${waitTime} seconds for ${track.destination.context.currentTime} => ${track.currentTime} - ${track.bufferDuration}`)
+                // console.log(`Waiting ${waitTime} seconds for ${track.destination.context.currentTime} => ${track.currentTime} - ${BUFFER_DURATION}`)
                 await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
             }
+            // while (track.destination.context.state === "suspended") {
+            //     console.log(`Waiting ${waitTime} for track to resume`, track.destination.context.currentTime)
+            //     await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+            // }
             return trackEnded;
         },
         loadPreset: async function (track: TrackState, presetID, config = {}) {
@@ -56,18 +71,15 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
                 destination: {
                     context: audioContext
                 },
-                currentTime,
-                bufferDuration
+                currentTime
             } = track;
-            const startTime = currentTime + bufferDuration;
-            if (startTime < audioContext.currentTime) {
+            if (currentTime < audioContext.currentTime) {
                 console.error("skipping note that occurs in the past: ",
-                    commandString, 'startTime:', startTime, '<', 'audioContext.currentTime', audioContext.currentTime)
+                    commandString, 'currentTime:', currentTime, '<', 'audioContext.currentTime', audioContext.currentTime)
                 return
             }
             const command: CommandWithParams = {
                 commandString: commandString,
-                startTime,
                 ...params
             }
             // const command: string, params: CommandParams = {command, ...track, ...props};
@@ -76,6 +88,10 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
             track.effects.forEach(effect => effect(track, command));
             // TODO: check for track end time?
             track.instrument(track, command);
+            if (!didAutoResume && audioContext.state === 'suspended' && audioContext instanceof AudioContext) {
+                audioContext.resume().then(() => console.info("AudioContext was resumed", audioContext.currentTime));
+                didAutoResume = true;
+            }
         },
         // executeCallback: function (track: TrackState, callback, ...args) {
         //     const subTrack = {
@@ -96,20 +112,17 @@ export const defaultEmptyInstrument: InstrumentInstance = () => {
     throw new Error(Errors.ERR_NO_INSTRUMENT);
 }
 
-export function getDefaultTrackState(destination: AudioNode, bufferDuration: number = 0): TrackState {
+export function getDefaultTrackState(destination: AudioNode): TrackState {
     return {
         beatsPerMinute: 60,
-        bufferDuration,
         currentTime: destination.context.currentTime, // Plus buffer duration? no.
         position: 0,
-        duration: 1,
-        velocity: 128,
-        velocityDivisor: 128,
+        // pan: 0,
+        // duration: 1,
+        // velocity: 128,
+        // velocityDivisor: 128,
         instrument: defaultEmptyInstrument,
         effects: [],
         destination
-        // duration: 0,
-        // velocity: 0,
-        // velocityDivisor: 1,
     }
 }

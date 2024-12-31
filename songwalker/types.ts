@@ -15,13 +15,12 @@ export type SongError = {
 export interface CommandParams {
     velocity?: number,
     duration?: number,
-    pan: number,
+    pan?: number,
     destination?: AudioNode,
 }
 
 export interface CommandWithParams extends CommandParams {
     commandString: string,
-    startTime: number,
 }
 
 export type ParsedParams = {
@@ -70,11 +69,11 @@ export interface TrackState {
     currentTime: number,    // Actual time
     position: number,      // Positional time (in beats)
     beatsPerMinute: number,
-    bufferDuration: number,
-    duration: number,
-    velocity: number,
-    velocityDivisor: number,
-    pan: number,
+    // bufferDuration: number,
+    duration?: number,
+    velocity?: number,
+    velocityDivisor?: number,
+    pan?: number,
     destination: AudioNode,
     instrument: InstrumentInstance,
     effects: Array<InstrumentInstance>,
@@ -85,6 +84,7 @@ export interface TrackState {
     // [key: string]: any
     // promise: Promise<void> | null
 }
+
 
 /** @deprecated **/
 export interface CommandState extends TrackState {

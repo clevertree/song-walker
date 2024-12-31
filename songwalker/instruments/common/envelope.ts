@@ -28,14 +28,14 @@ export function configEnvelope(context: BaseAudioContext, config: EnvelopeConfig
     // if (config.mixer || config.attack) {
     return (trackAndParams) => {
         let {attack = 0, mixer = 1, release = 0} = config;
-        const {startTime, velocity, velocityDivisor, destination} = trackAndParams
+        const {currentTime, velocity = 128, velocityDivisor = 128, destination} = trackAndParams
         let gainNode = context.createGain();
         gainNode.connect(destination);
         const amplitude = mixer * (velocity / velocityDivisor);
         if (attack) {
             gainNode.gain.value = 0;
-            gainNode.gain.linearRampToValueAtTime(amplitude, startTime + (attack));
-            console.log('attack', {startTime, attack})
+            gainNode.gain.linearRampToValueAtTime(amplitude, currentTime + (attack));
+            console.log('attack', {currentTime, attack})
         } else {
             gainNode.gain.value = amplitude;
         }
