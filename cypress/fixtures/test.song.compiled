@@ -12,7 +12,7 @@
     if (await wait(8)) return;
 
     async function track1(track, instrument) {
-        track = {...track, parentTrack: track, position: 0}
+        track = {...track, position: 0}
         track.instrument = instrument;
         track.duration = 1 / 4
         execute('C5');
@@ -50,7 +50,7 @@
     }
 
     async function beat1(track) {
-        track = {...track, parentTrack: track, position: 0}
+        track = {...track, position: 0}
         track.instrument = perc
         track.velocityDivisor = 10
         execute('chh');

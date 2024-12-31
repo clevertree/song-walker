@@ -17,6 +17,7 @@ describe('Polyphony', () => {
                 title: 'osc',
                 loader: OscillatorInstrument,
                 config: {
+                    pan: -.5,
                     mixer: 0.1,
                     type: 'sawtooth'
                 }
@@ -24,6 +25,7 @@ describe('Polyphony', () => {
                 title: 'buffer',
                 loader: AudioBufferInstrument,
                 config: {
+                    pan: .5,
                     mixer: 0.8,
                     src: generateRandomBuffer(context)
                 }

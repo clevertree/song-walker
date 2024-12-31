@@ -15,7 +15,8 @@ describe('AudioBuffer', () => {
         track.instrument = await AudioBufferInstrument(track, {
             src,
             loop: true,
-            mixer: 1
+            mixer: 1,
+            pan: -.2
         })
         const {wait, parseAndExecute: play} = getDefaultSongFunctions();
 

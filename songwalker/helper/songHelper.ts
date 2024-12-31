@@ -26,11 +26,11 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
         wait: function defaultWaitCallback(track, duration) {
             track.position += duration;
             track.currentTime += duration * (60 / track.beatsPerMinute);
-            if (track.parentTrack) {
-                const {minimumEndTime} = track.parentTrack;
-                if (!minimumEndTime || minimumEndTime < track.currentTime)
-                    track.parentTrack.minimumEndTime = track.currentTime;
-            }
+            // if (track.parentTrack) {
+            //     const {minimumEndTime} = track.parentTrack;
+            //     if (!minimumEndTime || minimumEndTime < track.currentTime)
+            //         track.parentTrack.minimumEndTime = track.currentTime;
+            // }
             // console.info('wait', duration, track.currentTime, track.beatsPerMinute);
             // TODO: check for track end duration and potentially return 'true'
             return false;

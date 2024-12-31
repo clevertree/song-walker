@@ -42,7 +42,7 @@ export const EXPORT_JS = {
         const [, trackName, trackArgs] = match;
         return `async function ${trackName}(track${trackArgs ? ', ' + trackArgs : ''}){`
             + `\n\t${VAR_TRACK_STATE} = {...${VAR_TRACK_STATE}, ${
-                'parentTrack' as keyof TrackState}:${VAR_TRACK_STATE}, ${
+                // 'parentTrack' as keyof TrackState}:${VAR_TRACK_STATE}, ${
                 'position' as keyof TrackState
             }:0}`
     },

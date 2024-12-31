@@ -10,7 +10,8 @@ describe('Oscillator', () => {
             ...getDefaultTrackState(context.destination),
         }
         track.instrument = OscillatorInstrument(track, {
-            mixer: 1.1
+            mixer: 1.1,
+            pan: 1
         })
         const {wait, parseAndExecute: play} = getDefaultSongFunctions();
 

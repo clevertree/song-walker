@@ -64,7 +64,7 @@ async function testSong(track: TrackState, instrumentCallback: (...args: any[]) 
 // }
 
 async function testTrack2(track: TrackState) {
-    track = {...track, position: 0, parentTrack: track};
+    track = {...track, position: 0};
     const {waitAsync, parseAndExecute: play} = DefaultSongFunctions;
     track.duration = 1 / 4;
     play(track, 'C5^2')
@@ -92,7 +92,7 @@ async function testTrack2(track: TrackState) {
 }
 
 async function testTrack(track: TrackState) {
-    track = {...track, position: 0, parentTrack: track};
+    track = {...track, position: 0};
     const w = DefaultSongFunctions.waitAsync;
     const n = DefaultSongFunctions.execute;
     n(track, "C5", {duration: 1 / 4});
@@ -117,7 +117,7 @@ async function testTrack(track: TrackState) {
 
 
 async function testTrackPercussion(track: TrackState) {
-    track = {...track, position: 0, parentTrack: track};
+    track = {...track, position: 0};
     const w = DefaultSongFunctions.waitAsync;
     const n = DefaultSongFunctions.execute;
     track.instrument = await testPercussionInstrument(track, cy.stub())

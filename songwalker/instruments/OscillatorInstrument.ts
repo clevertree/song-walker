@@ -8,6 +8,7 @@ const DEFAULT_OSCILLATOR_TYPE = 'square';
 
 export interface OscillatorInstrumentConfig extends EnvelopeConfig, KeyRangeConfig {
     type?: 'sine' | 'square' | 'sawtooth' | 'triangle',
+    pan?: number,
     detune?: number,
     pulseWidth?: number,
 }
@@ -16,9 +17,9 @@ export interface OscillatorInstrumentConfig extends EnvelopeConfig, KeyRangeConf
 
 export default function OscillatorInstrument(track: TrackState, config: OscillatorInstrumentConfig): InstrumentInstance {
     // console.log('OscillatorInstrument', config, config.type);
-    const {context} = track.destination;
+    const {context: audioContext} = track.destination;
     let createOscillator = configOscillator();
-    let createGain = configEnvelope(context, config);
+    let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)
 
     const instrumentInstance = function parseCommand(track: TrackState, commandWithParams: CommandWithParams) {
@@ -41,25 +42,32 @@ export default function OscillatorInstrument(track: TrackState, config: Oscillat
             throw new Error("Unrecognized note: " + commandWithParams);
         if (filterNote(noteInfo))
             return
-        return playOscillator(noteInfo, {...track, ...commandWithParams})
+        return playOscillator(noteInfo, {...config, ...track, ...commandWithParams})
     }
     // Set instance to current instrument if no instrument is currently loaded
     if (track.instrument === defaultEmptyInstrument)
         track.instrument = instrumentInstance
     return instrumentInstance;
 
-    function playOscillator(noteInfo: ParsedNote, trackAndParams: TrackState & CommandWithParams) {
+    function playOscillator(noteInfo: ParsedNote, command: OscillatorInstrumentConfig & TrackState & CommandWithParams) {
         let {
             startTime,
             duration,
             beatsPerMinute,
-            currentTime
-        } = trackAndParams;
+            currentTime,
+            pan = 0
+        } = command;
 
         // Envelope
-        const gainNode = createGain(trackAndParams);
+        const gainNode = createGain(command);
+
+        // Panning
+        const panNode = audioContext.createStereoPanner();
+        panNode.pan.value = pan;
+        panNode.connect(gainNode);
+
         // Oscillator
-        const oscillator = createOscillator(noteInfo, gainNode);
+        const oscillator = createOscillator(noteInfo, panNode);
         oscillator.start(startTime);
         const {release = 0} = config;
         let endTime = startTime + (duration * (60 / beatsPerMinute));
@@ -73,7 +81,7 @@ export default function OscillatorInstrument(track: TrackState, config: Oscillat
             endTime,
             duration,
             beatsPerMinute
-        }, trackAndParams.destination.context.currentTime)
+        }, command.destination.context.currentTime)
         // TODO: add active notes to track state?
         return oscillator
     }
@@ -91,7 +99,7 @@ export default function OscillatorInstrument(track: TrackState, config: Oscillat
                 case 'square':
                 case 'sawtooth':
                 case 'triangle':
-                    source = context.createOscillator();
+                    source = audioContext.createOscillator();
                     source.type = type;
                     source.detune.value = detune;
                     source.frequency.value = frequency;

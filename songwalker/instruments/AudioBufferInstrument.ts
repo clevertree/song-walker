@@ -3,6 +3,7 @@ import {parseNote} from "..";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
 import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
+import {OscillatorInstrumentConfig} from "@songwalker/instruments/OscillatorInstrument";
 
 const DEFAULT_FREQUENCY_ROOT = 220;
 
@@ -13,6 +14,7 @@ export interface AudioBufferInstrumentConfig extends EnvelopeConfig, KeyRangeCon
     loop?: boolean,
     loopStart?: number,
     loopEnd?: number,
+    pan?: number,
     detune?: number,
     frequencyRoot?: number | string
 }
@@ -41,7 +43,7 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
             throw new Error("Unrecognized note: " + commandWithParams);
         if (filterNote(noteInfo))
             return
-        return playAudioBuffer(noteInfo, {...track, ...commandWithParams})
+        return playAudioBuffer(noteInfo, {...config, ...track, ...commandWithParams})
     }
 
     // Set instance to current instrument if no instrument is currently loaded
@@ -50,17 +52,24 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
     return instrumentInstance;
 
 
-    function playAudioBuffer(noteInfo: ParsedNote, trackAndParams: TrackState & CommandWithParams) {
+    function playAudioBuffer(noteInfo: ParsedNote, command: OscillatorInstrumentConfig & TrackState & CommandWithParams) {
         let {
             beatsPerMinute,
             startTime,
             duration,
-        } = trackAndParams;
+            pan = 0
+        } = command;
 
         // Envelope
-        const gainNode = createGain(trackAndParams);
+        const gainNode = createGain(command);
+
+        // Panning
+        const panNode = audioContext.createStereoPanner();
+        panNode.pan.value = pan;
+        panNode.connect(gainNode);
+
         // Audio Buffer
-        const bufferNode = createSourceNode(noteInfo, gainNode)
+        const bufferNode = createSourceNode(noteInfo, panNode)
 
         bufferNode.start(startTime);
         const endTime = startTime + (duration * (60 / beatsPerMinute));

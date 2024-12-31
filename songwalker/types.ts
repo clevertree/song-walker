@@ -15,6 +15,7 @@ export type SongError = {
 export interface CommandParams {
     velocity?: number,
     duration?: number,
+    pan: number,
     destination?: AudioNode,
 }
 
@@ -73,12 +74,11 @@ export interface TrackState {
     duration: number,
     velocity: number,
     velocityDivisor: number,
+    pan: number,
     destination: AudioNode,
     instrument: InstrumentInstance,
     effects: Array<InstrumentInstance>,
-    /** @deprecated **/
-    minimumEndTime?: number,    // What's this for?
-    parentTrack?: TrackState
+    // parentTrack?: TrackState
     // startTime: number,
     // duration?: number,
     // durationDivisor?: number,
