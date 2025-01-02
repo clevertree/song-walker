@@ -1,5 +1,5 @@
-import {InstrumentInstance, parseNote, TrackState} from "@songwalker";
-import {CommandWithParams, ParsedNote} from "@songwalker/types";
+import {parseNote, TrackState} from "@songwalker";
+import {CommandWithParams, InstrumentLoader, ParsedNote, SongWalkerState} from "@songwalker/types";
 import {configEnvelope, EnvelopeConfig, updateEnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
 import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
@@ -15,9 +15,9 @@ export interface OscillatorInstrumentConfig extends EnvelopeConfig, KeyRangeConf
 
 // type ConfigKey = keyof OscillatorInstrumentConfig;
 
-export default function OscillatorInstrument(track: TrackState, config: OscillatorInstrumentConfig): InstrumentInstance {
+const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (songState: SongWalkerState, config) => {
     // console.log('OscillatorInstrument', config, config.type);
-    const {context: audioContext} = track.destination;
+    const {context: audioContext, rootTrackState} = songState;
     let createOscillator = configOscillator();
     let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)
@@ -45,8 +45,8 @@ export default function OscillatorInstrument(track: TrackState, config: Oscillat
         return playOscillator(noteInfo, {...config, ...track, ...commandWithParams})
     }
     // Set instance to current instrument if no instrument is currently loaded
-    if (track.instrument === defaultEmptyInstrument)
-        track.instrument = instrumentInstance
+    if (rootTrackState.instrument === defaultEmptyInstrument)
+        rootTrackState.instrument = instrumentInstance
     return instrumentInstance;
 
     function playOscillator(noteInfo: ParsedNote, command: OscillatorInstrumentConfig & TrackState & CommandWithParams) {
@@ -118,3 +118,4 @@ export default function OscillatorInstrument(track: TrackState, config: Oscillat
     }
 
 }
+export default OscillatorInstrument;

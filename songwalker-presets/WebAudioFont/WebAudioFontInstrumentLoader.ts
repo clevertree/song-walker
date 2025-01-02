@@ -1,4 +1,4 @@
-import {InstrumentLoader, TrackState} from "@songwalker/types";
+import {InstrumentLoader, SongWalkerState} from "@songwalker/types";
 import WebAudioFontInstrument, {
     WebAudioFontInstrumentConfig
 } from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
@@ -16,23 +16,21 @@ export interface WebAudioFontInstrumentLoaderConfig {
 // }
 
 
-const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoaderConfig> = async function (track: TrackState, config) {
+const WebAudioFontInstrumentLoader: InstrumentLoader<WebAudioFontInstrumentLoaderConfig> = async function (songState: SongWalkerState, config) {
     const {
-        destination: {
-            context: audioContext
-        }
-    } = track;
+        context: audioContext,
+        rootTrackState
+    } = songState;
     const {
         presetPath
     } = config;
     let fontConfig: WebAudioFontInstrumentConfig = await fetchJSONFromMirror(presetPath);
 
-    const syncTime = audioContext.currentTime - track.currentTime;
+    const syncTime = audioContext.currentTime - rootTrackState.currentTime;
     if (syncTime > 0) {
-        track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
-        console.error(`WebAudioFontInstrumentLoader continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)
+        console.error(`WebAudioFontInstrumentLoader continued loading past buffer (${syncTime}).`)
     }
-    return WebAudioFontInstrument(track, fontConfig)
+    return WebAudioFontInstrument(songState, fontConfig)
 }
 
 export default WebAudioFontInstrumentLoader;

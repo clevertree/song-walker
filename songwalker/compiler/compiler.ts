@@ -2,7 +2,7 @@ import {
     CommandParamsAliases,
     ParsedParams,
     SongCallback,
-    SongFunctions,
+    SongWalkerState,
     TokenItem,
     TokenList,
     TrackState
@@ -16,11 +16,11 @@ const VAR_TRACK_STATE = 'track';
 // export const F_LOAD = "_lp";
 // export const F_EXECUTE = "_e";
 export const F_EXPORT = `{${
-    'waitAsync' as keyof SongFunctions
+    'waitAsync' as keyof SongWalkerState
 }, ${
-    'execute' as keyof SongFunctions
+    'execute' as keyof SongWalkerState
 }, ${
-    'loadPreset' as keyof SongFunctions
+    'loadPreset' as keyof SongWalkerState
 }}`
 export const EXPORT_JS = {
     // songTemplate: (sourceCode: string) => `(() => {return ${sourceCode}})()`,
@@ -31,10 +31,10 @@ export const EXPORT_JS = {
         const propStrings: string[] = Object.keys(params).map(
             (paramName) => `${paramName}:${params[paramName as keyof ParsedParams]}`)
         let paramString = Object.values(params).length > 0 ? `, {${propStrings.join(',')}}` : '';
-        return `${'execute' as keyof SongFunctions}(${VAR_TRACK_STATE}, '${commandString}'${paramString});`
+        return `${'execute' as keyof SongWalkerState}(${VAR_TRACK_STATE}, '${commandString}'${paramString});`
     },
     // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
-    wait: (durationStatement: string) => `if(await ${'waitAsync' as keyof SongFunctions}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`,
+    wait: (durationStatement: string) => `if(await ${'waitAsync' as keyof SongWalkerState}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`,
     trackDefinition: (trackDefinition: string) => {
         const match = (trackDefinition).match(LANGUAGE["track-definition"]);
         if (!match)

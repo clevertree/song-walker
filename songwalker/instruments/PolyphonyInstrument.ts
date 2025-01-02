@@ -1,4 +1,11 @@
-import {CommandWithParams, InstrumentInstance, Preset, TrackState} from "@songwalker/types";
+import {
+    CommandWithParams,
+    InstrumentInstance,
+    InstrumentLoader,
+    Preset,
+    SongWalkerState,
+    TrackState
+} from "@songwalker/types";
 import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
 
 
@@ -13,8 +20,9 @@ export interface PolyphonyInstrumentConfig {
 // }
 
 
-export default async function PolyphonyInstrument(track: TrackState, config: PolyphonyInstrumentConfig): Promise<InstrumentInstance> {
+const PolyphonyInstrument: InstrumentLoader<PolyphonyInstrumentConfig> = async (songState: SongWalkerState, config) => {
     // console.log('PolyphonyInstrument', config, config.title);
+    const {rootTrackState} = songState;
 
     let aliases: { [key: string]: InstrumentInstance } = {}
     const voices: InstrumentInstance[] = await Promise.all(config.voices.map(voice => {
@@ -25,7 +33,7 @@ export default async function PolyphonyInstrument(track: TrackState, config: Pol
         } = voice;
         // const voiceLoader = InstrumentLibrary.getInstrumentLoader(instrumentPath)
         return new Promise<InstrumentInstance>(async (resolve) => {
-            const voiceInstance = await voiceLoader(track, voiceConfig);
+            const voiceInstance = await voiceLoader(songState, voiceConfig);
             aliases[title] = voiceInstance;
             resolve(voiceInstance);
         })
@@ -44,7 +52,8 @@ export default async function PolyphonyInstrument(track: TrackState, config: Pol
     }
 
     // Set instance to current instrument if no instrument is currently loaded
-    if (track.instrument === defaultEmptyInstrument)
-        track.instrument = instrumentInstance
+    if (rootTrackState.instrument === defaultEmptyInstrument)
+        rootTrackState.instrument = instrumentInstance
     return instrumentInstance;
 }
+export default PolyphonyInstrument;

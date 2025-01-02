@@ -1,9 +1,8 @@
-import {CommandWithParams, InstrumentInstance, ParsedNote, TrackState} from "@songwalker/types";
+import {CommandWithParams, InstrumentLoader, ParsedNote, SongWalkerState, TrackState} from "@songwalker/types";
 import {parseNote} from "..";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
 import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
-import {OscillatorInstrumentConfig} from "@songwalker/instruments/OscillatorInstrument";
 
 const DEFAULT_FREQUENCY_ROOT = 220;
 
@@ -19,17 +18,17 @@ export interface AudioBufferInstrumentConfig extends EnvelopeConfig, KeyRangeCon
     frequencyRoot?: number | string
 }
 
-export default async function AudioBufferInstrument(track: TrackState, config: AudioBufferInstrumentConfig): Promise<InstrumentInstance> {
+const AudioBufferInstrument: InstrumentLoader<AudioBufferInstrumentConfig> = async (songState: SongWalkerState, config) => {
     // console.log('AudioBufferInstrument', config, title);
-    const {context: audioContext} = track.destination;
+    const {context: audioContext, rootTrackState} = songState;
     let createSourceNode = await configAudioBuffer();
     let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)
 
-    const syncTime = audioContext.currentTime - track.currentTime;
+    const syncTime = audioContext.currentTime - rootTrackState.currentTime;
     if (syncTime > 0) {
-        track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
-        console.error(`AudioBufferInstrument continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)
+        // TODO: shouldn't happen
+        console.error(`AudioBufferInstrument continued loading past buffer (${syncTime}).`)
     }
     const instrumentInstance = function parseCommand(track: TrackState, commandWithParams: CommandWithParams) {
         // TODO: check alias
@@ -47,12 +46,12 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
     }
 
     // Set instance to current instrument if no instrument is currently loaded
-    if (track.instrument === defaultEmptyInstrument)
-        track.instrument = instrumentInstance
+    if (rootTrackState.instrument === defaultEmptyInstrument)
+        rootTrackState.instrument = instrumentInstance
     return instrumentInstance;
 
 
-    function playAudioBuffer(noteInfo: ParsedNote, command: OscillatorInstrumentConfig & TrackState & CommandWithParams) {
+    function playAudioBuffer(noteInfo: ParsedNote, command: AudioBufferInstrumentConfig & TrackState & CommandWithParams) {
         let {
             beatsPerMinute,
             currentTime,
@@ -106,6 +105,7 @@ export default async function AudioBufferInstrument(track: TrackState, config: A
     }
 
 }
+export default AudioBufferInstrument;
 
 let cache = new Map<string, AudioBuffer>();
 

@@ -1,4 +1,4 @@
-import {CommandWithParams, InstrumentInstance, TrackState} from "@songwalker/types";
+import {CommandWithParams, InstrumentLoader, SongWalkerState, TrackState} from "@songwalker/types";
 import {parseNote} from "@songwalker";
 import WebAudioFontPlayer from "./src/player";
 import {WavePreset} from "@songwalker-presets/WebAudioFont/src/otypes";
@@ -15,19 +15,17 @@ export interface WebAudioFontInstrumentConfig extends WavePreset {
 // }
 
 
-export default async function WebAudioFontInstrument(track: TrackState, config: WebAudioFontInstrumentConfig): Promise<InstrumentInstance> {
+const WebAudioFontInstrument: InstrumentLoader<WebAudioFontInstrumentConfig> = async function (songState: SongWalkerState, config) {
     const {
-        destination: {
-            context: audioContext
-        }
-    } = track;
+        context: audioContext,
+        rootTrackState
+    } = songState;
     const player = new WebAudioFontPlayer();
     await player.adjustPreset(audioContext, config);
 
-    const syncTime = audioContext.currentTime - track.currentTime;
+    const syncTime = audioContext.currentTime - rootTrackState.currentTime;
     if (syncTime > 0) {
-        track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
-        console.error(`WebAudioFontInstrument continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)
+        console.error(`WebAudioFontInstrumentLoader continued loading past buffer (${syncTime}).`)
     }
 
     return function playWebAudioFontNote(track: TrackState, commandWithParams: CommandWithParams) {
@@ -50,3 +48,4 @@ export default async function WebAudioFontInstrument(track: TrackState, config: 
         player.queueWaveTable(audioContext, destination, config, currentTime, pitch, durationSeconds);
     }
 }
+export default WebAudioFontInstrument

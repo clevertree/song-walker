@@ -1,16 +1,16 @@
 // noinspection DuplicatedCode
 
 import WebAudioFontInstrument from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
-import {TrackState} from "@songwalker";
-import {getDefaultSongFunctions, getDefaultTrackState} from "@songwalker/helper/songHelper";
+import {getDefaultSongWalkerState} from "@songwalker/helper/songHelper";
 
 describe('WebAudioFontInstrument', () => {
 
     it('loads and plays', async () => {
         const context = new AudioContext();
-        const track: TrackState = getDefaultTrackState(context.destination)
+        const songState = getDefaultSongWalkerState(context);
+        const {rootTrackState: track} = songState;
         track.beatsPerMinute = 160;
-        track.instrument = await WebAudioFontInstrument(track, {
+        track.instrument = await WebAudioFontInstrument(songState, {
             zones: [
                 {
                     ahdsr: false,
@@ -29,7 +29,7 @@ describe('WebAudioFontInstrument', () => {
             ]
         })
 
-        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
+        const {wait, parseAndExecute: play} = songState;
 
         for (let i = 0; i < 4; i++) {
             play(track, 'C3^10@1/2')

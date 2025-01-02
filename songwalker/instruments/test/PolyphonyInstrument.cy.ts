@@ -1,24 +1,23 @@
 import PolyphonyInstrument from "@songwalker/instruments/PolyphonyInstrument";
-import {TrackState} from "@songwalker";
 import OscillatorInstrument, {OscillatorInstrumentConfig} from "@songwalker/instruments/OscillatorInstrument";
 import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBufferInstrument";
 import {Preset} from "@songwalker/types";
-import {getDefaultSongFunctions, getDefaultTrackState} from "@songwalker/helper/songHelper";
+import {getDefaultSongWalkerState} from "@songwalker/helper/songHelper";
 import {generateRandomBuffer} from "@songwalker/instruments/test/testHelper";
 
 describe('Polyphony', () => {
-    it('Polyphony plays C#4^10d1/2', async () => {
+    it('Polyphony plays C#4d1/2', async () => {
         const context = new AudioContext();
-        const track: TrackState = {
-            ...getDefaultTrackState(context.destination),
-        }
-        track.instrument = await PolyphonyInstrument(track, {
+
+        const songState = getDefaultSongWalkerState(context);
+        const {rootTrackState: track} = songState;
+        track.instrument = await PolyphonyInstrument(songState, {
             voices: [{
                 title: 'osc',
                 loader: OscillatorInstrument,
                 config: {
                     pan: -.5,
-                    mixer: 0.1,
+                    mixer: 0.8,
                     type: 'sawtooth'
                 }
             } as Preset<OscillatorInstrumentConfig>, {
@@ -32,12 +31,12 @@ describe('Polyphony', () => {
             } as Preset<AudioBufferInstrumentConfig>]
         })
 
-        const {wait, parseAndExecute: play} = getDefaultSongFunctions();
+        const {wait, parseAndExecute: play} = songState;
 
         for (let i = 0; i < 8; i++) {
-            play(track, 'C#4^10@1/8')
+            play(track, 'C#4@1/8')
             wait(track, 1 / 8)
-            play(track, 'D#4^10@1/8')
+            play(track, 'D#4@1/8')
             wait(track, 1 / 8)
         }
     })
