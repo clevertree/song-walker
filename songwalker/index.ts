@@ -1,17 +1,11 @@
-import {
-    parseNote,
-    parseCommandValues,
-    parseNumeric
-} from './helper/commandHelper'
-import {
-    InstrumentInstance,
-    TrackState,
-} from './types'
+import {parseCommandValues, parseNote, parseNumeric} from './helper/commandHelper'
+import {CommandWithParams, InstrumentInstance, TrackState} from './types'
 
 
 export type {
     InstrumentInstance,
-    TrackState
+    TrackState,
+    CommandWithParams
 }
 
 export {

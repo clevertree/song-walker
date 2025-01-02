@@ -2,9 +2,11 @@ import {InstrumentInstance, TrackState} from "@songwalker";
 import {CommandWithParams} from "@songwalker/types";
 
 export interface ReverbEffectConfig {
-    seconds?: number,
+    duration?: number,
     decay?: number,
-    reverse?: boolean
+    reverse?: boolean,
+    wet?: number
+    dry?: number
 }
 
 export default async function ReverbEffect(track: TrackState, config: ReverbEffectConfig): Promise<InstrumentInstance> {
@@ -14,11 +16,11 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
         }
     } = track;
     const {
-        seconds = 3,
+        duration = 1,
         decay = 2,
         reverse = false
     } = config;
-    const input = audioContext.createConvolver();
+    const input = new ConvolverNode(audioContext);
     const output = input;
 
     buildImpulse();
@@ -31,12 +33,20 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
 
     // this.effects.push(analyzerEffect)
     function connectReverbEffect(track: TrackState, commandWithParams: CommandWithParams) {
-        const {destination} = {...track, ...commandWithParams};
+        const {destination, wet = 0.5, dry = 1} = {...config, ...track, ...commandWithParams};
         const effectDestination = audioContext.createGain();
         output.connect(destination);
         // TODO: mixer value
-        effectDestination.connect(input);
-        effectDestination.connect(track.destination);
+
+        // Mixer
+        const wetGain = new GainNode(audioContext, {gain: wet});
+        const dryGain = new GainNode(audioContext, {gain: dry});
+        wetGain.connect(input)
+        dryGain.connect(destination)
+
+        // Connect to destination
+        effectDestination.connect(wetGain);
+        effectDestination.connect(dryGain);
         commandWithParams.destination = effectDestination;
     }
 
@@ -45,9 +55,10 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
     return connectReverbEffect;
 
     function buildImpulse() {
+        const durationSeconds = duration * (60 / track.beatsPerMinute)
         // based on https://github.com/clevertree/simple-reverb/
         let rate = audioContext.sampleRate
-            , length = rate * seconds
+            , length = rate * durationSeconds
             // , decay = this.decay
             , impulse = audioContext.createBuffer(2, length, rate)
             , impulseL = impulse.getChannelData(0)

@@ -10,7 +10,7 @@ import {
 import PresetLibrary from "../presets/PresetLibrary";
 import Errors from '../constants/errors'
 import {parseCommandValues} from "@songwalker";
-import {BUFFER_DURATION} from "@songwalker/constants/buffer";
+import {DEFAULT_BUFFER_DURATION} from "@songwalker/constants/buffer";
 
 interface SongFunctionsExtended extends SongFunctions {
     parseAndExecute: (track: TrackState, commandString: string, additionalParams?: CommandParams) => void
@@ -26,6 +26,7 @@ export async function playSong(song: SongCallback, context: AudioContext = new A
 
 export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLibrary) {
     let didAutoResume = false;
+    let bufferDuration = DEFAULT_BUFFER_DURATION;
     const functions: SongFunctionsExtended = {
         waitForTrackToFinish: async function (track) {
             const waitTime = track.currentTime - track.destination.context.currentTime;
@@ -48,7 +49,7 @@ export function getDefaultSongFunctions(presetLibrary: PresetBankBase = PresetLi
         },
         waitAsync: async function defaultWaitCallback(track, duration) {
             const trackEnded = functions.wait(track, duration);
-            const waitTime = track.currentTime - track.destination.context.currentTime - BUFFER_DURATION
+            const waitTime = track.currentTime - track.destination.context.currentTime - bufferDuration
             if (waitTime > 0) {
                 // console.log(`Waiting ${waitTime} seconds for ${track.destination.context.currentTime} => ${track.currentTime} - ${BUFFER_DURATION}`)
                 await new Promise(resolve => setTimeout(resolve, waitTime * 1000));

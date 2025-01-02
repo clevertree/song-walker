@@ -1,9 +1,10 @@
 import AudioBufferInstrument, {AudioBufferInstrumentConfig} from './AudioBufferInstrument'
 import OscillatorInstrument, {OscillatorInstrumentConfig} from './OscillatorInstrument'
 import PolyphonyInstrument, {PolyphonyInstrumentConfig} from './PolyphonyInstrument'
-import SimpleReverbEffect from './effects/convolver/ReverbEffect'
-import ReverbEffect, {ReverbEffectConfig} from './effects/convolver/ReverbEffect'
+import SimpleReverbEffect from '@songwalker/instruments/effects/reverb/ReverbEffect'
+import ReverbEffect, {ReverbEffectConfig} from '@songwalker/instruments/effects/reverb/ReverbEffect'
 import {Preset} from "@songwalker/types";
+import DelayEffect, {DelayEffectConfig} from "@songwalker/instruments/effects/delay/DelayEffect";
 
 export {
     AudioBufferInstrument,
@@ -37,4 +38,9 @@ const InstrumentPresetBank = async function* () {
         loader: ReverbEffect,
         config: {}
     } as Preset<ReverbEffectConfig>
+    yield {
+        title: 'Delay',
+        loader: DelayEffect,
+        config: {}
+    } as Preset<DelayEffectConfig>
 }

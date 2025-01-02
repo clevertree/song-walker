@@ -1,1 +1,1 @@
-export const BUFFER_DURATION = 1;
+export const DEFAULT_BUFFER_DURATION = 1;

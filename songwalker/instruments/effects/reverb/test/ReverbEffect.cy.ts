@@ -3,7 +3,7 @@
 import {TrackState} from "@songwalker";
 import {getDefaultSongFunctions, getDefaultTrackState} from "@songwalker/helper/songHelper";
 import {OscillatorInstrument} from "@songwalker/instruments";
-import ReverbEffect from "@songwalker/instruments/effects/convolver/ReverbEffect";
+import ReverbEffect from "@songwalker/instruments/effects/reverb/ReverbEffect";
 
 describe('Oscillator', () => {
     it('Oscillator with Reverb', async () => {
@@ -19,7 +19,7 @@ describe('Oscillator', () => {
         });
         track.effects = [await ReverbEffect(track, {
             reverse: false,
-            seconds: 10,
+            duration: 10,
             decay: 10
         })];
 
