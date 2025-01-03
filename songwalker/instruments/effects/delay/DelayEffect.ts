@@ -1,4 +1,5 @@
-import {CommandWithParams, InstrumentInstance, TrackState} from "@songwalker";
+import {TrackState} from "@songwalker";
+import {InstrumentLoader} from "@songwalker/types";
 
 export interface DelayEffectConfig {
     duration?: number,
@@ -10,19 +11,16 @@ export interface DelayEffectConfig {
     dry?: number
 }
 
-export default async function DelayEffect(track: TrackState, config: DelayEffectConfig): Promise<InstrumentInstance> {
+const DelayEffect: InstrumentLoader<DelayEffectConfig> = (songState, config) => {
     const {
-        destination: {
-            context: audioContext
-        }
-    } = track;
+        context: audioContext
+    } = songState;
 
-    // this.effects.push(analyzerEffect)
-    function connectDelayEffect(track: TrackState, commandWithParams: CommandWithParams) {
+    return function connectDelayEffect(track: TrackState) {
         const {
             destination,
             beatsPerMinute
-        } = {...track, ...commandWithParams};
+        } = track;
         const {
             feedback = 0.5,
             wet = 0.5,
@@ -50,13 +48,14 @@ export default async function DelayEffect(track: TrackState, config: DelayEffect
         // Connect to destination
         effectDestination.connect(wetGain);
         effectDestination.connect(dryGain);
-        commandWithParams.destination = effectDestination;
+
+        // Return new track state object
+        return {
+            ...track,
+            destination: effectDestination
+        }
     }
-
-    // Don't automatically append effect to track state
-    // track.effects.push(connectDelayEffect)
-    return connectDelayEffect;
-
 }
 
+export default DelayEffect
 // Effect may encapsulate current instrument to modify commands in real-time

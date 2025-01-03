@@ -1,10 +1,10 @@
-import {CommandParams, CommandParamsAliases, ParsedCommand, ParsedNote, ParsedParams} from "@songwalker/types";
-import {LANGUAGE, PARAM_ALIAS} from "@songwalker/compiler/compiler";
+import {OverrideAliases, ParsedNote} from "@songwalker/types";
+import {LANGUAGE} from "@songwalker/compiler/compiler";
 
 const DEFAULT_FREQUENCY_A4 = 440; // 432;
 
 // const REGEX_PARSE_COMMAND = LANGUAGE["command-statement"]; // /^([^@^;\s]+)((?:[@^][^@^;\s]+)*)(?=;)?$/
-const REGEX_PARSE_COMMAND_PARAMS = /([@^])([^@^\s]+)/g
+const REGEX_PARSE_COMMAND_PARAMS = /([@^])([^@^=;\s]+)/g
 const REGEX_PARSE_FRACTION = /^(\d*)\/(\d+)?$/
 const REGEX_NOTE_COMMAND = /^([A-G][#qb]{0,2})(\d*)$/
 
@@ -20,48 +20,29 @@ export function parseNumeric(numericString: string) {
     }
 }
 
-export function parseCommand(fullCommandString: string) {
-    const match = fullCommandString.match(LANGUAGE["command-statement"]);
-    if (!match)
-        throw new Error("Invalid command string: " + fullCommandString);
-    const [, command, paramString] = match;
-    return [
-        command,
-        paramString
-    ];
+export function formatCommandOverrides(overrides: string, aliases: OverrideAliases) {
+    let formattedProperties = ''
+    const matches = overrides.matchAll(REGEX_PARSE_COMMAND_PARAMS);
+    for (let [, key, value] of matches) {
+        const propertyName = aliases[key as keyof OverrideAliases];
+        if (!propertyName)
+            throw new Error("Invalid override: " + key);
+        if (value[0] === '/')
+            value = '1' + value;
+        formattedProperties += (formattedProperties ? ', ' : '') + `${propertyName}:${value}`
+    }
+    return `{${formattedProperties}}`
 }
 
-export function parseCommandValues(fullCommandString: string): ParsedCommand {
-    const params: CommandParams = {}
-    const [command, paramString] = parseCommand(fullCommandString);
-    const parsedParams = parseCommandParams(paramString);
-    const paramNames = Object.keys(parsedParams) as (keyof ParsedParams)[]
-    for (let paramName of paramNames) {
-        const paramValue = parsedParams[paramName]
-        if (paramValue) {
-            switch (paramName) {
-                case 'duration':
-                case 'velocity':
-                    params[paramName] = parseNumeric(paramValue);
-                    break;
-            }
-        }
-    }
-    return {
-        command,
-        params
-    };
-}
-
-export function parseCommandParams(paramString: string): ParsedParams {
-    const parsedParams: ParsedParams = {};
-    const paramMatches = [...paramString.matchAll(REGEX_PARSE_COMMAND_PARAMS)];
-    for (const paramMatch of paramMatches) {
-        let [, paramSymbol, paramValue] = paramMatch;
-        parsedParams[PARAM_ALIAS[paramSymbol as keyof CommandParamsAliases]] = formatDuration(paramValue)
-    }
-    return parsedParams;
-}
+// export function parseCommandParams(paramString: string): ParsedParams {
+//     const parsedParams: ParsedParams = {};
+//     const paramMatches = [...paramString.matchAll(REGEX_PARSE_COMMAND_PARAMS)];
+//     for (const paramMatch of paramMatches) {
+//         let [, paramSymbol, paramValue] = paramMatch;
+//         parsedParams[OVERRIDE_ALIAS[paramSymbol as keyof OverrideAliases]] = formatDuration(paramValue)
+//     }
+//     return parsedParams;
+// }
 
 export function parseNote(noteCommand: string, baseFrequency: number = DEFAULT_FREQUENCY_A4): ParsedNote {
     const match = noteCommand.match(REGEX_NOTE_COMMAND);

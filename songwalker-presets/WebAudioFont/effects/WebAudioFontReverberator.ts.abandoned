@@ -36,7 +36,7 @@ export default async function WebAudioFontReverberatorEffect(track: TrackState, 
     // this.effects.push(analyzerEffect)
     return reverbEffect;
 
-    return function playWebAudioFontNote(command: CommandWithParams) {
+    return function playWebAudioFontNote(command: commandWithOverrides) {
         const {
             destination,
             currentTime,

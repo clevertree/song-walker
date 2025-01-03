@@ -1,5 +1,5 @@
-import {InstrumentInstance, TrackState} from "@songwalker";
-import {CommandWithParams} from "@songwalker/types";
+import {TrackState} from "@songwalker";
+import {InstrumentLoader} from "@songwalker/types";
 
 export interface ReverbEffectConfig {
     duration?: number,
@@ -9,12 +9,10 @@ export interface ReverbEffectConfig {
     dry?: number
 }
 
-export default async function ReverbEffect(track: TrackState, config: ReverbEffectConfig): Promise<InstrumentInstance> {
+const ReverbEffect: InstrumentLoader<ReverbEffectConfig> = (songState, config) => {
     const {
-        destination: {
-            context: audioContext
-        }
-    } = track;
+        context: audioContext
+    } = songState;
     const {
         duration = 1,
         decay = 2,
@@ -25,15 +23,14 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
 
     buildImpulse();
 
-    const syncTime = audioContext.currentTime - track.currentTime;
+    const syncTime = audioContext.currentTime - songState.rootTrackState.currentTime;
     if (syncTime > 0) {
-        track.currentTime = audioContext.currentTime // Move track time forward to compensate for loading time
-        console.error(`ReverbEffect continued loading past buffer (${syncTime}). Syncing currentTime to `, track.currentTime)
+        console.error(`ReverbEffect continued loading past buffer (${syncTime}).`)
     }
 
-    // this.effects.push(analyzerEffect)
-    function connectReverbEffect(track: TrackState, commandWithParams: CommandWithParams) {
-        const {destination, wet = 0.5, dry = 1} = {...config, ...track, ...commandWithParams};
+    return function connectReverbEffect(track: TrackState) {
+        const {destination} = track;
+        const {wet = 0.5, dry = 1} = config;
         const effectDestination = audioContext.createGain();
         output.connect(destination);
         // TODO: mixer value
@@ -47,15 +44,16 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
         // Connect to destination
         effectDestination.connect(wetGain);
         effectDestination.connect(dryGain);
-        commandWithParams.destination = effectDestination;
+
+        // Return new track state object
+        return {
+            ...track,
+            destination: effectDestination
+        }
     }
 
-    // Don't automatically append effect to track state
-    // track.effects.push(connectReverbEffect)
-    return connectReverbEffect;
-
     function buildImpulse() {
-        const durationSeconds = duration * (60 / track.beatsPerMinute)
+        const durationSeconds = duration * (60 / songState.rootTrackState.beatsPerMinute)
         // based on https://github.com/clevertree/simple-reverb/
         let rate = audioContext.sampleRate
             , length = rate * durationSeconds
@@ -75,4 +73,4 @@ export default async function ReverbEffect(track: TrackState, config: ReverbEffe
     }
 }
 
-// Effect may encapsulate current instrument to modify commands in real-time
+export default ReverbEffect;

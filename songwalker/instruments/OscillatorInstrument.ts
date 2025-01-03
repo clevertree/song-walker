@@ -1,8 +1,7 @@
-import {parseNote, TrackState} from "@songwalker";
-import {CommandWithParams, InstrumentLoader, ParsedNote, SongWalkerState} from "@songwalker/types";
+import {TrackState} from "@songwalker";
+import {InstrumentLoader, ParsedNote, SongWalkerState} from "@songwalker/types";
 import {configEnvelope, EnvelopeConfig, updateEnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
-import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
@@ -17,48 +16,47 @@ export interface OscillatorInstrumentConfig extends EnvelopeConfig, KeyRangeConf
 
 const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (songState: SongWalkerState, config) => {
     // console.log('OscillatorInstrument', config, config.type);
-    const {context: audioContext, rootTrackState} = songState;
+    const {
+        context: audioContext,
+        parseNote
+    } = songState;
     let createOscillator = configOscillator();
     let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)
 
-    const instrumentInstance = function parseCommand(track: TrackState, commandWithParams: CommandWithParams) {
-        switch (commandWithParams.commandString) {
+    return function (track: TrackState, command: string) {
+        switch (command) {
             case 'play':
             case 'stop':
                 throw 'todo';
             case 'attack':
             case 'release':
                 // TODO: move to envelope config file?
-                return updateEnvelopeConfig(config, track, commandWithParams)
+                return updateEnvelopeConfig(config, track, command)
             // case 'keyRangeHigh':
             // case 'keyRangeLow':
             //     return updateKeyRangeConfig(config, configKey as keyof KeyRangeConfig, commandState)
             case 'detune':
-                return updateConfig(commandWithParams)
+                return updateConfig(track, command)
         }
-        const noteInfo = parseNote(commandWithParams.commandString);
+        const noteInfo = parseNote(command);
         if (!noteInfo)
-            throw new Error("Unrecognized note: " + commandWithParams);
+            throw new Error("Unrecognized note: " + command);
         if (filterNote(noteInfo))
-            return
-        return playOscillator(noteInfo, {...config, ...track, ...commandWithParams})
-    }
-    // Set instance to current instrument if no instrument is currently loaded
-    if (rootTrackState.instrument === defaultEmptyInstrument)
-        rootTrackState.instrument = instrumentInstance
-    return instrumentInstance;
+            return track
+        return playOscillator(noteInfo, track)
+    };
 
-    function playOscillator(noteInfo: ParsedNote, command: OscillatorInstrumentConfig & TrackState & CommandWithParams) {
+    function playOscillator(noteInfo: ParsedNote, track: TrackState) {
         let {
             currentTime,
             duration = 0,
             beatsPerMinute,
             pan = 0
-        } = command;
+        } = {...config, ...track};
 
         // Envelope
-        const gainNode = createGain(command);
+        const gainNode = createGain(track);
         let destination = gainNode;
 
         // Panning
@@ -79,7 +77,7 @@ const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (song
         }
         oscillator.stop(endTime);
         // TODO: add active notes to track state?
-        return oscillator
+        return track
     }
 
     function configOscillator() {
@@ -109,12 +107,13 @@ const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (song
         }
     }
 
-    function updateConfig(commandWithParams: CommandWithParams) {
-        switch (commandWithParams.commandString) {
+    function updateConfig(track: TrackState, command: string) {
+        switch (command) {
             case "detune":
-                config.detune = commandWithParams.velocity
+                config.detune = track.velocity
+                return track;
         }
-        throw new Error("Unknown config key: " + commandWithParams.commandString);
+        throw new Error("Unknown config key: " + command);
     }
 
 }

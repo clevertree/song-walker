@@ -1,5 +1,5 @@
 import {
-    CommandWithParams,
+    CommandWithOverrides,
     InstrumentInstance,
     InstrumentLoader,
     Preset,
@@ -40,7 +40,7 @@ const PolyphonyInstrument: InstrumentLoader<PolyphonyInstrumentConfig> = async (
     }));
 
 
-    const instrumentInstance = function playPolyphonyNote(track: TrackState, command: CommandWithParams) {
+    const instrumentInstance = function playPolyphonyNote(track: TrackState, command: CommandWithOverrides) {
         if (aliases[command.commandString]) {
             // if alias is found, execute directly
             return aliases[command.commandString](track, command);

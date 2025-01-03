@@ -1,5 +1,4 @@
 import {TrackState} from "@songwalker";
-import {CommandWithParams} from "@songwalker/types";
 
 export interface EnvelopeConfig {
     mixer?: number,
@@ -10,9 +9,9 @@ export interface EnvelopeConfig {
     release?: number
 }
 
-export function updateEnvelopeConfig(config: EnvelopeConfig, track: TrackState, commandWithParams: CommandWithParams) {
-    const {duration = 0} = commandWithParams;
-    switch (commandWithParams.commandString) {
+export function updateEnvelopeConfig(config: EnvelopeConfig, track: TrackState, command: string) {
+    const {duration = 0} = track;
+    switch (command) {
         case 'attack':
             config.attack = duration * (60 / track.beatsPerMinute)
             return;
@@ -20,15 +19,18 @@ export function updateEnvelopeConfig(config: EnvelopeConfig, track: TrackState, 
             config.release = duration * (60 / track.beatsPerMinute)
             return;
     }
-    throw new Error("Unknown config key: " + commandWithParams.commandString);
+    throw new Error("Unknown config key: " + command);
 }
 
-export function configEnvelope(context: BaseAudioContext, config: EnvelopeConfig): (trackAndParams: TrackState & CommandWithParams) => AudioNode {
+export function configEnvelope(context: BaseAudioContext, config: EnvelopeConfig): (track: TrackState) => AudioNode {
     // Attack is the time taken for initial run-up of level from nil to peak, beginning when the key is pressed.
     // if (config.mixer || config.attack) {
-    return (trackAndParams) => {
+    return (track: TrackState) => {
         let {attack = 0, mixer = 1, release = 0} = config;
-        const {currentTime, velocity = 128, velocityDivisor = 128, destination} = trackAndParams
+        const {
+            currentTime, velocity = 128, velocityDivisor = 128,
+            destination = context.destination
+        } = track
         let gainNode = context.createGain();
         gainNode.connect(destination);
         const amplitude = mixer * (velocity / velocityDivisor);

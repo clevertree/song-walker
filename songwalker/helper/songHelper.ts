@@ -1,6 +1,4 @@
 import {
-    CommandParams,
-    CommandWithParams,
     InstrumentInstance,
     PresetBankBase,
     SongCallback,
@@ -10,7 +8,7 @@ import {
 } from "@songwalker/types";
 import PresetLibrary from "../presets/PresetLibrary";
 import Errors from '../constants/errors'
-import {parseCommandValues} from "@songwalker";
+import {parseNote} from "@songwalker";
 import {DEFAULT_BUFFER_DURATION} from "@songwalker/constants/buffer";
 
 
@@ -32,8 +30,18 @@ export async function renderSong(song: SongCallback, context: OfflineAudioContex
 }
 
 export function getDefaultSongWalkerState(context: BaseAudioContext, overrides: TrackStateOverrides = {}, presetLibrary: PresetBankBase = PresetLibrary) {
-    let didAutoResume = false;
     let bufferDuration = DEFAULT_BUFFER_DURATION;
+    let autoResumeCallback = () => {
+    };
+    if (context instanceof AudioContext) {
+        autoResumeCallback = () => {
+            if (context.state === 'suspended') {
+                autoResumeCallback = () => {
+                };
+                context.resume().then(() => console.info("AudioContext was resumed", context.currentTime));
+            }
+        }
+    }
     const rootTrackState: TrackState = getDefaultTrackState(context.destination, overrides);
     const songState: SongWalkerState = {
         context,
@@ -62,39 +70,49 @@ export function getDefaultSongWalkerState(context: BaseAudioContext, overrides: 
             }
             return trackEnded;
         },
-        loadPreset: async function (songState: SongWalkerState, presetID, config = {}) {
+        loadPreset: async function (presetID, config = {}) {
             const preset = await presetLibrary.findPreset(presetID);
             if (preset) {
                 return preset.loader(songState, {...preset.config, ...config});
             }
             throw new Error("Preset id not found: " + presetID);
         },
-        execute: function (track: TrackState, commandString: string, params: CommandParams = {}) {
+        execute: function (track, commandString, overrides = {}) {
             let {
-                destination: {
-                    context: audioContext
-                },
-                currentTime
+                currentTime,
+                instrument = () => {
+                    throw new Error("Instrument not loaded");
+                }
             } = track;
-            if (currentTime < audioContext.currentTime) {
+            if (currentTime < context.currentTime) {
                 console.error("skipping note that occurs in the past: ",
-                    commandString, 'currentTime:', currentTime, '<', 'audioContext.currentTime', audioContext.currentTime)
+                    commandString, 'currentTime:', currentTime, '<', 'audioContext.currentTime', context.currentTime)
                 return
             }
-            const command: CommandWithParams = {
-                commandString: commandString,
-                ...params
+
+            // Create new object for instrument execution
+            let instrumentTrack: TrackState = {...track, ...overrides};
+
+            if (track.effects) {
+                for (const effect of track.effects) {
+                    const newTrackObject = effect(track, commandString)
+                    if (!newTrackObject) {
+                        // If nothing was returned, note is skipped.
+                        console.warn(`Effect returned ${newTrackObject}, so note was skipped.`)
+                        return;
+                    }
+                    // Modifies TrackState.destination to create processing effect (i.e. reverb)
+                    // Effect may encapsulate current instrument to modify commands in real-time
+                    instrumentTrack = newTrackObject;
+                }
             }
-            // const command: string, params: CommandParams = {command, ...track, ...props};
-            // Modifies TrackState.destination to create processing effect (i.e. reverb)
-            // To modify or add notes, effects have to modify the CommandState
-            track.effects.forEach(effect => effect(track, command));
             // TODO: check for track end time?
-            track.instrument(track, command);
-            if (!didAutoResume && audioContext.state === 'suspended' && audioContext instanceof AudioContext) {
-                audioContext.resume().then(() => console.info("AudioContext was resumed", audioContext.currentTime));
-                didAutoResume = true;
-            }
+            instrument(instrumentTrack, commandString);
+            autoResumeCallback();
+        },
+        executeTrack: function (track, trackCallback, overrides = {}, ...args) {
+            const newTrackState: TrackState = {...track, ...overrides, position: 0};
+            trackCallback(newTrackState, ...args)
         },
         // executeCallback: function (track: TrackState, callback, ...args) {
         //     const subTrack = {
@@ -103,10 +121,7 @@ export function getDefaultSongWalkerState(context: BaseAudioContext, overrides: 
         //     }
         //     callback(subTrack, ...args);
         // },
-        parseAndExecute: function (track: TrackState, commandString: string, additionalParams: CommandParams = {}) {
-            const {command, params} = parseCommandValues(commandString);
-            songState.execute(track, command, {...params, ...additionalParams});
-        }
+        parseNote,
     };
     return songState;
 }

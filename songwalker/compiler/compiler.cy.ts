@@ -1,26 +1,26 @@
 import {compileSongToCallback, compileSongToJavascript, EXPORT_JS, sourceToTokens} from './compiler'
-import {playSong} from "../helper/songHelper"
+import {playSong} from "@songwalker/helper/songHelper";
 
 describe('compiler', () => {
     const emptyTemplate = (s: string) => s;
     it('play statement - C5@3/8^.2;', () => {
-        const SONG_SOURCE = `C5@3/8^.2;`
+        const SONG_SOURCE = `C5@3/8^.2`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [["command-statement", "C5@3/8^.2;"]]
+            [["command-statement", "C5@3/8^.2"]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(EXPORT_JS.command('C5', {duration: '3/8', velocity: '.2'}))
+        expect(javascriptContent).to.eq(EXPORT_JS.commandStatement('C5@3/8^.2'))
     })
 
     it('wait statement - 1/6; /5', () => {
         const SONG_SOURCE = `1/6; /5`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [["wait-statement", "1/6;"], " ", ["wait-statement", "/5"]]
+            [["wait-statement", "1/6"], "; ", ["wait-statement", "/5"]]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(EXPORT_JS.wait(`1/6`) + ' ' + EXPORT_JS.wait(`1/5`))
+        expect(javascriptContent).to.eq(EXPORT_JS.wait(`1/6`) + '; ' + EXPORT_JS.wait(`1/5`))
     })
 
     it('set track variable', () => {
@@ -59,7 +59,7 @@ describe('compiler', () => {
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
         expect(javascriptContent).to.eq(
             EXPORT_JS.trackDefinition("track myTrack(myTrackArg) {")
-            + ` ${EXPORT_JS.command('C4', {velocity: '2'})} ${EXPORT_JS.command('D4', {duration: '2'})} }`)
+            + ` ${EXPORT_JS.commandStatement('C4^2')} ${EXPORT_JS.commandStatement('D4@2')} }`)
 
     })
 

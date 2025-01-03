@@ -1,13 +1,5 @@
-import {
-    CommandParamsAliases,
-    ParsedParams,
-    SongCallback,
-    SongWalkerState,
-    TokenItem,
-    TokenList,
-    TrackState
-} from "@songwalker/types";
-import {parseCommand, parseCommandParams, parseWait} from "@songwalker/helper/commandHelper";
+import {OverrideAliases, SongCallback, SongWalkerState, TokenItem, TokenList} from "@songwalker/types";
+import {formatCommandOverrides, parseWait} from "@songwalker/helper/commandHelper";
 import Prism, {Token} from "prismjs";
 
 const ROOT_TRACK = 'rootTrack';
@@ -20,18 +12,24 @@ export const F_EXPORT = `{${
 }, ${
     'execute' as keyof SongWalkerState
 }, ${
+    'executeTrack' as keyof SongWalkerState
+}, ${
     'loadPreset' as keyof SongWalkerState
-}}`
+}, ${
+    'rootTrackState' as keyof SongWalkerState
+}:track}`
 export const EXPORT_JS = {
     // songTemplate: (sourceCode: string) => `(() => {return ${sourceCode}})()`,
     songTemplate: (sourceCode: string) =>
-        `(async function ${ROOT_TRACK}(track, ${F_EXPORT}) {\n${sourceCode}})`,
+        `(async function ${ROOT_TRACK}(${F_EXPORT}) {\n${sourceCode}})`,
 
-    command: (commandString: string, params: ParsedParams) => {
-        const propStrings: string[] = Object.keys(params).map(
-            (paramName) => `${paramName}:${params[paramName as keyof ParsedParams]}`)
-        let paramString = Object.values(params).length > 0 ? `, {${propStrings.join(',')}}` : '';
-        return `${'execute' as keyof SongWalkerState}(${VAR_TRACK_STATE}, '${commandString}'${paramString});`
+    commandStatement: (commandString: string) => {
+        const match = (commandString).match(LANGUAGE["command-statement"]);
+        if (!match)
+            throw new Error("Invalid command statement: " + commandString)
+        const [, command, overrideString] = match;
+        const exportOverrides = overrideString ? ', ' + formatCommandOverrides(overrideString, OVERRIDE_ALIAS) : ''
+        return `${'execute' as keyof SongWalkerState}(${VAR_TRACK_STATE}, "${command}"${exportOverrides});`
     },
     // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
     wait: (durationStatement: string) => `if(await ${'waitAsync' as keyof SongWalkerState}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`,
@@ -40,35 +38,45 @@ export const EXPORT_JS = {
         if (!match)
             throw new Error("Invalid track definition: " + trackDefinition)
         const [, trackName, trackArgs] = match;
-        return `async function ${trackName}(track${trackArgs ? ', ' + trackArgs : ''}){`
-            + `\n\t${VAR_TRACK_STATE} = {...${VAR_TRACK_STATE}, ${
-                // 'parentTrack' as keyof TrackState}:${VAR_TRACK_STATE}, ${
-                'position' as keyof TrackState
-            }:0}`
+        return `async function ${trackName}(${VAR_TRACK_STATE}${trackArgs ? ', ' + trackArgs : ''}){`
     },
-    function: (functionStatement: string) => {
+    trackStatement: (trackStatement: string) => {
+        const match = (trackStatement).match(LANGUAGE["track-statement"]);
+        if (!match)
+            throw new Error("Invalid track statement: " + trackStatement)
+        const [, trackName, overrideString, paramString] = match;
+        let exportOverrides = overrideString ? ', ' + formatCommandOverrides(overrideString, TRACK_OVERRIDE_ALIAS) : ''
+        const functionCall = trackName + `.bind(${VAR_TRACK_STATE}${paramString ? ', ' + paramString : ''})`
+        return `${'executeTrack' as keyof SongWalkerState}(${VAR_TRACK_STATE}, ${functionCall}${exportOverrides});`
+    },
+    functionStatement: (functionStatement: string) => {
         const functionMatch = (functionStatement).match(LANGUAGE["function-statement"]);
         if (!functionMatch)
             throw new Error("Invalid function: " + functionStatement)
         const [, fsVarStatement = "", fsAwaitStatement = "", fsMethodName, fsParamString] = functionMatch;
-        return `${fsVarStatement}${fsAwaitStatement}${fsMethodName}(${VAR_TRACK_STATE}${fsParamString ? ', ' + fsParamString : ''});`
+        return `${fsVarStatement}${fsAwaitStatement}${fsMethodName}(${fsParamString});`
     }
 }
-export const PARAM_ALIAS: CommandParamsAliases = {
+export const OVERRIDE_ALIAS: OverrideAliases = {
     '@': 'duration',
+    '^': 'velocity'
+};
+export const TRACK_OVERRIDE_ALIAS: OverrideAliases = {
+    '@': 'trackDuration',
     '^': 'velocity'
 };
 
 export const LANGUAGE = {
     'comment': /(\/\/).*$/m,
     'track-definition': /(?=async\s+)?\btrack\b\s*([$\w][$\w]+)\(((?:[^()]|\([^()]*\))*)\)\s*{/,
+    'track-statement': /\|([a-zA-Z][^@^=;().\s]*)((?:[@^][^@^=;()\s]+)*)(?:\(((?:[^()]|\([^()]*\))*)\))?;?/,
     'function-definition': /(?=async\s+)?\bfunction\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{/,
-    'function-statement': /\b((?:(?:const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?(await\s+)?\b([$\w][$\w.]+)\(((?:[^()]|\([^()]*\))*)\);?/,
     // 'function-statement': /\b(function|track)[ \t]+([\w.]+)[ \t]*\(([^)]*)\)\s*{/,
     // 'function-statement': /\b(((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?\w+\([^)]*\)[ \t]*;?/,
+    'function-statement': /\b((?:(?:const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?(await\s+)?\b([$\w][$\w.]+)\(((?:[^()]|\([^()]*\))*)\);?/,
     'variable-statement': /((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*([\w'.\/-]|\{[^{}]*}|\[[^[]*])+[ \t]*;?/,
-    'command-statement': /\b([a-zA-Z][^@^=;.\s]*)((?:[@^][^@^=;\s]+)*);?(?!\s*[.=])/,
-    'wait-statement': /(\d*[\/.]?\d+);?/,
+    'command-statement': /\b([a-zA-Z][^@^=;().\s]*)((?:[@^][^@^=;()\s]+)*);?(?!\s*[.=])/,
+    'wait-statement': /(\d*[\/.]?\d+)/
     // 'track-start': PATTERN_TRACK_START,
     // 'import': {
     //     pattern: /import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/,
@@ -164,19 +172,21 @@ function formatTokenContent(token: TokenItem | string, currentTokenID = 0): stri
         case 'comment':
             return token[1] as string;
         case 'function-statement':
-            return EXPORT_JS.function(token[1] as string);
+            return EXPORT_JS.functionStatement(token[1] as string);
         case 'variable-statement':
         case 'function-definition':
             return token[1] as string;
+        case 'track-statement':
+            return EXPORT_JS.trackStatement(token[1] as string);
         case 'track-definition':
             return EXPORT_JS.trackDefinition(token[1] as string);
         // case 'param-duration':
         //     const durationValues = tokensToKeys(token[1] as TokenList);
         //     return formatNumericString(durationValues['param-numeric'], durationValues['param-factor']);
         case 'command-statement':
-            const [commandString, paramString] = parseCommand(token[1] as string);
-            const parsedParams = parseCommandParams(paramString);
-            return EXPORT_JS.command(commandString, parsedParams);
+            // const [commandString, paramString] = parseCommand(token[1] as string);
+            // const parsedParams = parseCommandParams(paramString);
+            return EXPORT_JS.commandStatement(token[1] as string);
         case 'wait-statement':
             return EXPORT_JS.wait(parseWait(token[1] as string));
         default:
