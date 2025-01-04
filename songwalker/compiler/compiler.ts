@@ -45,9 +45,9 @@ export const EXPORT_JS = {
         if (!match)
             throw new Error("Invalid track statement: " + trackStatement)
         const [, trackName, overrideString, paramString] = match;
-        let exportOverrides = overrideString ? ', ' + formatCommandOverrides(overrideString, TRACK_OVERRIDE_ALIAS) : ''
-        const functionCall = trackName + `.bind(${VAR_TRACK_STATE}${paramString ? ', ' + paramString : ''})`
-        return `${'executeTrack' as keyof SongWalkerState}(${VAR_TRACK_STATE}, ${functionCall}${exportOverrides});`
+        let exportOverrides = ', ' + formatCommandOverrides(overrideString, TRACK_OVERRIDE_ALIAS)
+        // const functionCall = trackName + `.bind(${VAR_TRACK_STATE}${paramString ? ', ' + paramString : ''})`
+        return `${'executeTrack' as keyof SongWalkerState}(${VAR_TRACK_STATE}, ${trackName}${exportOverrides}${paramString ? ', ' + paramString : ''});`
     },
     functionStatement: (functionStatement: string) => {
         const functionMatch = (functionStatement).match(LANGUAGE["function-statement"]);

@@ -19,7 +19,6 @@ const WebAudioFontInstrument: InstrumentLoader<WebAudioFontInstrumentConfig> = a
     const {
         context: audioContext,
         rootTrackState,
-        parseCommand
     } = songState;
     const player = new WebAudioFontPlayer();
     await player.adjustPreset(audioContext, config);
@@ -29,15 +28,13 @@ const WebAudioFontInstrument: InstrumentLoader<WebAudioFontInstrumentConfig> = a
         console.error(`WebAudioFontInstrumentLoader continued loading past buffer (${syncTime}).`)
     }
 
-    return function playWebAudioFontNote(track: TrackState, command: string) {
-        const parsedCommand = parseCommand(command);
+    return function playWebAudioFontNote(track: TrackState, commandString: string) {
         const {
-            commandString,
             destination = audioContext.destination,
             currentTime,
             duration = 0,
             beatsPerMinute
-        } = {...track, ...parsedCommand};
+        } = track;
         let pitch: number;
         if (typeof DrumToMIDI[commandString] !== 'undefined') {
             pitch = DrumToMIDI[commandString]

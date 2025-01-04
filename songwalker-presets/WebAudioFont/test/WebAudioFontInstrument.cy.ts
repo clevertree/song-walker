@@ -7,6 +7,7 @@ describe('WebAudioFontInstrument', () => {
 
     it('loads and plays', async () => {
         const context = new AudioContext();
+        await context.suspend()
         const songState = getDefaultSongWalkerState(context);
         const {rootTrackState: track} = songState;
         track.beatsPerMinute = 160;
@@ -29,13 +30,15 @@ describe('WebAudioFontInstrument', () => {
             ]
         })
 
-        const {wait, parseAndExecute: play} = songState;
+        const {wait, execute} = songState;
 
         for (let i = 0; i < 4; i++) {
-            play(track, 'C3^10@1/2')
+            execute(track, 'C3^10', {duration: 1 / 2})
             wait(track, 1 / 2)
-            play(track, 'D#3^10@1/4')
-            wait(track, 1 / 2)
+            execute(track, 'D#3^10', {duration: 1 / 4})
+            wait(track, 1 / 4)
+            execute(track, 'E#3^10', {duration: 1 / 4})
+            wait(track, 1 / 4)
         }
     })
 })

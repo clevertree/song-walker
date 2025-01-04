@@ -1,4 +1,4 @@
-import {CommandWithOverrides, InstrumentLoader, ParsedNote, SongWalkerState, TrackState} from "@songwalker/types";
+import {InstrumentLoader, ParsedNote, SongWalkerState, TrackState} from "@songwalker/types";
 import {parseNote} from "..";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
@@ -19,7 +19,7 @@ export interface AudioBufferInstrumentConfig extends EnvelopeConfig, KeyRangeCon
 
 const AudioBufferInstrument: InstrumentLoader<AudioBufferInstrumentConfig> = async (songState: SongWalkerState, config) => {
     // console.log('AudioBufferInstrument', config, title);
-    const {context: audioContext, rootTrackState, parseCommand} = songState;
+    const {context: audioContext, rootTrackState} = songState;
     let createSourceNode = await configAudioBuffer();
     let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)
@@ -29,32 +29,37 @@ const AudioBufferInstrument: InstrumentLoader<AudioBufferInstrumentConfig> = asy
         // TODO: shouldn't happen
         console.error(`AudioBufferInstrument continued loading past buffer (${syncTime}).`)
     }
-    return function (track: TrackState, command: string) {
-        const parsedCommand = parseCommand(command);
+
+    function playAudioBuffer(track: TrackState, command: string) {
         // TODO: check alias
-        switch (parsedCommand.commandString) {
+        switch (command) {
             case 'play':
             case 'stop':
                 throw 'todo';
         }
-        const noteInfo = parseNote(parsedCommand.commandString);
+        const noteInfo = parseNote(command);
         if (!noteInfo)
             throw new Error("Unrecognized note: " + command);
         if (filterNote(noteInfo))
             return track
-        return playAudioBuffer(noteInfo, track, parsedCommand)
+        return playAudioBufferNote(noteInfo, track)
     }
 
-    function playAudioBuffer(noteInfo: ParsedNote, track: TrackState, command: CommandWithOverrides) {
+    // Set this instrument if no root track instrument was set
+    if (!songState.rootTrackState.instrument)
+        songState.rootTrackState.instrument = playAudioBuffer;
+    return playAudioBuffer
+
+    function playAudioBufferNote(noteInfo: ParsedNote, track: TrackState) {
         let {
             beatsPerMinute,
             currentTime,
             duration = 0,
             pan = 0
-        } = {...config, ...track, ...command};
+        } = {...config, ...track};
 
         // Envelope
-        const gainNode = createGain(track, command);
+        const gainNode = createGain(track);
         let destination = gainNode;
 
         // Panning

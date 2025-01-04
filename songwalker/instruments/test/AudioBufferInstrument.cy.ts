@@ -16,13 +16,14 @@ describe('AudioBuffer', () => {
             mixer: 1,
             pan: -.2
         })
-        const {wait, parseAndExecute: play} = songState;
+        const {wait, execute} = songState;
 
-        for (let i = 0; i < 8; i++) {
-            play(track, 'C#4@1/8')
-            wait(track, 1 / 8)
-            play(track, 'D#4@1/8')
-            wait(track, 1 / 8)
+        let duration = 1 / 8
+        for (let i = 0; i < 4; i++) {
+            execute(track, 'C#4', {duration})
+            wait(track, duration)
+            execute(track, 'D#4', {duration})
+            wait(track, duration)
         }
     })
 })

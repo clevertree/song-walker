@@ -1,13 +1,5 @@
-import {
-    InstrumentInstance,
-    PresetBankBase,
-    SongCallback,
-    SongWalkerState,
-    TrackState,
-    TrackStateOverrides
-} from "@songwalker/types";
+import {PresetBankBase, SongCallback, SongWalkerState, TrackState, TrackStateOverrides} from "@songwalker/types";
 import PresetLibrary from "../presets/PresetLibrary";
-import Errors from '../constants/errors'
 import {parseNote} from "@songwalker";
 import {DEFAULT_BUFFER_DURATION} from "@songwalker/constants/buffer";
 
@@ -58,8 +50,8 @@ export function getDefaultSongWalkerState(context: BaseAudioContext, overrides: 
             track.position += duration;
             track.currentTime += duration * (60 / track.beatsPerMinute);
             // console.info('wait', duration, track.currentTime, track.beatsPerMinute);
-            // TODO: check for track end duration and potentially return 'true'
-            return false;
+            return typeof track.trackDuration !== "undefined" && track.trackDuration <= track.position;
+
         },
         waitAsync: async function defaultWaitCallback(track, duration) {
             const trackEnded = songState.wait(track, duration);
@@ -90,20 +82,19 @@ export function getDefaultSongWalkerState(context: BaseAudioContext, overrides: 
                 return
             }
 
+            // TODO: Skip note
+            // if (typeof track.trackStart !== "undefined" && track.position < track.trackStart) {
+            //     return;
+            // }
+
             // Create new object for instrument execution
             let instrumentTrack: TrackState = {...track, ...overrides};
 
             if (track.effects) {
                 for (const effect of track.effects) {
-                    const newTrackObject = effect(track, commandString)
-                    if (!newTrackObject) {
-                        // If nothing was returned, note is skipped.
-                        console.warn(`Effect returned ${newTrackObject}, so note was skipped.`)
-                        return;
-                    }
                     // Modifies TrackState.destination to create processing effect (i.e. reverb)
-                    // Effect may encapsulate current instrument to modify commands in real-time
-                    instrumentTrack = newTrackObject;
+                    // Effect may encapsulate current instrument to modify commands in real-time (or skip notes)
+                    effect(instrumentTrack, commandString)
                 }
             }
             // TODO: check for track end time?
@@ -126,9 +117,6 @@ export function getDefaultSongWalkerState(context: BaseAudioContext, overrides: 
     return songState;
 }
 
-export const defaultEmptyInstrument: InstrumentInstance = () => {
-    throw new Error(Errors.ERR_NO_INSTRUMENT);
-}
 
 export function getDefaultTrackState(destination: AudioNode, overrides: TrackStateOverrides = {}): TrackState {
     return {
@@ -139,9 +127,8 @@ export function getDefaultTrackState(destination: AudioNode, overrides: TrackSta
         // duration: 1,
         // velocity: 128,
         // velocityDivisor: 128,
-        instrument: defaultEmptyInstrument,
-        effects: [],
-        destination,
+        // effects: [],
+        // destination,
         ...overrides
     }
 }

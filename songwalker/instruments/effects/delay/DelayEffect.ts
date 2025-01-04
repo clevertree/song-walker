@@ -18,7 +18,7 @@ const DelayEffect: InstrumentLoader<DelayEffectConfig> = (songState, config) => 
 
     return function connectDelayEffect(track: TrackState) {
         const {
-            destination,
+            destination = audioContext.destination,
             beatsPerMinute
         } = track;
         const {
@@ -49,11 +49,8 @@ const DelayEffect: InstrumentLoader<DelayEffectConfig> = (songState, config) => 
         effectDestination.connect(wetGain);
         effectDestination.connect(dryGain);
 
-        // Return new track state object
-        return {
-            ...track,
-            destination: effectDestination
-        }
+        // Return track state object
+        track.destination = effectDestination
     }
 }
 

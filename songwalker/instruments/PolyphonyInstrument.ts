@@ -1,12 +1,4 @@
-import {
-    CommandWithOverrides,
-    InstrumentInstance,
-    InstrumentLoader,
-    Preset,
-    SongWalkerState,
-    TrackState
-} from "@songwalker/types";
-import {defaultEmptyInstrument} from "@songwalker/helper/songHelper";
+import {InstrumentInstance, InstrumentLoader, Preset, SongWalkerState, TrackState} from "@songwalker/types";
 
 
 export interface PolyphonyInstrumentConfig {
@@ -40,10 +32,10 @@ const PolyphonyInstrument: InstrumentLoader<PolyphonyInstrumentConfig> = async (
     }));
 
 
-    const instrumentInstance = function playPolyphonyNote(track: TrackState, command: CommandWithOverrides) {
-        if (aliases[command.commandString]) {
+    const instrumentInstance = function playPolyphonyNote(track: TrackState, command: string) {
+        if (aliases[command]) {
             // if alias is found, execute directly
-            return aliases[command.commandString](track, command);
+            return aliases[command](track, command);
         } else {
             for (let i = 0; i < voices.length; i++) {
                 voices[i](track, command);
@@ -51,9 +43,9 @@ const PolyphonyInstrument: InstrumentLoader<PolyphonyInstrumentConfig> = async (
         }
     }
 
-    // Set instance to current instrument if no instrument is currently loaded
-    if (rootTrackState.instrument === defaultEmptyInstrument)
-        rootTrackState.instrument = instrumentInstance
-    return instrumentInstance;
+    // Set this instrument if no root track instrument was set
+    if (!songState.rootTrackState.instrument)
+        songState.rootTrackState.instrument = instrumentInstance;
+    return instrumentInstance
 }
 export default PolyphonyInstrument;

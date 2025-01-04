@@ -29,11 +29,12 @@ const ReverbEffect: InstrumentLoader<ReverbEffectConfig> = (songState, config) =
     }
 
     return function connectReverbEffect(track: TrackState) {
-        const {destination} = track;
+        const {
+            destination = audioContext.destination
+        } = track;
         const {wet = 0.5, dry = 1} = config;
         const effectDestination = audioContext.createGain();
         output.connect(destination);
-        // TODO: mixer value
 
         // Mixer
         const wetGain = new GainNode(audioContext, {gain: wet});
@@ -45,11 +46,8 @@ const ReverbEffect: InstrumentLoader<ReverbEffectConfig> = (songState, config) =
         effectDestination.connect(wetGain);
         effectDestination.connect(dryGain);
 
-        // Return new track state object
-        return {
-            ...track,
-            destination: effectDestination
-        }
+        // Return track state object
+        track.destination = effectDestination
     }
 
     function buildImpulse() {

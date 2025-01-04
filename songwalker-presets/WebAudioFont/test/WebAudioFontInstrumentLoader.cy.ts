@@ -19,20 +19,21 @@ describe('WebAudioFontInstrument', () => {
         let instrumentKeys = await fetchJSONFromMirror(PRESET_PATH_INSTRUMENT_KEYS);
         const context = new AudioContext();
         await context.suspend()
-
         const songState = getDefaultSongWalkerState(context);
         const {rootTrackState: track} = songState;
         track.instrument = await WebAudioFontInstrumentLoader(songState, {
             presetPath: `${PRESET_PATH_INSTRUMENT}/${instrumentKeys[Math.round(Math.random() * instrumentKeys.length)]}.json`
         })
 
-        const {wait, parseAndExecute: play} = songState;
+        const {wait, execute} = songState;
 
         for (let i = 0; i < 4; i++) {
-            play(track, 'C3^10@1/2')
+            execute(track, 'C3^10', {duration: 1 / 2})
             wait(track, 1 / 2)
-            play(track, 'D#3^10@1/2')
-            wait(track, 1 / 2)
+            execute(track, 'D#3^10', {duration: 1 / 4})
+            wait(track, 1 / 4)
+            execute(track, 'E#3^10', {duration: 1 / 4})
+            wait(track, 1 / 4)
         }
     })
 
@@ -48,10 +49,10 @@ describe('WebAudioFontInstrument', () => {
             presetPath: `${PRESET_PATH_PERCUSSION}/${percussionKeys[Math.round(Math.random() * percussionKeys.length)]}.json`
         })
 
-        const {wait, parseAndExecute: play} = songState;
+        const {wait, execute} = songState;
 
         for (let i = 0; i < 8; i++) {
-            play(track, 'C3^10@1/2')
+            execute(track, 'C3', {duration: 1 / 2})
             wait(track, 1 / 4)
         }
     })
@@ -68,12 +69,12 @@ describe('WebAudioFontInstrument', () => {
             presetPath: `${PRESET_PATH_DRUMSET}/${drumsetKeys[Math.round(Math.random() * drumsetKeys.length)]}.json`
         })
 
-        const {wait, parseAndExecute: play} = songState;
+        const {wait, execute} = songState;
 
         for (let o = 0; o <= 2; o++) {
             for (let i = 0; i < 6; i++) {
                 const note = String.fromCharCode(65 + i)
-                play(track, `${note}${o}^10@1/2`)
+                execute(track, 'C3', {duration: 1 / 2})
                 wait(track, 1 / 4)
             }
         }

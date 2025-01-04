@@ -2,6 +2,8 @@ import {TrackState} from "@songwalker";
 import {InstrumentLoader, ParsedNote, SongWalkerState} from "@songwalker/types";
 import {configEnvelope, EnvelopeConfig, updateEnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
+import {Simulate} from "react-dom/test-utils";
+
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
@@ -24,7 +26,7 @@ const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (song
     let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)
 
-    return function (track: TrackState, command: string) {
+    function playOscillator(track: TrackState, command: string) {
         switch (command) {
             case 'play':
             case 'stop':
@@ -44,10 +46,15 @@ const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (song
             throw new Error("Unrecognized note: " + command);
         if (filterNote(noteInfo))
             return track
-        return playOscillator(noteInfo, track)
-    };
+        return playOscillatorNote(noteInfo, track)
+    }
 
-    function playOscillator(noteInfo: ParsedNote, track: TrackState) {
+    // Set this instrument if no root track instrument was set
+    if (!songState.rootTrackState.instrument)
+        songState.rootTrackState.instrument = playOscillator;
+    return playOscillator
+
+    function playOscillatorNote(noteInfo: ParsedNote, track: TrackState) {
         let {
             currentTime,
             duration = 0,

@@ -12,43 +12,43 @@
     executeTrack(track, beat1.bind(track), {trackDuration: 7});
     if (await waitAsync(track, 8))
 
-    async function track1(track, instrument) {
-        track.effects = [reverb];
-        track.instrument = instrument;
-        track.duration = 1 / 4
-        execute(track, "C3");
-        if (await waitAsync(track, 1 / 2)) return;
-        track.pitchBend = -0.4
-        track.config = {var: 'wut'}
-        execute(track, "C2", {duration: 1 / 4});
-        if (await waitAsync(track, 1 / 2)) return;  // override duration and velocity
-        execute(track, "G2");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "Eb2");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "Eb3");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "F3");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "Eb3");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "D3");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "C3");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "C2");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "G2");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "Eb2");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "D3");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "C2");
-        if (await waitAsync(track, 1 / 2)) return;
-        execute(track, "Bb2");
-        if (await waitAsync(track, 1 / 2))
-    }
+        async function track1(track, instrument) {
+            track.effects = [reverb];
+            track.instrument = instrument;
+            track.duration = 1 / 4
+            execute(track, "C3");
+            if (await waitAsync(track, 1 / 2)) return;
+            track.pitchBend = -0.4
+            track.config = {var: 'wut'}
+            execute(track, "C2", {duration: 1 / 4});
+            if (await waitAsync(track, 1 / 2)) return;  // override duration and velocity
+            execute(track, "G2");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "Eb2");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "Eb3");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "F3");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "Eb3");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "D3");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "C3");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "C2");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "G2");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "Eb2");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "D3");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "C2");
+            if (await waitAsync(track, 1 / 2)) return;
+            execute(track, "Bb2");
+            if (await waitAsync(track, 1 / 2))
+        }
 
     async function beat1(track) {
 // console.log(track.destination.context.currentTime, track.currentTime);

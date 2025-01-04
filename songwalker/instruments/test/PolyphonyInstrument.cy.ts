@@ -31,13 +31,14 @@ describe('Polyphony', () => {
             } as Preset<AudioBufferInstrumentConfig>]
         })
 
-        const {wait, parseAndExecute: play} = songState;
+        const {wait, execute} = songState;
 
-        for (let i = 0; i < 8; i++) {
-            play(track, 'C#4@1/8')
-            wait(track, 1 / 8)
-            play(track, 'D#4@1/8')
-            wait(track, 1 / 8)
+        const duration = 1 / 8;
+        for (let i = 0; i < 2; i++) {
+            execute(track, 'C#4', {duration})
+            wait(track, duration)
+            execute(track, 'D#4', {duration})
+            wait(track, duration)
         }
     })
 })

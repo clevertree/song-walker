@@ -12,13 +12,6 @@ export type SongError = {
     trackName?: string;
 }
 
-export interface CommandWithOverrides extends TrackStateOverrides {
-    commandString: string,
-}
-
-export type ParsedParams = {
-    [paramName in keyof TrackState]?: string;
-}
 
 export interface OverrideAliases {
     '@': keyof TrackState,
@@ -34,23 +27,9 @@ export interface ParsedNote {
 
 
 // export type TrackEventHandler = (trackEvent: SongTrackEvent, tokenID: number) => void;
-// export type SongState = {
-//     isPlaying: boolean,
-//     // trackEventHandler: HandlesTrackEvents
-//     // playFrequency: (trackState: TrackState, frequency: string, duration: number, ...args: any[]) => void;
-// };
 
 export interface HandlesTrackEvents {
     handleTrackEvent(trackName: string, trackEvent: SongTrackEvent, tokenID: number): void;
-}
-
-export type SongHandler = {
-    isPlaying(): boolean,
-    // startPlayback(): TrackHandler,
-    stopPlayback(): void,
-    // addEventCallback: (trackName: string, callback: TrackEventHandler) => void,
-    waitForSongToFinish: () => Promise<void>
-    // getRootTrackState: () => TrackState
 }
 
 export interface TrackState {
@@ -63,21 +42,21 @@ export interface TrackState {
     instrument?: InstrumentInstance,
     effects?: Array<InstrumentInstance>,
     duration?: number,
-    trackDuration?: number,
     velocity?: number,
     velocityDivisor?: number,
     pan?: number,
     destination?: AudioNode,
-    // parentTrack?: TrackState
-    // startTime: number,
-    // [key: string]: any
+
+    // Track-specific
+    trackDuration?: number,
+    // trackStart?: number,
 }
 
 export type TrackStateOverrides = {
     [param in keyof TrackState]?: TrackState[param]
 }
 
-export type TrackCallback = (track: TrackState) => void
+export type TrackCallback = (track: TrackState, ...args: any[]) => void
 
 
 export interface SongWalkerState {
@@ -87,8 +66,7 @@ export interface SongWalkerState {
     waitAsync: (track: TrackState, duration: number) => Promise<boolean>
     waitForTrackToFinish: (track: TrackState) => Promise<void>
     // waitForSongToFinish: () => Promise<void>
-    loadPreset: (presetID: string,
-                 config: object) => Promise<InstrumentInstance>,
+    loadPreset: (presetID: string, config: object) => Promise<InstrumentInstance>,
     execute: (track: TrackState, command: string, overrides?: TrackStateOverrides) => void
     executeTrack: (track: TrackState, trackCallback: TrackCallback, overrides?: TrackStateOverrides) => void
     // parseCommand: (commandString: string) => CommandWithOverrides,
