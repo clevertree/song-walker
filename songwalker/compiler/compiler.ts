@@ -8,7 +8,7 @@ const VAR_TRACK_STATE = 'track';
 // export const F_LOAD = "_lp";
 // export const F_EXECUTE = "_e";
 export const F_EXPORT = `{${
-    'waitAsync' as keyof SongWalkerState
+    'wait' as keyof SongWalkerState
 }, ${
     'execute' as keyof SongWalkerState
 }, ${
@@ -32,7 +32,7 @@ export const EXPORT_JS = {
         return `${'execute' as keyof SongWalkerState}(${VAR_TRACK_STATE}, "${command}"${exportOverrides});`
     },
     // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
-    wait: (durationStatement: string) => `if(await ${'waitAsync' as keyof SongWalkerState}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`,
+    wait: (durationStatement: string) => `if(await ${'wait' as keyof SongWalkerState}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`,
     trackDefinition: (trackDefinition: string) => {
         const match = (trackDefinition).match(LANGUAGE["track-definition"]);
         if (!match)

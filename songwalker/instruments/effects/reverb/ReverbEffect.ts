@@ -10,9 +10,7 @@ export interface ReverbEffectConfig {
 }
 
 const ReverbEffect: InstrumentLoader<ReverbEffectConfig> = (songState, config) => {
-    const {
-        context: audioContext
-    } = songState;
+    const audioContext = songState.getContext();
     const {
         duration = 1,
         decay = 2,

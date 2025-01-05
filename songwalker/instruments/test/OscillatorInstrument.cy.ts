@@ -1,10 +1,14 @@
 import OscillatorInstrument from "@songwalker/instruments/OscillatorInstrument";
-import {getDefaultSongWalkerState} from "@songwalker/helper/songHelper";
+import {getSongRendererState} from "@songwalker/helper/songHelper";
 
 describe('Oscillator', () => {
     it('Oscillator plays notes', async () => {
-        const context = new AudioContext();
-        const songState = getDefaultSongWalkerState(context);
+        const context = new OfflineAudioContext({
+            numberOfChannels: 2,
+            length: 44100 * 8,
+            sampleRate: 44100,
+        });
+        const songState = getSongRendererState(context);
         const {rootTrackState: track} = songState;
         track.instrument = await OscillatorInstrument(songState, {
             mixer: .8,

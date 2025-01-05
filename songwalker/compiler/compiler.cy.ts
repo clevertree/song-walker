@@ -1,5 +1,5 @@
 import {compileSongToCallback, compileSongToJavascript, EXPORT_JS, sourceToTokens} from './compiler'
-import {playSong} from "@songwalker/helper/songHelper";
+import {renderSong} from "@songwalker/helper/songHelper";
 
 describe('compiler', () => {
     const emptyTemplate = (s: string) => s;
@@ -91,11 +91,11 @@ describe('compiler', () => {
     })
 
 
-    it('executes song', () => {
+    it('renders song', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
             const song = compileSongToCallback(SONG_SOURCE);
             cy.wrap((async () => {
-                await playSong(song);
+                await renderSong(song);
             })()).then(() => {
             });
         })

@@ -19,7 +19,8 @@ export interface AudioBufferInstrumentConfig extends EnvelopeConfig, KeyRangeCon
 
 const AudioBufferInstrument: InstrumentLoader<AudioBufferInstrumentConfig> = async (songState: SongWalkerState, config) => {
     // console.log('AudioBufferInstrument', config, title);
-    const {context: audioContext, rootTrackState} = songState;
+    const {getContext, rootTrackState} = songState;
+    const audioContext = getContext();
     let createSourceNode = await configAudioBuffer();
     let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)

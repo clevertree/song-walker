@@ -1,19 +1,34 @@
-import {PresetBankBase, SongCallback, SongWalkerState, TrackState, TrackStateOverrides} from "@songwalker/types";
+import {
+    InstrumentInstance,
+    PresetBank,
+    SongCallback,
+    SongWalkerState,
+    TrackState,
+    TrackStateOverrides
+} from "@songwalker/types";
 import PresetLibrary from "../presets/PresetLibrary";
 import {parseNote} from "@songwalker";
 import {DEFAULT_BUFFER_DURATION} from "@songwalker/constants/buffer";
 
 
 export async function playSong(song: SongCallback, context: AudioContext = new AudioContext(), overrides: TrackStateOverrides = {}) {
-    const songState = getDefaultSongWalkerState(context, overrides);
+    const songState = getSongPlayerState(context, overrides);
     await context.suspend();
+    // Play song
     await song(songState)
-    await songState.waitForTrackToFinish(songState.rootTrackState);
+    await waitForTrackToFinish(context, songState.rootTrackState);
     return songState;
 }
 
-export async function renderSong(song: SongCallback, context: OfflineAudioContext, overrides: TrackStateOverrides = {}) {
-    const songState = getDefaultSongWalkerState(context, overrides);
+export async function renderSong(song: SongCallback, overrides: TrackStateOverrides = {}) {
+    const {lengthInSeconds} = await walkSongHeadless(song);
+    const context = new OfflineAudioContext({
+        numberOfChannels: 2,
+        length: 44100 * lengthInSeconds,
+        sampleRate: 44100,
+    })
+    const songState = getSongRendererState(context, overrides);
+    // Render song
     await song(songState)
     return {
         renderedBuffer: await context.startRendering(),
@@ -21,114 +36,141 @@ export async function renderSong(song: SongCallback, context: OfflineAudioContex
     };
 }
 
-export function getDefaultSongWalkerState(context: BaseAudioContext, overrides: TrackStateOverrides = {}, presetLibrary: PresetBankBase = PresetLibrary) {
-    let bufferDuration = DEFAULT_BUFFER_DURATION;
-    let autoResumeCallback = () => {
-    };
-    if (context instanceof AudioContext) {
-        autoResumeCallback = () => {
-            if (context.state === 'suspended') {
-                autoResumeCallback = () => {
-                };
-                context.resume().then(() => console.info("AudioContext was resumed", context.currentTime));
-            }
+export async function walkSongHeadless(song: SongCallback) {
+    const songState = getSongAnalysisState();
+    // Analyze song
+    await song(songState);
+    const {
+        rootTrackState: {
+            currentTime,
+            position
+        }
+    } = songState;
+    return {lengthInSeconds: currentTime, lengthPosition: position};
+}
+
+export async function waitForTrackToFinish(context: AudioContext, track: TrackState) {
+    const waitTime = track.currentTime - context.currentTime;
+    if (waitTime > 0) {
+        console.log(`Waiting ${waitTime} for track to finish ${context.currentTime} => ${track.currentTime}`)
+        await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+    }
+}
+
+// function defaultWaitCallback(track: TrackState, duration: number) {
+//     track.position += duration;
+//     track.currentTime += duration * (60 / track.beatsPerMinute);
+//     // console.info('wait', duration, track.currentTime, track.beatsPerMinute);
+//     return typeof track.trackDuration !== "undefined" && track.trackDuration <= track.position;
+// }
+
+export async function defaultLoadPreset(songState: SongWalkerState, presetID: string | RegExp, config = {}, presetLibrary: PresetBank = PresetLibrary) {
+    const filter = presetID instanceof RegExp ? presetID : new RegExp(presetID, 'i');
+    for await (const preset of presetLibrary()) {
+        if (filter.test(preset.title)) {
+            return preset.loader(songState, {...preset.config, ...config});
         }
     }
-    const rootTrackState: TrackState = getDefaultTrackState(context.destination, overrides);
+    throw new Error("Preset ID not found: " + presetID);
+}
+
+const DEFAULT_STATE: SongWalkerState = {
+    bufferDuration: DEFAULT_BUFFER_DURATION,
+    parseNote,
+    loadPreset: async function (presetID, config = {}) {
+        throw "loadPreset is not implemented"
+    },
+    getContext: function () {
+        throw "getContext is not implemented"
+    },
+    rootTrackState: {
+        beatsPerMinute: 60,
+        currentTime: 0, // Plus buffer duration? no.
+        position: 0,
+    },
+    wait: async (track: TrackState, duration: number) => {
+        track.position += duration;
+        track.currentTime += duration * (60 / track.beatsPerMinute);
+        // console.info('wait', duration, track.currentTime, track.beatsPerMinute);
+        return typeof track.trackDuration !== "undefined" && track.trackDuration <= track.position;
+    },
+    execute: (track, commandString, overrides) => {
+        let {
+            instrument = () => {
+                throw new Error("Instrument not loaded");
+            }
+        } = track;
+        let instrumentTrack: TrackState = {...track, ...overrides};
+
+        if (track.effects) {
+            for (const effect of track.effects) {
+                // Modifies TrackState.destination to create processing effect (i.e. reverb)
+                // Effect may encapsulate current instrument to modify commands in real-time (or skip notes)
+                effect(instrumentTrack, commandString)
+            }
+        }
+        instrument(instrumentTrack, commandString);
+    },
+    executeTrack: function (track, trackCallback, overrides = {}, ...args) {
+        const newTrackState: TrackState = {...track, ...overrides, position: 0};
+        trackCallback(newTrackState, ...args)
+    },
+
+
+}
+
+
+export function getSongAnalysisState(): SongWalkerState {
+    return {
+        ...DEFAULT_STATE,
+        executeTrack: () => {
+            // Do not execute sub-tracks
+        },
+        loadPreset: async () => {
+            // Do not load instruments
+            return null as unknown as InstrumentInstance
+        },
+    }
+}
+
+export function getSongRendererState(context: OfflineAudioContext, overrides: TrackStateOverrides = {}, presetLibrary: PresetBank = PresetLibrary) {
     const songState: SongWalkerState = {
-        context,
-        rootTrackState,
-        // waitForSongToFinish: async () => songState.waitForTrackToFinish(songState.rootTrackState),
-        waitForTrackToFinish: async function (track) {
-            const waitTime = track.currentTime - context.currentTime;
-            if (waitTime > 0) {
-                console.log(`Waiting ${waitTime} for track to finish ${context.currentTime} => ${track.currentTime}`)
-                await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
+        ...DEFAULT_STATE,
+        getContext: () => context,
+        loadPreset: async (presetID, config) => defaultLoadPreset(songState, presetID, config, presetLibrary)
+    }
+    return songState;
+}
+
+export function getSongPlayerState(context: AudioContext, overrides: TrackStateOverrides = {}, presetLibrary: PresetBank = PresetLibrary) {
+    let autoResumed = false;
+    const songState: SongWalkerState = {
+        ...DEFAULT_STATE,
+        getContext: () => context,
+        loadPreset: async (presetID, config) => defaultLoadPreset(songState, presetID, config, presetLibrary),
+        execute: (track, commandString, overrides) => {
+            if (track.currentTime < context.currentTime) {
+                console.error("skipping note that occurs in the past: ",
+                    commandString, 'currentTime:', track.currentTime, '<', 'audioContext.currentTime', context.currentTime)
+                return
+            }
+            DEFAULT_STATE.execute(track, commandString, overrides);
+            if (!autoResumed && context.state === 'suspended') {
+                autoResumed = true;
+                context.resume().then(() => console.info("AudioContext was resumed", context.currentTime));
             }
         },
-        wait: function defaultWaitCallback(track, duration) {
-            track.position += duration;
-            track.currentTime += duration * (60 / track.beatsPerMinute);
-            // console.info('wait', duration, track.currentTime, track.beatsPerMinute);
-            return typeof track.trackDuration !== "undefined" && track.trackDuration <= track.position;
-
-        },
-        waitAsync: async function defaultWaitCallback(track, duration) {
-            const trackEnded = songState.wait(track, duration);
-            const waitTime = track.currentTime - context.currentTime - bufferDuration
+        wait: async function (track, duration) {
+            const trackEnded = DEFAULT_STATE.wait(track, duration);
+            const waitTime = track.currentTime - context.currentTime - songState.bufferDuration
             if (waitTime > 0) {
                 // console.log(`Waiting ${waitTime} seconds for ${context.currentTime} => ${track.currentTime} - ${BUFFER_DURATION}`)
                 await new Promise(resolve => setTimeout(resolve, waitTime * 1000));
             }
             return trackEnded;
-        },
-        loadPreset: async function (presetID, config = {}) {
-            const preset = await presetLibrary.findPreset(presetID);
-            if (preset) {
-                return preset.loader(songState, {...preset.config, ...config});
-            }
-            throw new Error("Preset id not found: " + presetID);
-        },
-        execute: function (track, commandString, overrides = {}) {
-            let {
-                currentTime,
-                instrument = () => {
-                    throw new Error("Instrument not loaded");
-                }
-            } = track;
-            if (currentTime < context.currentTime) {
-                console.error("skipping note that occurs in the past: ",
-                    commandString, 'currentTime:', currentTime, '<', 'audioContext.currentTime', context.currentTime)
-                return
-            }
+        }
 
-            // TODO: Skip note
-            // if (typeof track.trackStart !== "undefined" && track.position < track.trackStart) {
-            //     return;
-            // }
-
-            // Create new object for instrument execution
-            let instrumentTrack: TrackState = {...track, ...overrides};
-
-            if (track.effects) {
-                for (const effect of track.effects) {
-                    // Modifies TrackState.destination to create processing effect (i.e. reverb)
-                    // Effect may encapsulate current instrument to modify commands in real-time (or skip notes)
-                    effect(instrumentTrack, commandString)
-                }
-            }
-            // TODO: check for track end time?
-            instrument(instrumentTrack, commandString);
-            autoResumeCallback();
-        },
-        executeTrack: function (track, trackCallback, overrides = {}, ...args) {
-            const newTrackState: TrackState = {...track, ...overrides, position: 0};
-            trackCallback(newTrackState, ...args)
-        },
-        // executeCallback: function (track: TrackState, callback, ...args) {
-        //     const subTrack = {
-        //         ...track,
-        //         parentTrack: track,
-        //     }
-        //     callback(subTrack, ...args);
-        // },
-        parseNote,
-    };
+    }
     return songState;
 }
 
-
-export function getDefaultTrackState(destination: AudioNode, overrides: TrackStateOverrides = {}): TrackState {
-    return {
-        beatsPerMinute: 60,
-        currentTime: destination.context.currentTime, // Plus buffer duration? no.
-        position: 0,
-        // pan: 0,
-        // duration: 1,
-        // velocity: 128,
-        // velocityDivisor: 128,
-        // effects: [],
-        // destination,
-        ...overrides
-    }
-}

@@ -1,4 +1,4 @@
-export function generateRandomBuffer(context: AudioContext) {
+export function generateRandomBuffer(context: BaseAudioContext) {
     const src = context.createBuffer(1, 8192, 44100);
     const audioBufferArray = src.getChannelData(0);
     for (let i = 0; i < 8192; i++) {

@@ -2,16 +2,10 @@ import {SongWalkerState, TrackState} from "@songwalker/types";
 import {renderSong} from "@songwalker/helper/songHelper";
 
 describe('songPlayer', () => {
-    const audioContext = new OfflineAudioContext({
-        numberOfChannels: 2,
-        length: 44100 * 40,
-        sampleRate: 44100,
-    });
-
     it('plays sub-tracks', async () => {
         // const logCallback = cy.stub();
         const instrumentCallback = cy.stub();
-        const {songState, renderedBuffer} = await renderSong(testSong, audioContext, {
+        const {songState, renderedBuffer} = await renderSong(testSong, {
             instrument: instrumentCallback
         });
         // const songState = getDefaultTrackState(destination);

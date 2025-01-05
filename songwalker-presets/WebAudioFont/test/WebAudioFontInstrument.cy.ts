@@ -1,14 +1,17 @@
 // noinspection DuplicatedCode
 
 import WebAudioFontInstrument from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
-import {getDefaultSongWalkerState} from "@songwalker/helper/songHelper";
+import {getSongRendererState} from "@songwalker/helper/songHelper";
 
 describe('WebAudioFontInstrument', () => {
 
     it('loads and plays', async () => {
-        const context = new AudioContext();
-        await context.suspend()
-        const songState = getDefaultSongWalkerState(context);
+        const context = new OfflineAudioContext({
+            numberOfChannels: 2,
+            length: 44100 * 8,
+            sampleRate: 44100,
+        });
+        const songState = getSongRendererState(context);
         const {rootTrackState: track} = songState;
         track.beatsPerMinute = 160;
         track.instrument = await WebAudioFontInstrument(songState, {

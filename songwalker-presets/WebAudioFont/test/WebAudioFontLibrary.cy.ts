@@ -1,6 +1,6 @@
 import {WebAudioFontLibrary} from "@songwalker-presets/WebAudioFont/WebAudioFontLibrary";
 import {Preset} from "@songwalker/types";
-import {getDefaultSongWalkerState} from "@songwalker/helper/songHelper";
+import {getSongRendererState} from "@songwalker/helper/songHelper";
 
 describe('WebAudioFontLibrary', () => {
     it('lists all presets. load 3', async () => {
@@ -18,8 +18,12 @@ describe('WebAudioFontLibrary', () => {
         console.log('Library iteration time:', `${Date.now() - startTime}ms`)
         expect(count).to.be.greaterThan(5000)
 
-        const context = new AudioContext();
-        const songState = getDefaultSongWalkerState(context);
+        const context = new OfflineAudioContext({
+            numberOfChannels: 2,
+            length: 44100 * 8,
+            sampleRate: 44100,
+        });
+        const songState = getSongRendererState(context);
         for (const preset of randomPresets) {
             const {config, loader} = preset;
             songState.rootTrackState.instrument = await loader(songState, config)

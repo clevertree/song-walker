@@ -2,8 +2,6 @@ import {TrackState} from "@songwalker";
 import {InstrumentLoader, ParsedNote, SongWalkerState} from "@songwalker/types";
 import {configEnvelope, EnvelopeConfig, updateEnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
-import {Simulate} from "react-dom/test-utils";
-
 
 const DEFAULT_OSCILLATOR_TYPE = 'square';
 
@@ -19,9 +17,10 @@ export interface OscillatorInstrumentConfig extends EnvelopeConfig, KeyRangeConf
 const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (songState: SongWalkerState, config) => {
     // console.log('OscillatorInstrument', config, config.type);
     const {
-        context: audioContext,
+        getContext,
         parseNote
     } = songState;
+    const audioContext = getContext();
     let createOscillator = configOscillator();
     let createGain = configEnvelope(audioContext, config);
     let filterNote = configFilterByKeyRange(config)

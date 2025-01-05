@@ -60,11 +60,11 @@ export type TrackCallback = (track: TrackState, ...args: any[]) => void
 
 
 export interface SongWalkerState {
-    context: BaseAudioContext
+    bufferDuration: number,
+    getContext: () => BaseAudioContext
     rootTrackState: TrackState
-    wait: (track: TrackState, duration: number) => boolean
-    waitAsync: (track: TrackState, duration: number) => Promise<boolean>
-    waitForTrackToFinish: (track: TrackState) => Promise<void>
+    wait: (track: TrackState, duration: number) => Promise<boolean>
+    // waitForTrackToFinish: (track: TrackState) => Promise<void>
     // waitForSongToFinish: () => Promise<void>
     loadPreset: (presetID: string, config: object) => Promise<InstrumentInstance>,
     execute: (track: TrackState, command: string, overrides?: TrackStateOverrides) => void
@@ -96,11 +96,6 @@ export type InstrumentLoader<Config = any> = (song: SongWalkerState, config: Con
 
 export type PresetBank = () => Generator<Preset> | AsyncGenerator<Preset>
 
-export interface PresetBankBase {
-    listPresets: PresetBank,
-
-    findPreset(presetID: string | RegExp): Promise<Preset>,
-}
 
 // export type PresetType = 'instrument' | 'drum-kit' | 'effect'
 

@@ -2,14 +2,17 @@ import PolyphonyInstrument from "@songwalker/instruments/PolyphonyInstrument";
 import OscillatorInstrument, {OscillatorInstrumentConfig} from "@songwalker/instruments/OscillatorInstrument";
 import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBufferInstrument";
 import {Preset} from "@songwalker/types";
-import {getDefaultSongWalkerState} from "@songwalker/helper/songHelper";
+import {getSongRendererState} from "@songwalker/helper/songHelper";
 import {generateRandomBuffer} from "@songwalker/instruments/test/testHelper";
 
 describe('Polyphony', () => {
     it('Polyphony plays C#4d1/2', async () => {
-        const context = new AudioContext();
-
-        const songState = getDefaultSongWalkerState(context);
+        const context = new OfflineAudioContext({
+            numberOfChannels: 2,
+            length: 44100 * 8,
+            sampleRate: 44100,
+        });
+        const songState = getSongRendererState(context);
         const {rootTrackState: track} = songState;
         track.instrument = await PolyphonyInstrument(songState, {
             voices: [{

@@ -14,7 +14,6 @@ export interface PolyphonyInstrumentConfig {
 
 const PolyphonyInstrument: InstrumentLoader<PolyphonyInstrumentConfig> = async (songState: SongWalkerState, config) => {
     // console.log('PolyphonyInstrument', config, config.title);
-    const {rootTrackState} = songState;
 
     let aliases: { [key: string]: InstrumentInstance } = {}
     const voices: InstrumentInstance[] = await Promise.all(config.voices.map(voice => {

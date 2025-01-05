@@ -17,9 +17,9 @@ export interface WebAudioFontInstrumentConfig extends WavePreset {
 
 const WebAudioFontInstrument: InstrumentLoader<WebAudioFontInstrumentConfig> = async function (songState: SongWalkerState, config) {
     const {
-        context: audioContext,
         rootTrackState,
     } = songState;
+    const audioContext = songState.getContext();
     const player = new WebAudioFontPlayer();
     await player.adjustPreset(audioContext, config);
 

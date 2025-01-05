@@ -1,13 +1,17 @@
 import AudioBufferInstrument from "@songwalker/instruments/AudioBufferInstrument";
 import {generateRandomBuffer} from "@songwalker/instruments/test/testHelper";
-import {getDefaultSongWalkerState} from "@songwalker/helper/songHelper";
+import {getSongRendererState} from "@songwalker/helper/songHelper";
 
 
 describe('AudioBuffer', () => {
     it('AudioBuffer plays C#4d1/2', async () => {
-        const context = new AudioContext();
+        const context = new OfflineAudioContext({
+            numberOfChannels: 2,
+            length: 44100 * 8,
+            sampleRate: 44100,
+        });
+        const songState = getSongRendererState(context);
         const src = generateRandomBuffer(context)
-        const songState = getDefaultSongWalkerState(context);
         const {rootTrackState: track} = songState;
         track.beatsPerMinute = 32;
         track.instrument = await AudioBufferInstrument(songState, {

@@ -10,16 +10,19 @@ import {
     PRESET_PATH_PERCUSSION,
     PRESET_PATH_PERCUSSION_KEYS
 } from "@songwalker-presets/WebAudioFont/constants";
-import {getDefaultSongWalkerState} from "@songwalker/helper/songHelper";
+import {getSongRendererState} from "@songwalker/helper/songHelper";
 
 describe('WebAudioFontInstrument', () => {
 
 
     it('loads and plays instrument', async () => {
         let instrumentKeys = await fetchJSONFromMirror(PRESET_PATH_INSTRUMENT_KEYS);
-        const context = new AudioContext();
-        await context.suspend()
-        const songState = getDefaultSongWalkerState(context);
+        const context = new OfflineAudioContext({
+            numberOfChannels: 2,
+            length: 44100 * 8,
+            sampleRate: 44100,
+        });
+        const songState = getSongRendererState(context);
         const {rootTrackState: track} = songState;
         track.instrument = await WebAudioFontInstrumentLoader(songState, {
             presetPath: `${PRESET_PATH_INSTRUMENT}/${instrumentKeys[Math.round(Math.random() * instrumentKeys.length)]}.json`
@@ -39,10 +42,12 @@ describe('WebAudioFontInstrument', () => {
 
     it('loads and plays percussion', async () => {
         let percussionKeys = await fetchJSONFromMirror(PRESET_PATH_PERCUSSION_KEYS);
-        const context = new AudioContext();
-        await context.suspend()
-
-        const songState = getDefaultSongWalkerState(context);
+        const context = new OfflineAudioContext({
+            numberOfChannels: 2,
+            length: 44100 * 8,
+            sampleRate: 44100,
+        });
+        const songState = getSongRendererState(context);
         const {rootTrackState: track} = songState;
 
         track.instrument = await WebAudioFontInstrumentLoader(songState, {
@@ -60,9 +65,12 @@ describe('WebAudioFontInstrument', () => {
     it('loads and plays drumset', async () => {
         let drumsetKeys = await fetchJSONFromMirror(PRESET_PATH_DRUMSET_KEYS);
 
-        const context = new AudioContext();
-        await context.suspend()
-        const songState = getDefaultSongWalkerState(context);
+        const context = new OfflineAudioContext({
+            numberOfChannels: 2,
+            length: 44100 * 8,
+            sampleRate: 44100,
+        });
+        const songState = getSongRendererState(context);
         const {rootTrackState: track} = songState;
 
         track.instrument = await WebAudioFontInstrumentLoader(songState, {
