@@ -6,7 +6,8 @@ import {
     exportWaitStatement,
     sourceToTokens
 } from '../compiler'
-import {renderSong} from "@songwalker/helper/songHelper";
+
+import {renderSong} from "@songwalker/helper/renderHelper";
 
 describe('compiler', () => {
     const emptyTemplate = (s: string) => s;

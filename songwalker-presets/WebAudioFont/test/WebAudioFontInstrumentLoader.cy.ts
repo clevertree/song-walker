@@ -10,7 +10,8 @@ import {
     PRESET_PATH_PERCUSSION,
     PRESET_PATH_PERCUSSION_KEYS
 } from "@songwalker-presets/WebAudioFont/constants";
-import {getSongRendererState} from "@songwalker/helper/songHelper";
+
+import {getSongRendererState} from "@songwalker/helper/renderHelper";
 
 describe('WebAudioFontInstrument', () => {
 

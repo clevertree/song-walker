@@ -1,7 +1,8 @@
 // noinspection DuplicatedCode
 
 import WebAudioFontInstrument from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
-import {getSongRendererState} from "@songwalker/helper/songHelper";
+
+import {getSongRendererState} from "@songwalker/helper/renderHelper";
 
 describe('WebAudioFontInstrument', () => {
 

@@ -1,52 +1,18 @@
-import {
-    InstrumentInstance,
-    PresetBank,
-    SongCallback,
-    SongWalkerState,
-    TrackState,
-    TrackStateOverrides
-} from "@songwalker/types";
+import {PresetBank, SongCallback, SongWalkerState, TrackState, TrackStateOverrideCallback} from "@songwalker/types";
 import PresetLibrary from "../presets/PresetLibrary";
 import {parseNote} from "@songwalker";
 import {DEFAULT_BUFFER_DURATION} from "@songwalker/constants/buffer";
 
 
-export async function playSong(song: SongCallback, rootTrackOverrides: TrackStateOverrides = {}, context: AudioContext = new AudioContext()) {
+export async function playSong(song: SongCallback,
+                               rootTrackOverrides?: TrackStateOverrideCallback,
+                               context: AudioContext = new AudioContext()) {
     const songState = getSongPlayerState(context, rootTrackOverrides);
     await context.suspend();
     // Play song
     await song(songState)
     await waitForTrackToFinish(context, songState.rootTrackState);
     return songState;
-}
-
-export async function renderSong(song: SongCallback, rootTrackOverrides: TrackStateOverrides = {}) {
-    const {lengthInSeconds} = await walkSongHeadless(song);
-    const context = new OfflineAudioContext({
-        numberOfChannels: 2,
-        length: 44100 * lengthInSeconds,
-        sampleRate: 44100,
-    })
-    const songState = getSongRendererState(context, rootTrackOverrides);
-    // Render song
-    await song(songState)
-    return {
-        renderedBuffer: await context.startRendering(),
-        songState
-    };
-}
-
-export async function walkSongHeadless(song: SongCallback) {
-    const songState = getSongAnalysisState();
-    // Analyze song
-    await song(songState);
-    const {
-        rootTrackState: {
-            currentTime,
-            position
-        }
-    } = songState;
-    return {lengthInSeconds: currentTime, lengthPosition: position};
 }
 
 export async function waitForTrackToFinish(context: AudioContext, track: TrackState) {
@@ -57,12 +23,12 @@ export async function waitForTrackToFinish(context: AudioContext, track: TrackSt
     }
 }
 
-// function defaultWaitCallback(track: TrackState, duration: number) {
-//     track.position += duration;
-//     track.currentTime += duration * (60 / track.beatsPerMinute);
-//     // console.info('wait', duration, track.currentTime, track.beatsPerMinute);
-//     return typeof track.trackDuration !== "undefined" && track.trackDuration <= track.position;
-// }
+export async function defaultWaitCallback(track: TrackState, duration: number) {
+    track.position += duration;
+    track.currentTime += duration * (60 / track.beatsPerMinute);
+    // console.info('wait', duration, track.currentTime, track.beatsPerMinute);
+    return typeof track.trackDuration !== "undefined" && track.trackDuration <= track.position;
+}
 
 export async function defaultLoadPreset(songState: SongWalkerState, presetID: string | RegExp, config = {}, presetLibrary: PresetBank = PresetLibrary) {
     const preset = await findPreset(presetID, presetLibrary);
@@ -79,7 +45,9 @@ export async function findPreset(presetID: string | RegExp, presetLibrary: Prese
     throw new Error("Preset ID not found: " + presetID);
 }
 
-function getDefaultSongState(audioContext: BaseAudioContext, presetLibrary: PresetBank = PresetLibrary) {
+export function getDefaultSongState(audioContext: BaseAudioContext,
+                                    rootTrackOverrides?: TrackStateOverrideCallback,
+                                    presetLibrary: PresetBank = PresetLibrary) {
     const songState: SongWalkerState = {
         bufferDuration: DEFAULT_BUFFER_DURATION,
         parseNote,
@@ -92,12 +60,7 @@ function getDefaultSongState(audioContext: BaseAudioContext, presetLibrary: Pres
             currentTime: 0, // Plus buffer duration? no.
             position: 0,
         },
-        wait: async (track: TrackState, duration: number) => {
-            track.position += duration;
-            track.currentTime += duration * (60 / track.beatsPerMinute);
-            // console.info('wait', duration, track.currentTime, track.beatsPerMinute);
-            return typeof track.trackDuration !== "undefined" && track.trackDuration <= track.position;
-        },
+        wait: defaultWaitCallback,
         execute: (track, commandString, overrides) => {
             let {
                 instrument = () => {
@@ -120,35 +83,20 @@ function getDefaultSongState(audioContext: BaseAudioContext, presetLibrary: Pres
             trackCallback(newTrackState, ...args)
         },
     };
-    return songState;
-}
-
-
-export function getSongAnalysisState(): SongWalkerState {
-    return {
-        ...getDefaultSongState({} as BaseAudioContext),
-        execute: () => {
-            // Do not execute notes
-        },
-        executeTrack: () => {
-            // Do not execute sub-tracks
-        },
-        loadPreset: async () => {
-            // Do not load instruments
-            return null as unknown as InstrumentInstance
-        },
+    if (rootTrackOverrides) {
+        Object.assign(songState.rootTrackState,
+            typeof rootTrackOverrides === 'function' ? rootTrackOverrides(songState) : rootTrackOverrides);
     }
-}
-
-export function getSongRendererState(context: OfflineAudioContext, rootTrackOverrides: TrackStateOverrides = {}, presetLibrary: PresetBank = PresetLibrary) {
-    const songState = getDefaultSongState(context)
-    Object.assign(songState.rootTrackState, rootTrackOverrides);
     return songState;
 }
 
-export function getSongPlayerState(context: AudioContext = new AudioContext(), rootTrackOverrides: TrackStateOverrides = {}, presetLibrary: PresetBank = PresetLibrary) {
+
+export function getSongPlayerState(
+    context: AudioContext = new AudioContext(),
+    rootTrackOverrides?: TrackStateOverrideCallback,
+    presetLibrary: PresetBank = PresetLibrary) {
     let autoResumed = false;
-    const defaultSongState = getDefaultSongState(context, presetLibrary);
+    const defaultSongState = getDefaultSongState(context, rootTrackOverrides, presetLibrary);
     const songState: SongWalkerState = {
         ...defaultSongState,
         execute: (track, commandString, overrides) => {
@@ -173,7 +121,6 @@ export function getSongPlayerState(context: AudioContext = new AudioContext(), r
             return trackEnded;
         },
     }
-    Object.assign(songState.rootTrackState, rootTrackOverrides);
     return songState;
 }
 

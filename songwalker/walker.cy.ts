@@ -1,5 +1,6 @@
 import {SongWalkerState, TrackState} from "@songwalker/types";
-import {renderSong} from "@songwalker/helper/songHelper";
+
+import {renderSong} from "@songwalker/helper/renderHelper";
 
 describe('songPlayer', () => {
     it('plays sub-tracks', async () => {

@@ -1,8 +1,9 @@
 // noinspection DuplicatedCode
 
-import {getSongPlayerState, playSong, renderSong} from "@songwalker/helper/songHelper";
+import {getSongPlayerState, playSong} from "@songwalker/helper/songHelper";
 import {AudioBufferInstrument} from "@songwalker/instruments";
 import {songwalker} from "@songwalker/compiler/compiler";
+import {renderSong} from "@songwalker/helper/renderHelper";
 
 const song = songwalker`
 await loadPreset("Oscillator");

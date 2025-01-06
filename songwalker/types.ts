@@ -50,11 +50,13 @@ export interface TrackState {
     // Track-specific
     trackDuration?: number,
     // trackStart?: number,
+    custom?: any
 }
 
 export type TrackStateOverrides = {
     [param in keyof TrackState]?: TrackState[param]
 }
+export type TrackStateOverrideCallback = TrackStateOverrides | ((songState: SongWalkerState) => TrackStateOverrides)
 
 export type TrackCallback = (track: TrackState, ...args: any[]) => void
 
