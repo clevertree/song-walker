@@ -1,21 +1,28 @@
 // noinspection DuplicatedCode
 
-import WebAudioFontInstrument from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
+import {WebAudioFontInstrumentConfig} from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
 
-import {getSongRendererState} from "@songwalker/helper/renderHelper";
+import {renderSong} from "@songwalker/helper/renderHelper";
+import {songwalker} from "@songwalker/compiler/compiler";
+import {getSongPlayerState, playSong} from "@songwalker/helper/songHelper";
+import AudioBufferInstrument from "../../../songwalker/instruments/AudioBufferInstrument";
 
+const song = songwalker`
+await loadPreset('WebAudioFont', track.custom.webAudioFontConfig);
+
+for (let o = 2; o <= 6; o++) {
+    for (let i = 0; i < 6; i++) {
+        const note = String.fromCharCode(65 + i)
+        execute(track, note + o, {duration: 1 / 9})
+        1/8
+    }
+}
+D4 1 C4 1
+`
 describe('WebAudioFontInstrument', () => {
 
     it('loads and plays', async () => {
-        const context = new OfflineAudioContext({
-            numberOfChannels: 2,
-            length: 44100 * 8,
-            sampleRate: 44100,
-        });
-        const songState = getSongRendererState(context);
-        const {rootTrackState: track} = songState;
-        track.beatsPerMinute = 160;
-        track.instrument = await WebAudioFontInstrument(songState, {
+        const webAudioFontConfig: WebAudioFontInstrumentConfig = {
             zones: [
                 {
                     ahdsr: false,
@@ -28,21 +35,20 @@ describe('WebAudioFontInstrument', () => {
                     loopEnd: 213,
                     loopStart: 188,
                     // midi: 31,
-                    originalPitch: 8700,
+                    originalPitch: 8700 * 1,
                     sampleRate: 44100
                 }
             ]
-        })
-
-        const {wait, execute} = songState;
-
-        for (let i = 0; i < 4; i++) {
-            execute(track, 'C3^10', {duration: 1 / 2})
-            wait(track, 1 / 2)
-            execute(track, 'D#3^10', {duration: 1 / 4})
-            wait(track, 1 / 4)
-            execute(track, 'E#3^10', {duration: 1 / 4})
-            wait(track, 1 / 4)
         }
+        const {renderedBuffer} = await renderSong(song, {
+            custom: {webAudioFontConfig}
+        });
+        console.log('renderedBuffer', renderedBuffer)
+
+        const playerState = getSongPlayerState()
+        const instrument = await AudioBufferInstrument(playerState, {
+            src: renderedBuffer,
+        })
+        await playSong(songwalker`play`, {instrument})
     })
 })

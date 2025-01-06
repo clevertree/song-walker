@@ -1,4 +1,4 @@
-import {formatCommandOverrides, parseNote} from "./commandHelper";
+import {formatCommandOverrides, parseNote} from "../commandHelper";
 import {OVERRIDE_ALIAS} from "@songwalker/compiler/compiler";
 
 describe('noteHelper', () => {

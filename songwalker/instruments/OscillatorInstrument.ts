@@ -44,7 +44,7 @@ const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (song
         if (!noteInfo)
             throw new Error("Unrecognized note: " + command);
         if (filterNote(noteInfo))
-            return track
+            return
         return playOscillatorNote(noteInfo, track)
     }
 
@@ -82,7 +82,7 @@ const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (song
         }
         oscillator.stop(endTime);
         // TODO: add active notes to track state?
-        return track
+        return oscillator;
     }
 
     function configOscillator() {
@@ -116,7 +116,7 @@ const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (song
         switch (command) {
             case "detune":
                 config.detune = track.velocity
-                return track;
+                return;
         }
         throw new Error("Unknown config key: " + command);
     }

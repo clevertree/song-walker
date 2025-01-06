@@ -28,7 +28,7 @@ const WebAudioFontInstrument: InstrumentLoader<WebAudioFontInstrumentConfig> = a
         console.error(`WebAudioFontInstrumentLoader continued loading past buffer (${syncTime}).`)
     }
 
-    return function playWebAudioFontNote(track: TrackState, commandString: string) {
+    function playWebAudioFontNote(track: TrackState, commandString: string) {
         const {
             destination = audioContext.destination,
             currentTime,
@@ -46,5 +46,10 @@ const WebAudioFontInstrument: InstrumentLoader<WebAudioFontInstrumentConfig> = a
         const durationSeconds = duration * (60 / beatsPerMinute)
         player.queueWaveTable(audioContext, destination, config, currentTime, pitch, durationSeconds);
     }
+
+    // Set this instrument if no root track instrument was set
+    if (!songState.rootTrackState.instrument)
+        songState.rootTrackState.instrument = playWebAudioFontNote;
+    return playWebAudioFontNote
 }
 export default WebAudioFontInstrument

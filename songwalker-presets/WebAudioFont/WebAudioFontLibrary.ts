@@ -13,8 +13,17 @@ import {
     PRESET_PATH_PERCUSSION_KEYS,
     PRESET_PATH_PERCUSSION_NAMES
 } from "@songwalker-presets/WebAudioFont/constants";
+import WebAudioFontInstrument from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
 
 export const WebAudioFontLibrary = async function* listPresets() {
+    yield {
+        title: "WebAudioFont",
+        loader: WebAudioFontInstrument
+    }
+    yield {
+        title: "WebAudioFontLoader",
+        loader: WebAudioFontInstrumentLoader
+    }
     yield* listInstruments()
     yield* listDrumAndDrumSets()
 }

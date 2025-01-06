@@ -1,6 +1,6 @@
 // noinspection DuplicatedCode
 
-import WebAudioFontInstrumentLoader from "@songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader";
+import {WebAudioFontInstrumentLoaderConfig} from "@songwalker-presets/WebAudioFont/WebAudioFontInstrumentLoader";
 import {fetchJSONFromMirror} from "@songwalker-presets/WebAudioFont/mirrors";
 import {
     PRESET_PATH_DRUMSET,
@@ -11,81 +11,102 @@ import {
     PRESET_PATH_PERCUSSION_KEYS
 } from "@songwalker-presets/WebAudioFont/constants";
 
-import {getSongRendererState} from "@songwalker/helper/renderHelper";
+import {renderSong} from "@songwalker/helper/renderHelper";
+import {getSongPlayerState, playSong} from "@songwalker/helper/songHelper";
+import AudioBufferInstrument from "../../../songwalker/instruments/AudioBufferInstrument";
+import {songwalker} from "@songwalker/compiler/compiler";
 
 describe('WebAudioFontInstrument', () => {
 
 
     it('loads and plays instrument', async () => {
+
+        const song = songwalker`
+await loadPreset('WebAudioFontLoader', track.custom.webAudioFontInstrumentLoaderConfig);
+
+for (let o = 0; o <= 4; o++) {
+    for (let i = 0; i < 6; i++) {
+        const note = String.fromCharCode(65 + i)
+        execute(track, note + o, {duration: 1 / 9})
+        1/8
+    }
+}
+D4 1 C4 1
+`
         let instrumentKeys = await fetchJSONFromMirror(PRESET_PATH_INSTRUMENT_KEYS);
-        const context = new OfflineAudioContext({
-            numberOfChannels: 2,
-            length: 44100 * 8,
-            sampleRate: 44100,
-        });
-        const songState = getSongRendererState(context);
-        const {rootTrackState: track} = songState;
-        track.instrument = await WebAudioFontInstrumentLoader(songState, {
+        const webAudioFontInstrumentLoaderConfig: WebAudioFontInstrumentLoaderConfig = {
             presetPath: `${PRESET_PATH_INSTRUMENT}/${instrumentKeys[Math.round(Math.random() * instrumentKeys.length)]}.json`
-        })
-
-        const {wait, execute} = songState;
-
-        for (let i = 0; i < 4; i++) {
-            execute(track, 'C3^10', {duration: 1 / 2})
-            wait(track, 1 / 2)
-            execute(track, 'D#3^10', {duration: 1 / 4})
-            wait(track, 1 / 4)
-            execute(track, 'E#3^10', {duration: 1 / 4})
-            wait(track, 1 / 4)
         }
+
+        const {renderedBuffer} = await renderSong(song, {
+            custom: {webAudioFontInstrumentLoaderConfig}
+        });
+        console.log('renderedBuffer', renderedBuffer)
+
+        const playerState = getSongPlayerState()
+        const instrument = await AudioBufferInstrument(playerState, {
+            src: renderedBuffer,
+        })
+        await playSong(songwalker`play`, {instrument})
     })
 
     it('loads and plays percussion', async () => {
+        const song = songwalker`
+await loadPreset('WebAudioFontLoader', track.custom.webAudioFontInstrumentLoaderConfig);
+
+for (let o = 0; o <= 4; o++) {
+    for (let i = 0; i < 6; i++) {
+        const note = String.fromCharCode(65 + i)
+        execute(track, note + o, {duration: 1 / 9})
+        1/8
+    }
+}
+D4 1 C4 1
+`
         let percussionKeys = await fetchJSONFromMirror(PRESET_PATH_PERCUSSION_KEYS);
-        const context = new OfflineAudioContext({
-            numberOfChannels: 2,
-            length: 44100 * 8,
-            sampleRate: 44100,
-        });
-        const songState = getSongRendererState(context);
-        const {rootTrackState: track} = songState;
-
-        track.instrument = await WebAudioFontInstrumentLoader(songState, {
+        const webAudioFontInstrumentLoaderConfig: WebAudioFontInstrumentLoaderConfig = {
             presetPath: `${PRESET_PATH_PERCUSSION}/${percussionKeys[Math.round(Math.random() * percussionKeys.length)]}.json`
-        })
-
-        const {wait, execute} = songState;
-
-        for (let i = 0; i < 8; i++) {
-            execute(track, 'C3', {duration: 1 / 2})
-            wait(track, 1 / 4)
         }
+
+        const {renderedBuffer} = await renderSong(song, {
+            custom: {webAudioFontInstrumentLoaderConfig}
+        });
+        console.log('renderedBuffer', renderedBuffer)
+
+        const playerState = getSongPlayerState()
+        const instrument = await AudioBufferInstrument(playerState, {
+            src: renderedBuffer,
+        })
+        await playSong(songwalker`play`, {instrument})
     })
 
     it('loads and plays drumset', async () => {
+        const song = songwalker`
+await loadPreset('WebAudioFontLoader', track.custom.webAudioFontInstrumentLoaderConfig);
+
+for (let o = 0; o <= 4; o++) {
+    for (let i = 0; i < 6; i++) {
+        const note = String.fromCharCode(65 + i)
+        execute(track, note + o, {duration: 1 / 9})
+        1/8
+    }
+}
+D4 1 C4 1
+`
         let drumsetKeys = await fetchJSONFromMirror(PRESET_PATH_DRUMSET_KEYS);
-
-        const context = new OfflineAudioContext({
-            numberOfChannels: 2,
-            length: 44100 * 8,
-            sampleRate: 44100,
-        });
-        const songState = getSongRendererState(context);
-        const {rootTrackState: track} = songState;
-
-        track.instrument = await WebAudioFontInstrumentLoader(songState, {
+        const webAudioFontInstrumentLoaderConfig: WebAudioFontInstrumentLoaderConfig = {
             presetPath: `${PRESET_PATH_DRUMSET}/${drumsetKeys[Math.round(Math.random() * drumsetKeys.length)]}.json`
-        })
-
-        const {wait, execute} = songState;
-
-        for (let o = 0; o <= 2; o++) {
-            for (let i = 0; i < 6; i++) {
-                const note = String.fromCharCode(65 + i)
-                execute(track, 'C3', {duration: 1 / 2})
-                wait(track, 1 / 4)
-            }
         }
+
+        const {renderedBuffer} = await renderSong(song, {
+            custom: {webAudioFontInstrumentLoaderConfig}
+        });
+        console.log('renderedBuffer', renderedBuffer)
+
+        const playerState = getSongPlayerState()
+        const instrument = await AudioBufferInstrument(playerState, {
+            src: renderedBuffer,
+        })
+        await playSong(songwalker`play`, {instrument})
     })
 })

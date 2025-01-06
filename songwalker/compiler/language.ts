@@ -10,8 +10,8 @@ const LANGUAGE = {
         },
     },
     'function-definition': /(?=async\s+)?\bfunction\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{/,
-    'function-statement': functionStatement,
     'track-statement': /\|([a-zA-Z][^@^=;().\s]*)((?:[@^][^@^=;()\s]+)*)(?:\(((?:[^()]|\([^()]*\))*)\))?;?/,
+    'function-statement': functionStatement,
     'command-statement': /\b([a-zA-Z][a-zA-Z0-9]*)((?:[@^][^@^=;()\s]+)*);?/,
     'wait-statement': /(\d*[\/.]?\d+)/
 }

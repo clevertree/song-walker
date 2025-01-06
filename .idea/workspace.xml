@@ -5,21 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e87670a7-8e55-4d3a-9cd9-39fed29fbd42" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/songwalker/helper/renderHelper.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontInstrument.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontLibrary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/WebAudioFontLibrary.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrument.cy.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrumentLoader.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontInstrumentLoader.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontLibrary.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test/WebAudioFontLibrary.cy.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker/compiler/test/compiler.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/compiler/test/compiler.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/helper/commandHelper.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/helper/test/commandHelper.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/helper/songHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/helper/songHelper.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/delay/test/DelayEffect.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/effects/delay/test/DelayEffect.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/reverb/test/ReverbEffect.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/effects/reverb/test/ReverbEffect.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/AudioBufferInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/AudioBufferInstrument.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/OscillatorInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/OscillatorInstrument.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/PolyphonyInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/test/PolyphonyInstrument.cy.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/types.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker/walker.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/walker.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/helper/test/commandHelper.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/helper/test/commandHelper.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/OscillatorInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/instruments/OscillatorInstrument.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -157,7 +150,7 @@
       <workItem from="1735589656530" duration="9965000" />
       <workItem from="1735666537572" duration="596000" />
       <workItem from="1735674428482" duration="1197000" />
-      <workItem from="1735681749305" duration="65412000" />
+      <workItem from="1735681749305" duration="67006000" />
     </task>
     <servers />
   </component>
