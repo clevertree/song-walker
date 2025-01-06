@@ -1,4 +1,4 @@
-import {InstrumentLoader, ParsedNote, SongWalkerState, TrackState} from "@songwalker/types";
+import {InstrumentLoader, SongWalkerState, TrackState} from "@songwalker/types";
 import {parseNote} from "..";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";
@@ -35,6 +35,7 @@ const AudioBufferInstrument: InstrumentLoader<AudioBufferInstrumentConfig> = asy
         // TODO: check alias
         switch (command) {
             case 'play':
+                return playAudioBufferNote(track)
             case 'stop':
                 throw 'todo';
         }
@@ -42,8 +43,8 @@ const AudioBufferInstrument: InstrumentLoader<AudioBufferInstrumentConfig> = asy
         if (!noteInfo)
             throw new Error("Unrecognized note: " + command);
         if (filterNote(noteInfo))
-            return track
-        return playAudioBufferNote(noteInfo, track)
+            return;
+        return playAudioBufferNote(track, noteInfo.frequency)
     }
 
     // Set this instrument if no root track instrument was set
@@ -51,11 +52,11 @@ const AudioBufferInstrument: InstrumentLoader<AudioBufferInstrumentConfig> = asy
         songState.rootTrackState.instrument = playAudioBuffer;
     return playAudioBuffer
 
-    function playAudioBufferNote(noteInfo: ParsedNote, track: TrackState) {
+    function playAudioBufferNote(track: TrackState, frequency?: number) {
         let {
             beatsPerMinute,
             currentTime,
-            duration = 0,
+            duration,
             pan = 0
         } = {...config, ...track};
 
@@ -72,11 +73,14 @@ const AudioBufferInstrument: InstrumentLoader<AudioBufferInstrumentConfig> = asy
         }
 
         // Audio Buffer
-        const bufferNode = createSourceNode(noteInfo, destination)
+        const bufferNode = createSourceNode(destination, frequency)
 
         bufferNode.start(currentTime);
-        const endTime = currentTime + (duration * (60 / beatsPerMinute));
-        bufferNode.stop(endTime);
+        if (typeof duration !== 'undefined') {
+            const endTime = currentTime + (duration * (60 / beatsPerMinute));
+            bufferNode.stop(endTime);
+        }
+        return bufferNode;
         // TODO: add active notes to track state?
     }
 
@@ -94,13 +98,14 @@ const AudioBufferInstrument: InstrumentLoader<AudioBufferInstrumentConfig> = asy
             audioBuffer = src;
         }
         const parsedFrequencyRoot = getFrequencyRoot(frequencyRoot);
-        return (noteInfo: ParsedNote, destination: AudioNode) => {
-            const {frequency} = noteInfo;
+        return (destination: AudioNode, frequency?: number) => {
             const bufferNode = audioContext.createBufferSource();
             bufferNode.buffer = audioBuffer;
             bufferNode.detune.value = detune
             bufferNode.loop = loop;
-            bufferNode.playbackRate.value = frequency / parsedFrequencyRoot;
+            if (frequency) {
+                bufferNode.playbackRate.value = frequency / parsedFrequencyRoot;
+            }
             // Connect Source
             bufferNode.connect(destination);
             return bufferNode;

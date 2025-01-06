@@ -39,20 +39,20 @@ describe('songPlayer', () => {
 
 
 async function testSong(songState: SongWalkerState) {
-    const {waitAsync, rootTrackState: track, execute, executeTrack} = songState;
+    const {wait, rootTrackState: track, execute, executeTrack} = songState;
     // track.instrument = await testMelodicInstrument(track, instrumentCallback)
 
     track.beatsPerMinute = 160;
     executeTrack(track, testTrack)
     executeTrack(track, testTrack2)
 
-    await waitAsync(track, 2);
+    await wait(track, 2);
 
     track.beatsPerMinute = 80;
     executeTrack(track, testTrack)
     executeTrack(track, testTrackLoadLate)
 
-    await waitAsync(track, 2);
+    await wait(track, 2);
 
 // async function testSongNoInstrument(track: TrackState) {
 //     trackRenderer.startTrack(testTrack)
@@ -63,44 +63,44 @@ async function testSong(songState: SongWalkerState) {
         execute(track, 'C5')
         // playCommand( 'config', {});
         // track.config = {} // no need for config objectrack
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         track.currentTime = 1
         track.velocity = 3
         track.duration = 1 / 6;
         execute(track, 'C4');
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, 'G4');
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, 'Eb4');
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, 'Eb5');
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, 'F5');
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, 'Eb5');
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, 'D5');
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         return track;
     }
 
     async function testTrack(track: TrackState) {
         execute(track, "C5", {duration: 1 / 4});
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, "C4", {duration: 1 / 4});
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, "G4", {duration: 1 / 4});
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, "Eb4", {duration: 1 / 4});
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, "Eb5", {duration: 1 / 4});
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, "F5", {duration: 1 / 4});
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, "Eb5", {duration: 1 / 4});
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         execute(track, "D5", {duration: 1 / 4});
-        await waitAsync(track, 1 / 4);
+        await wait(track, 1 / 4);
         // n(track, "C5", {duration: 1 / 4});
         return track;
     }
@@ -111,15 +111,17 @@ async function testSong(songState: SongWalkerState) {
         track.beatsPerMinute = 240;
         execute(track, "kick");
         execute(track, "hat");
-        await waitAsync(track, 1);
+        await wait(track, 1);
         execute(track, "hat");
-        await waitAsync(track, 1);
+        await wait(track, 1);
         execute(track, "snare");
         execute(track, "hat");
-        await waitAsync(track, 1);
+        await wait(track, 1);
         execute(track, "hat");
-        await waitAsync(track, 1);
+        await wait(track, 1);
         execute(track, "kick");
+        await wait(track, 1);
+        execute(track, "snare");
         return track;
     }
 }

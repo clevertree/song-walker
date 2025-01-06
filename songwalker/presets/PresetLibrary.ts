@@ -15,7 +15,6 @@ async function* PresetLibrary(): AsyncGenerator<Preset> {
 
 export default PresetLibrary;
 
-
 export function registerPresetBank(presetBank: PresetBank) {
     presetBanks.push(presetBank);
 }

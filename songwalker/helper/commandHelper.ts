@@ -1,5 +1,6 @@
 import {OverrideAliases, ParsedNote} from "@songwalker/types";
-import {LANGUAGE} from "@songwalker/compiler/compiler";
+
+import LANGUAGE from "@songwalker/compiler/language";
 
 const DEFAULT_FREQUENCY_A4 = 440; // 432;
 

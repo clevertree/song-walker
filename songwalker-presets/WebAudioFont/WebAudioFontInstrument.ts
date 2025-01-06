@@ -32,7 +32,7 @@ const WebAudioFontInstrument: InstrumentLoader<WebAudioFontInstrumentConfig> = a
         const {
             destination = audioContext.destination,
             currentTime,
-            duration = 0,
+            duration = 1,
             beatsPerMinute
         } = track;
         let pitch: number;

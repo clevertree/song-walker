@@ -1,4 +1,11 @@
-import {compileSongToCallback, compileSongToJavascript, EXPORT_JS, sourceToTokens} from './compiler'
+import {
+    compileSongToCallback,
+    compileSongToJavascript,
+    exportCommandStatement,
+    exportTrackDefinition,
+    exportWaitStatement,
+    sourceToTokens
+} from '../compiler'
 import {renderSong} from "@songwalker/helper/songHelper";
 
 describe('compiler', () => {
@@ -7,30 +14,38 @@ describe('compiler', () => {
         const SONG_SOURCE = `C5@3/8^.2`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [["command-statement", "C5@3/8^.2"]]
+            [{"type": "command-statement", "content": "C5@3/8^.2", "length": 9}]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(EXPORT_JS.commandStatement('C5@3/8^.2'))
+        expect(javascriptContent).to.eq(exportCommandStatement('C5@3/8^.2'))
     })
 
     it('wait statement - 1/6; /5', () => {
         const SONG_SOURCE = `1/6; /5`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [["wait-statement", "1/6"], "; ", ["wait-statement", "/5"]]
-        ))
+            [
+                {"type": "wait-statement", "content": "1/6", "length": 3},
+                "; ",
+                {"type": "wait-statement", "content": "/5", "length": 2}
+            ]))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(EXPORT_JS.wait(`1/6`) + '; ' + EXPORT_JS.wait(`1/5`))
+        expect(javascriptContent).to.eq(exportWaitStatement(`1/6`) + '; ' + exportWaitStatement(`1/5`))
     })
 
     it('set track variable', () => {
         const SONG_SOURCE = `track.someVar = 'wutValue';track.someVar=1/7;track.someVar = track.otherVar;`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [
-                ["variable-statement", "track.someVar = 'wutValue';"],
-                ["variable-statement", "track.someVar=1/7;"],
-                ["variable-statement", "track.someVar = track.otherVar;"]]
+            [{
+                "type": "variable-statement",
+                "content": ["track.someVar = 'wutValue';"],
+                "length": 27
+            }, {
+                "type": "variable-statement",
+                "content": ["track.someVar=1/7;"],
+                "length": 18
+            }, {"type": "variable-statement", "content": ["track.someVar = track.otherVar;"], "length": 31}]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
         expect(javascriptContent).to.eq("track.someVar = 'wutValue';track.someVar=1/7;track.someVar = track.otherVar;")
@@ -40,10 +55,11 @@ describe('compiler', () => {
         const SONG_SOURCE = `const someVar = wutVar;let otherVar=1/7;`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [
-                ["variable-statement", "const someVar = wutVar;"],
-                ["variable-statement", "let otherVar=1/7;"]
-            ]
+            [{
+                "type": "variable-statement",
+                "content": ["const someVar = wutVar;"],
+                "length": 23
+            }, {"type": "variable-statement", "content": ["let otherVar=1/7;"], "length": 17}]
         ))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
         expect(javascriptContent).to.eq("const someVar = wutVar;let otherVar=1/7;")
@@ -54,12 +70,16 @@ describe('compiler', () => {
         const SONG_SOURCE = `track myTrack(myTrackArg) { C4^2 D4@2 }`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [["track-definition", "track myTrack(myTrackArg) {"], " ", ["command-statement", "C4^2"], " ", ["command-statement", "D4@2"], " }"]
-        ))
+            [
+                {"type": "track-definition", "content": "track myTrack(myTrackArg) {", "length": 27},
+                " ",
+                {"type": "command-statement", "content": "C4^2", "length": 4},
+                " ",
+                {"type": "command-statement", "content": "D4@2", "length": 4}, " }"]))
         const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
         expect(javascriptContent).to.eq(
-            EXPORT_JS.trackDefinition("track myTrack(myTrackArg) {")
-            + ` ${EXPORT_JS.commandStatement('C4^2')} ${EXPORT_JS.commandStatement('D4@2')} }`)
+            exportTrackDefinition("track myTrack(myTrackArg) {")
+            + ` ${exportCommandStatement('C4^2')} ${exportCommandStatement('D4@2')} }`)
 
     })
 
@@ -68,25 +88,15 @@ describe('compiler', () => {
         const SONG_SOURCE = `testFunction('arg');`
         const compiledSource = sourceToTokens(SONG_SOURCE);
         expect(JSON.stringify(compiledSource)).to.eq(JSON.stringify(
-            [["function-statement", "testFunction('arg');"]]
-        ))
+            [
+                {"type": "function-statement", "content": "testFunction('arg');", "length": 20}
+            ]))
     })
 
     it('compiles to callback', () => {
         cy.fixture('test.song').then((SONG_SOURCE) => {
-            cy.fixture('test.song.compiled').then((SONG_SOURCE_COMPILED) => {
-                const javascriptContent = compileSongToJavascript(SONG_SOURCE);
-                console.log(javascriptContent)
-                const callback = compileSongToCallback(SONG_SOURCE);
-                console.log('callback', callback);
-                // expect(Object.values(tokens).length).to.eq(88);
-                // const cmdList1 = javascriptContent.split(/\n/);
-                // const cmdList2 = SONG_SOURCE_COMPILED.split(/\n/);
-                // for (let i = 0; i < cmdList1.length; i++) {
-                //     expect(cmdList1[i].replace(/\s/g, '')).to.eq(cmdList2[i].replace(/\s/g, ''))
-                // }
-                // expect(javascriptContent).to.eq(SONG_SOURCE_COMPILED)
-            })
+            const callback = compileSongToCallback(SONG_SOURCE);
+            console.log('callback', callback);
         })
     })
 

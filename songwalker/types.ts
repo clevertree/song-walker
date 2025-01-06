@@ -1,9 +1,9 @@
-export type TokenItem = [name: string, content: TokenList | string]
+// export type TokenItem = [name: string, content: TokenList | string]
 
 // export type TokenItemOrString = TokenItem | string
 
 
-export type TokenList = Array<TokenItem | string>
+// export type TokenList = Array<TokenItem | string>
 
 
 export type SongError = {
@@ -60,8 +60,9 @@ export type TrackCallback = (track: TrackState, ...args: any[]) => void
 
 
 export interface SongWalkerState {
+    getContext(): BaseAudioContext
+
     bufferDuration: number,
-    getContext: () => BaseAudioContext
     rootTrackState: TrackState
     wait: (track: TrackState, duration: number) => Promise<boolean>
     // waitForTrackToFinish: (track: TrackState) => Promise<void>
@@ -88,7 +89,7 @@ export interface SongTrackEvent {
 
 // export type InstrumentInstance = (trackState: TrackState, command: string) => NoteHandler;
 export type InstrumentInstance = (track: TrackState,
-                                  command: string) => TrackState | void;
+                                  command: string) => void | AudioScheduledSourceNode;
 
 export type InstrumentLoader<Config = any> = (song: SongWalkerState, config: Config) => Promise<InstrumentInstance> | InstrumentInstance
 

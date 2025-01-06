@@ -1,54 +1,54 @@
-(async function rootTrack({waitAsync, execute, executeTrack, loadPreset, rootTrackState: track}) {
+(async function rootTrack({wait, execute, executeTrack, loadPreset, rootTrackState: track}) {
     const lead = await loadPreset(/FluidR3.*\/.*Guitar/i);
-    const osc = await loadPreset("Oscillator", {'type': 'square'});
+    const osc = await loadPreset("Oscillator", {'type': 'square', mixer: 0.4});
     const perc = await loadPreset("FluidR3_GM/Room 1");
     const reverb = await loadPreset("Reverb");
     track.beatsPerMinute = 160;
 
-    track1(track, osc);
-    executeTrack(track, beat1.bind(track), {velocity: 96, trackDuration: 4});
-    if (await waitAsync(track, 8)) return;
-    executeTrack(track, track1.bind(track, osc));
-    executeTrack(track, beat1.bind(track), {trackDuration: 7});
-    if (await waitAsync(track, 8))
+    executeTrack(track, track1, {}, lead);
+    executeTrack(track, beat1, {velocity: 96, trackDuration: 4});
+    if (await wait(track, 8)) return;
+    executeTrack(track, track1, {}, osc);
+    executeTrack(track, beat1, {trackDuration: 7});
+    if (await wait(track, 8))
 
-        async function track1(track, instrument) {
-            track.effects = [reverb];
-            track.instrument = instrument;
-            track.duration = 1 / 4
-            execute(track, "C3");
-            if (await waitAsync(track, 1 / 2)) return;
-            track.pitchBend = -0.4
-            track.config = {var: 'wut'}
-            execute(track, "C2", {duration: 1 / 4});
-            if (await waitAsync(track, 1 / 2)) return;  // override duration and velocity
-            execute(track, "G2");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "Eb2");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "Eb3");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "F3");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "Eb3");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "D3");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "C3");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "C2");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "G2");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "Eb2");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "D3");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "C2");
-            if (await waitAsync(track, 1 / 2)) return;
-            execute(track, "Bb2");
-            if (await waitAsync(track, 1 / 2))
-        }
+    async function track1(track, instrument) {
+        track.effects = [reverb];
+        track.instrument = instrument;
+        track.duration = 1 / 4
+        execute(track, "C3");
+        if (await wait(track, 1 / 2)) return;
+        track.pitchBend = -0.4
+        track.config = {var: 'wut'}
+        execute(track, "C2", {duration: 1 / 4});
+        if (await wait(track, 1 / 2)) return;  // override duration and velocity
+        execute(track, "G2");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "Eb2");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "Eb3");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "F3");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "Eb3");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "D3");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "C3");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "C2");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "G2");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "Eb2");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "D3");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "C2");
+        if (await wait(track, 1 / 2)) return;
+        execute(track, "Bb2");
+        if (await wait(track, 1 / 2))
+    }
 
     async function beat1(track) {
 // console.log(track.destination.context.currentTime, track.currentTime);
@@ -56,47 +56,47 @@
         track.instrument = perc
         track.velocityDivisor = 10
         execute(track, "chh", {velocity: 3});
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh", {velocity: 3});
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh");
         execute(track, "as");
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh", {velocity: 3, duration: 1 / 8});
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh");
         execute(track, "abd");
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh", {velocity: 3});
         execute(track, "abd", {velocity: 6});
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh");
         execute(track, "as");
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh", {velocity: 3});
-        if (await waitAsync(track, 1 / 4)) return;
+        if (await wait(track, 1 / 4)) return;
         execute(track, "chh", {velocity: 3});
-        if (await waitAsync(track, 1 / 4)) return;
+        if (await wait(track, 1 / 4)) return;
         execute(track, "chh");
         execute(track, "abd");
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh", {velocity: 3});
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh");
         execute(track, "as");
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh", {velocity: 3});
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh");
         execute(track, "abd");
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh", {velocity: 3});
         execute(track, "abd", {velocity: 6});
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "chh");
         execute(track, "as");
-        if (await waitAsync(track, 1 / 2)) return;
+        if (await wait(track, 1 / 2)) return;
         execute(track, "ohh", {velocity: 3, duration: 1 / 3});
-        if (await waitAsync(track, 1 / 2))
+        if (await wait(track, 1 / 2))
     }
 })

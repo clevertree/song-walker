@@ -12,9 +12,7 @@ export interface DelayEffectConfig {
 }
 
 const DelayEffect: InstrumentLoader<DelayEffectConfig> = (songState, config) => {
-    const {
-        context: audioContext
-    } = songState;
+    const audioContext = songState.getContext();
 
     return function connectDelayEffect(track: TrackState) {
         const {
@@ -28,10 +26,10 @@ const DelayEffect: InstrumentLoader<DelayEffectConfig> = (songState, config) => 
             duration = 1,
         } = config;
 
-        const delayTime = duration * (60 / beatsPerMinute);
+        const maxDelayTime = duration * (60 / beatsPerMinute);
 
         const effectDestination = new GainNode(audioContext);
-        const delayNode = new DelayNode(audioContext, {delayTime})
+        const delayNode = new DelayNode(audioContext, {delayTime: maxDelayTime, maxDelayTime})
         const feedbackNode = new GainNode(audioContext, {gain: feedback})
 
         // Connect Delay node and setup feedback

@@ -1,39 +1,31 @@
 // noinspection DuplicatedCode
 
-import {getSongRendererState} from "@songwalker/helper/songHelper";
-import {OscillatorInstrument} from "@songwalker/instruments";
-import ReverbEffect from "@songwalker/instruments/effects/reverb/ReverbEffect";
+import {getSongPlayerState, playSong, renderSong} from "@songwalker/helper/songHelper";
+import {AudioBufferInstrument} from "@songwalker/instruments";
+import {songwalker} from "@songwalker/compiler/compiler";
 
-describe('Oscillator', () => {
-    it('Oscillator with Reverb', async () => {
-        const context = new OfflineAudioContext({
-            numberOfChannels: 2,
-            length: 44100 * 8,
-            sampleRate: 44100,
-        });
-        const songState = getSongRendererState(context);
-        const {rootTrackState: track} = songState;
-        // track.bufferDuration = 0.2
+const song = songwalker`
+await loadPreset("Oscillator");
+track.effects = [await loadPreset("Reverb", {duration: 10, decay: 0.5})];
+for (let o = 2; o <= 6; o++) {
+    for (let i = 0; i < 6; i++) {
+        const note = String.fromCharCode(65 + i)
+        execute(track, note + o, {duration: 1 / 9})
+        1/8
+    }
+}
+10
+`
 
-        OscillatorInstrument(songState, {
-            mixer: .8,
-            pan: 0.2
-        });
-        track.effects = [await ReverbEffect(songState, {
-            reverse: false,
-            duration: 10,
-            decay: 10
-        })];
+describe('ReverbEffect', () => {
+    it('Oscillator with ReverbEffect', async () => {
+        const {renderedBuffer} = await renderSong(song);
+        console.log('renderedBuffer', renderedBuffer)
 
-        const {wait, execute} = songState;
-
-
-        for (let o = 2; o <= 6; o++) {
-            for (let i = 0; i < 6; i++) {
-                const note = String.fromCharCode(65 + i)
-                execute(track, `${note}${o}`, {duration: 1 / 9})
-                await wait(track, 1 / 8)
-            }
-        }
+        const playerState = getSongPlayerState()
+        const instrument = await AudioBufferInstrument(playerState, {
+            src: renderedBuffer,
+        })
+        await playSong(songwalker`play`, {instrument})
     })
 })

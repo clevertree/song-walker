@@ -56,7 +56,7 @@ const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (song
     function playOscillatorNote(noteInfo: ParsedNote, track: TrackState) {
         let {
             currentTime,
-            duration = 0,
+            duration = 1,
             beatsPerMinute,
             pan = 0
         } = {...config, ...track};
@@ -72,7 +72,6 @@ const OscillatorInstrument: InstrumentLoader<OscillatorInstrumentConfig> = (song
             panNode.connect(gainNode);
             destination = panNode;
         }
-
         // Oscillator
         const oscillator = createOscillator(noteInfo, destination);
         oscillator.start(currentTime);

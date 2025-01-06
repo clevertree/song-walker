@@ -1,6 +1,84 @@
-import {OverrideAliases, SongCallback, SongWalkerState, TokenItem, TokenList} from "@songwalker/types";
+import {OverrideAliases, SongCallback, SongWalkerState} from "@songwalker/types";
 import {formatCommandOverrides, parseWait} from "@songwalker/helper/commandHelper";
 import Prism, {Token} from "prismjs";
+import LANGUAGE from "@songwalker/compiler/language";
+
+
+function formatTokenContent(token: Token | string, currentTokenID = 0): string {
+    if (typeof token === "string")
+        return token;
+    switch (token.type as keyof typeof LANGUAGE) {
+        case 'comment':
+        case 'function-definition':
+        case 'loop-statement':
+        case 'function-statement':
+            return token.content as string;
+        // return exportFunctionStatement(token.content as string);
+        case 'variable-statement':
+            return (token.content as Array<Token | string>).map(formatTokenContent).join('')
+        case 'track-statement':
+            return exportTrackStatement(token.content as string);
+        case 'track-definition':
+            return exportTrackDefinition(token.content as string);
+        case 'command-statement':
+            return exportCommandStatement(token.content as string);
+        case 'wait-statement':
+            return exportWaitStatement(parseWait(token.content as string));
+        default:
+            throw new Error(`Unknown token type '${token.content}': ${JSON.stringify(token)} at tokenID ${currentTokenID}`);
+    }
+}
+
+export function sourceToTokens(source: string) {
+    return Prism.tokenize(source, LANGUAGE);
+}
+
+export function compileSongToJavascript(
+    songSource: string,
+    template: (s: string) => string = exportSongTemplate
+    // eventMode: boolean = false
+) {
+    const tokenList = sourceToTokens(songSource)
+    console.info((tokenList))
+    const javascriptSource = tokenList
+        .map((token, tokenID) => {
+            if (typeof token === "string")
+                return token;
+            return `${formatTokenContent(token, tokenID)}`;
+        })
+        .join('');
+    return template(javascriptSource)
+}
+
+
+export function compileSongToCallback(songSource: string) {
+    const jsSource = compileSongToJavascript(songSource);
+    console.info(jsSource)
+    const callback: SongCallback = eval(jsSource);
+    return callback;
+}
+
+export function songwalker(strings: TemplateStringsArray, ...values: string[]) {
+    let result = '';
+    strings.forEach((str, i) => {
+        result += str + (values[i] ? values[i] : '');
+    });
+    return compileSongToCallback(result);
+}
+
+// export function getTokenLength(token: TokenItem | string): number {
+//     if (typeof token === 'string') {
+//         return token.length;
+//     } else {
+//         if (Array.isArray(token.content)) {
+//             return token.content.reduce((sum, token) => sum + getTokenLength(token), 0);
+//         } else {
+//             return token.content.length
+//         }
+//     }
+// }
+
+/** Compiler Exports **/
 
 const ROOT_TRACK = 'rootTrack';
 const VAR_TRACK_STATE = 'track';
@@ -17,46 +95,7 @@ export const F_EXPORT = `{${
     'loadPreset' as keyof SongWalkerState
 }, ${
     'rootTrackState' as keyof SongWalkerState
-}:track}`
-export const EXPORT_JS = {
-    // songTemplate: (sourceCode: string) => `(() => {return ${sourceCode}})()`,
-    songTemplate: (sourceCode: string) =>
-        `(async function ${ROOT_TRACK}(${F_EXPORT}) {\n${sourceCode}})`,
-
-    commandStatement: (commandString: string) => {
-        const match = (commandString).match(LANGUAGE["command-statement"]);
-        if (!match)
-            throw new Error("Invalid command statement: " + commandString)
-        const [, command, overrideString] = match;
-        const exportOverrides = overrideString ? ', ' + formatCommandOverrides(overrideString, OVERRIDE_ALIAS) : ''
-        return `${'execute' as keyof SongWalkerState}(${VAR_TRACK_STATE}, "${command}"${exportOverrides});`
-    },
-    // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
-    wait: (durationStatement: string) => `if(await ${'wait' as keyof SongWalkerState}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`,
-    trackDefinition: (trackDefinition: string) => {
-        const match = (trackDefinition).match(LANGUAGE["track-definition"]);
-        if (!match)
-            throw new Error("Invalid track definition: " + trackDefinition)
-        const [, trackName, trackArgs] = match;
-        return `async function ${trackName}(${VAR_TRACK_STATE}${trackArgs ? ', ' + trackArgs : ''}){`
-    },
-    trackStatement: (trackStatement: string) => {
-        const match = (trackStatement).match(LANGUAGE["track-statement"]);
-        if (!match)
-            throw new Error("Invalid track statement: " + trackStatement)
-        const [, trackName, overrideString, paramString] = match;
-        let exportOverrides = ', ' + formatCommandOverrides(overrideString, TRACK_OVERRIDE_ALIAS)
-        // const functionCall = trackName + `.bind(${VAR_TRACK_STATE}${paramString ? ', ' + paramString : ''})`
-        return `${'executeTrack' as keyof SongWalkerState}(${VAR_TRACK_STATE}, ${trackName}${exportOverrides}${paramString ? ', ' + paramString : ''});`
-    },
-    functionStatement: (functionStatement: string) => {
-        const functionMatch = (functionStatement).match(LANGUAGE["function-statement"]);
-        if (!functionMatch)
-            throw new Error("Invalid function: " + functionStatement)
-        const [, fsVarStatement = "", fsAwaitStatement = "", fsMethodName, fsParamString] = functionMatch;
-        return `${fsVarStatement}${fsAwaitStatement}${fsMethodName}(${fsParamString});`
-    }
-}
+}:track}`;
 export const OVERRIDE_ALIAS: OverrideAliases = {
     '@': 'duration',
     '^': 'velocity'
@@ -66,384 +105,38 @@ export const TRACK_OVERRIDE_ALIAS: OverrideAliases = {
     '^': 'velocity'
 };
 
-export const LANGUAGE = {
-    'comment': /(\/\/).*$/m,
-    'track-definition': /(?=async\s+)?\btrack\b\s*([$\w][$\w]+)\(((?:[^()]|\([^()]*\))*)\)\s*{/,
-    'track-statement': /\|([a-zA-Z][^@^=;().\s]*)((?:[@^][^@^=;()\s]+)*)(?:\(((?:[^()]|\([^()]*\))*)\))?;?/,
-    'function-definition': /(?=async\s+)?\bfunction\b\s*([$\w][$\w]+)(\((?:[^()]|\([^()]*\))*\))\s*{/,
-    // 'function-statement': /\b(function|track)[ \t]+([\w.]+)[ \t]*\(([^)]*)\)\s*{/,
-    // 'function-statement': /\b(((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?\w+\([^)]*\)[ \t]*;?/,
-    'function-statement': /\b((?:(?:const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*)?(await\s+)?\b([$\w][$\w.]+)\(((?:[^()]|\([^()]*\))*)\);?/,
-    'variable-statement': /((const|let)[ \t]*)?[\w.]+[ \t]*=[ \t]*([\w'.\/-]|\{[^{}]*}|\[[^[]*])+[ \t]*;?/,
-    'command-statement': /\b([a-zA-Z][^@^=;().\s]*)((?:[@^][^@^=;()\s]+)*);?(?!\s*[.=])/,
-    'wait-statement': /(\d*[\/.]?\d+)/
-    // 'track-start': PATTERN_TRACK_START,
-    // 'import': {
-    //     pattern: /import\s+(\w+)\s+from\s+(['"][\w.\/]+['"]);?/,
-    //     inside: Prism.languages.javascript
-    // },
-    // 'function-statement': {
-    //     pattern: /\b([\w.]+[ \t]*=[ \t]*)?\w+\([^)]*\)[ \t]*;?/,
-    //     inside: {
-    //         "assign-to-variable": /^[\w.]+(?=[ \t]*=[ \t]*)/,
-    //         // 'assign-operator': /=/,
-    //         'function-name': /\b\w+(?=\()/,
-    //         'param-key': {
-    //             pattern: /((?:^|[,{])[ \t]*)(?!\s)[_$a-zA-Z0-9](?:(?!\s)[$\w0-9])*(?=\s*:)/m,
-    //             lookbehind: true
-    //         },
-    //         'param-string': {
-    //             pattern: /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
-    //             greedy: true
-    //         },
-    //         'param-variable': /\b[a-zA-Z_]\w*\b/,
-    //         'param-duration': PATTERN_DURATION,
-    //         // 'punctuation': /[{}[\];(),.:]/
-    //     }
-    // },
-    //     inside: {
-    //         command: /^[^@^\s]+/,
-    //         param: {
-    //             pattern: /([@^][^@^\s;]+)/,
-    //             inside: {
-    //                 symbol: /^[@^]/,
-    //                 value: /[^@^\s;]+$/,
-    //             }
-    //         },
-    //         // punctuation: /;/
-    //     }
-    // },
-    //     inside: {
-    //         duration: /\d*[\/.]?\d+/,
-    //         // punctuation: /;/
-    //     }
-    // },
-    // inside: {
-    //     "assign-to-variable": /^((const|let)[ \t]*)?[\w.]+(?=[ \t]*=[ \t]*)/,
-    //     'param-string': /(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/,
-    // 'assign-value': /[^=;]+/,
-    // }
-    // },
-    // 'play-track-statement': {
-    //     pattern: /@\w+/,
-    //     inside: {
-    //         'play-track-identifier': /^@/,
-    //         'play-track-name': /\w+/
-    //     }
-    // },
-    // 'play-statement': {
-    //     pattern: /\b[a-zA-Z]\w*(:[^:;\s]*)*;?/,
-    //     inside: {
-    //         'play-note': /^[a-zA-Z]\w*/,
-    //         'play-arg': {
-    //             pattern: /:[^:;\s]*/,
-    //             inside: {
-    //                 'param-duration': {
-    //                     pattern: /^:\d*[\/.]?\d{1,2}[BTDt]?$/,
-    //                     inside: {
-    //                         'param-numeric': /\d*[\/.]?\d+/,
-    //                         'param-factor': /[BTDt]/,
-    //                     }
-    //                 },
-    //                 'param-string': /[^:]+/,
-    //             }
-    //         },
-    //         // punctuation: /;/
-    //     },
-    // },
-    // 'token-unknown': /\S+/
-    // punctuation: /;/
-    // 'newline': REGEXP_NEWLINE,
-    // 'play-statement': REGEXP_PLAY_STATEMENT,
+export function exportSongTemplate(sourceCode: string) {
+    return `(async function ${ROOT_TRACK}(${F_EXPORT}) {\n${sourceCode}})`;
 }
 
-function formatTokenContent(token: TokenItem | string, currentTokenID = 0): string {
-    if (typeof token === "string")
-        return token;
-    switch (token[0]) {
-        case 'name':
-        case 'function-name':
-        case 'punctuation':
-        case 'param-numeric':
-        case 'param-factor':
-        case 'param-key':
-        case 'param-variable':
-        case 'param-string':
-        case 'comment':
-            return token[1] as string;
-        case 'function-statement':
-            return EXPORT_JS.functionStatement(token[1] as string);
-        case 'variable-statement':
-        case 'function-definition':
-            return token[1] as string;
-        case 'track-statement':
-            return EXPORT_JS.trackStatement(token[1] as string);
-        case 'track-definition':
-            return EXPORT_JS.trackDefinition(token[1] as string);
-        // case 'param-duration':
-        //     const durationValues = tokensToKeys(token[1] as TokenList);
-        //     return formatNumericString(durationValues['param-numeric'], durationValues['param-factor']);
-        case 'command-statement':
-            // const [commandString, paramString] = parseCommand(token[1] as string);
-            // const parsedParams = parseCommandParams(paramString);
-            return EXPORT_JS.commandStatement(token[1] as string);
-        case 'wait-statement':
-            return EXPORT_JS.wait(parseWait(token[1] as string));
-        default:
-        case 'unknown':
-            throw new Error(`Unknown token type '${token[0]}': ${JSON.stringify(token)} at tokenID ${currentTokenID}`);
-        // return formatVariableTokenContent(token);
-        // return formatStringTokenContent(token);
-        // case 'function-statement':
-        //     const functionTokenList = [...token[1] as TokenList];
-        //     const functionNameToken = findTokenByType(functionTokenList, /^function-name$/);
-        //     const functionNameString = functionNameToken[1] as string;
-        //     const functionAssignResultToVariableToken = findTokenByType(functionTokenList, /^assign-to-variable$/);
-        //     let functionIsAwait = false;
-        //
-        //     switch (functionNameString) {
-        //         case 'loadPreset':
-        //         case 'loadInstrument':
-        //             functionIsAwait = true;
-        //         // const firstParamToken = findTokenByType(functionTokenList, /^param-/);
-        //         // if (firstParamToken.type === 'param-string') {
-        //         //     const pos = functionTokenList.indexOf(firstParamToken);
-        //         //     functionTokenList.splice(pos, 1, `require(${firstParamToken[1]})`)
-        //         // }
-        //     }
-        //     functionNames[functionNameString] = true;
-        //     if (functionAssignResultToVariableToken) {
-        //         const functionTokenPos = functionTokenList.indexOf(functionNameToken);
-        //         const functionParamString = functionTokenList.slice(functionTokenPos)
-        //             .filter(token => typeof token === "string" || token[1] !== ';')
-        //             .map((token) => formatTokenContent(token))
-        //             .join('');
-        //         functionNames[COMMANDS.setVariable] = true;
-        //         return `${COMMANDS.setVariable}('${functionAssignResultToVariableToken[1]}', ${functionIsAwait ? 'await ' : ''}${functionParamString})`;
-        //     } else {
-        //         return (functionIsAwait ? 'await ' : '') + functionTokenList.map((token) => formatTokenContent(token)).join('')
-        //     }
-        // case 'variable-statement':
-        //     debugger;
-        //     const variableName = getFirstTokenValue(token[1] as TokenList, 'assign-to-variable') as string;
-        //     const variableValue = getFirstTokenValue(token[1] as TokenList, 'assign-value') as string;
-        //     // const variableName = getFirstTokenValue(token[1] as TokenList, 'param-variable') as string;
-        //     // const variableTokenList = [...token[1] as TokenList];
-        //     // const variableNameToken = findTokenByType(variableTokenList, /^assign-to-variable$/);
-        //     // const variableValueToken = findTokenByType(token[1] as TokenList, /^param-/);
-        //     // functionNames[COMMANDS.setVariable] = true;
-        //     return EXPORT_JS.variable(variableName, variableValue);
-        // return `${COMMANDS.setVariable}('${variableNameToken[1]}', ${formatTokenContent(variableValueToken)})`;
-        // case 'track-start':
-        //     throw new Error("Shouldn't happen");
-        // case 'play-arg':
-        //     const playArgParamToken = findTokensByType(token[1] as TokenList, /^param-/);
-        //     return playArgParamToken.length > 0 ? formatTokenContent(playArgParamToken[0]) : 'null';
-        // case 'play-track-statement':
-        //     const trackNameToken = findTokenByType(token[1] as TokenList, /^play-track-name$/);
-        //     functionNames[COMMANDS.startTrack] = true;
-        //     return `${COMMANDS.startTrack}(${trackNameToken[1]})`;
-
-        // return token[1] as string;
-        // throw new Error(`Unknown token type: ${JSON.stringify(token)} at tokenID ${tokenID}`);
-    }
+export function exportCommandStatement(commandString: string) {
+    const match = (commandString).match(LANGUAGE["command-statement"]);
+    if (!match)
+        throw new Error("Invalid command statement: " + commandString)
+    const [, command, overrideString] = match;
+    const exportOverrides = overrideString ? ', ' + formatCommandOverrides(overrideString, OVERRIDE_ALIAS) : ''
+    return `${'execute' as keyof SongWalkerState}(${VAR_TRACK_STATE}, "${command}"${exportOverrides});`
 }
 
-export function sourceToTokens(source: string, language: object = LANGUAGE): TokenList {
-    function mapToken(token: string | Token): TokenItem | string {
-        if (typeof token === "string") {
-            return token;
-        } else {
-            let content = token.content as TokenList;
-            if (Array.isArray(token.content)) {
-                content = token.content.map(mapToken);
-            }
-            return [
-                token.type,
-                content
-            ]
-        }
-    }
-
-    return Prism.tokenize(source, language).map(mapToken);
+// variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
+export function exportWaitStatement(durationStatement: string) {
+    return `if(await ${'wait' as keyof SongWalkerState}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`;
 }
 
-export function tokensToSource(tokenList: TokenList): string {
-    return tokenList.map(token => tokenToSource(token)).join('')
+export function exportTrackDefinition(trackDefinition: string) {
+    const match = (trackDefinition).match(LANGUAGE["track-definition"]);
+    if (!match)
+        throw new Error("Invalid track definition: " + trackDefinition)
+    const [, trackName, trackArgs] = match;
+    return `async function ${trackName}(${VAR_TRACK_STATE}${trackArgs ? ', ' + trackArgs : ''}){`
 }
 
-export function tokenToSource(token: TokenItem | string): string {
-    if (typeof token === 'string') {
-        return token;
-    } else {
-        if (Array.isArray(token[1])) {
-            return tokensToSource(token[1]);
-        } else {
-            return token[1]
-        }
-    }
+export function exportTrackStatement(trackStatement: string) {
+    const match = (trackStatement).match(LANGUAGE["track-statement"]);
+    if (!match)
+        throw new Error("Invalid track statement: " + trackStatement)
+    const [, trackName, overrideString, paramString] = match;
+    let exportOverrides = ', ' + formatCommandOverrides(overrideString, TRACK_OVERRIDE_ALIAS)
+    // const functionCall = trackName + `.bind(${VAR_TRACK_STATE}${paramString ? ', ' + paramString : ''})`
+    return `${'executeTrack' as keyof SongWalkerState}(${VAR_TRACK_STATE}, ${trackName}${exportOverrides}${paramString ? ', ' + paramString : ''});`
 }
-
-export function getTokenLength(token: TokenItem | string): number {
-    if (typeof token === 'string') {
-        return token.length;
-    } else {
-        if (Array.isArray(token[1])) {
-            return token[1].reduce((sum, token) => sum + getTokenLength(token), 0);
-        } else {
-            return token[1].length
-        }
-    }
-}
-
-
-export function compileSongToJavascript(
-    songSource: string,
-    template: (s: string) => string = EXPORT_JS.songTemplate
-    // eventMode: boolean = false
-) {
-    const tokenList = sourceToTokens(songSource)
-    // const trackList = parseTrackList(songSource)
-    // const javascriptContent = compileTrackTokensToJavascript(trackList, eventMode);
-    // let currentTokenID = -1;
-    const javascriptSource = tokenList
-        .map((token, tokenID) => {
-            // currentTokenID = tokenID;
-            if (typeof token === "string")
-                return token;
-            return `${formatTokenContent(token, tokenID)}`;
-        })
-        // .map(debugMapper)
-        .join('');
-    return template(javascriptSource)
-}
-
-
-export function compileSongToCallback(songSource: string) {
-    const jsSource = compileSongToJavascript(songSource);
-    const callback: SongCallback = eval(jsSource);
-    return callback;
-}
-
-
-// export function walkTokens(tokenList: TokenList, callback: (token: string | TokenItem) => boolean | undefined | void): boolean {
-//     for (const token of tokenList) {
-//         if (callback(token))
-//             return true;
-//         if (typeof token !== "string" && Array.isArray(token[1])) {
-//             if (walkTokens(token[1], callback))
-//                 return true;
-//         }
-//     }
-//     return false;
-// }
-
-// function formatNumericString(numericString: string, factorString: string) {
-//     if (numericString.startsWith('/') && numericString.length > 1)
-//         numericString = `1${numericString}`;
-//     switch (factorString) {
-//         default:
-//         case 'B':
-//             return numericString;
-//         case 'D':
-//             return `(${numericString})*1.5`
-//         case 'T':
-//             return numericString = `(${numericString})/1.5`
-//         case 't':
-//             return numericString = `(${numericString})/td()`
-//     }
-// }
-
-// function formatTrack(trackName: string, trackSource: string, eventMode: boolean) {
-//     const tokenList = sourceToTokens(trackSource);
-//     /** @deprecated **/
-//     const functionNames: { [key: string]: boolean } = {};
-//     let debugMapper = (s: string, t: number) => s + '';
-//     if (eventMode) {
-//         debugMapper = (commandString: string, tokenID: number) => {
-//             if (commandString.trim() === '')
-//                 return commandString;
-//             return `${COMMANDS.setCurrentToken}(${tokenID});${commandString}`
-//         }
-//         functionNames[COMMANDS.setCurrentToken] = true;
-//     }
-//     let currentTokenID = -1;
-//     const functionContent = tokenList
-//         .map((token, tokenID) => {
-//             currentTokenID = tokenID;
-//             if (typeof token === "string")
-//                 return token;
-//             return `\t${formatTokenContent(token)};`;
-//         })
-//         .map(debugMapper)
-//         .join('');
-//     return `async function ${trackName}(${VARIABLES.trackRenderer}) {
-// \tconst {${formatFunctionList()}} = ${VARIABLES.trackRenderer};
-// ${functionContent}
-// }`
-
-// function formatFunctionList() {
-//     if (Object.values(functionNames).length === 0)
-//         return '';
-//     return Object.keys(COMMANDS)
-//         .filter(functionName => functionNames[COMMANDS[functionName]])
-//         .map(functionName => {
-//             const alias = COMMANDS[functionName];
-//             if (alias === functionName)
-//                 return functionName;
-//             return `${functionName + ':' + alias}`
-//         }).join(', ')
-// }
-
-// function formatStringTokenContent(token: TokenItem) {
-//     // if (!/(["'])(?:\\(?:\r\n|[\s\S])|(?!\1)[^\\\r\n])*\1/.test(token[1])) {
-//     // return `'${token[1]}'`
-//     // }
-//     return token[1] as string;
-// }
-//
-// function formatVariableTokenContent(token: TokenItem) {
-//     // functionNames[COMMANDS.getTrackState] = true;
-//     return `${VARIABLES.trackState}.${token[1]}`
-// }
-
-
-// export function parseTrackList(songSource: string): TrackSourceMap {
-//     const LANGUAGE = {
-//         'track-start': PATTERN_TRACK_START,
-//     }
-//     const tokens: TokenList = sourceToTokens(songSource, LANGUAGE);
-//
-//     let currentTrackName = ROOT_TRACK;
-//     const trackList: TrackSourceMap = {}
-//     let lastTrackSource = '';
-//     for (let tokenID = 0; tokenID < tokens.length; tokenID++) {
-//         const token = tokens[tokenID];
-//         if (typeof token === 'string') {
-//             lastTrackSource = token;
-//         } else {
-//             switch (token[0]) {
-//                 case 'track-start':
-//                     const trackName = findTokenByType(token[1] as TokenList, /^track-start-name$/).content as string;
-//                     // const match = formatTokenContent(token).match(REGEXP_FUNCTION_CALL);
-//                     trackList[currentTrackName] = lastTrackSource
-//                     currentTrackName = trackName;
-//                     break;
-//             }
-//         }
-//     }
-//     trackList[currentTrackName] = lastTrackSource
-//     // console.log('parseTrackList', trackList)
-//     return trackList
-// }
-
-// export function compileTrackTokensToJavascript(
-//     trackList: TrackSourceMap,
-//     eventMode: boolean = false) {
-//     const javascriptContent = EXPORT_JS.songTemplate(`${Object.keys(trackList).map((trackName) =>
-//         formatTrack(trackName, trackList[trackName], eventMode)
-//     ).join('\n\n')}`);
-//     console.log(javascriptContent)
-//     return javascriptContent;
-// }
-
