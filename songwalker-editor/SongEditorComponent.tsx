@@ -1,14 +1,11 @@
 "use client"
 
-import React, {useMemo} from 'react'
-import {Provider} from "react-redux";
+import React, {useState} from 'react'
 
 import styles from "./SongEditorComponent.module.scss"
-import MenuPanel from "./menu/MenuPanel";
-import createStore from "./store";
 import {ActiveEditors} from "@songwalker-editor/document/ActiveEditors";
-import {setDocumentValue} from "@songwalker-editor/document/documentActions";
-import {PlaybackProvider} from "@songwalker-editor/playback/PlaybackProvider";
+import {EditorContext, initialEditorState} from "@songwalker-editor/context";
+import {IEditorContext, IEditorState} from "@songwalker-editor/types";
 
 interface SongEditorComponentProps {
     initialValue: string,
@@ -17,21 +14,19 @@ interface SongEditorComponentProps {
 
 export default function SongEditorComponent(props: SongEditorComponentProps) {
     const {className, initialValue} = props;
-    const store = useMemo(() => {
-        const store = createStore();
-        store.dispatch(setDocumentValue(initialValue))
-        return store;
-    }, [initialValue])
+    const [editorState, setEditorState] = useState<IEditorState>(initialEditorState);
+    const editorContext: IEditorContext = {
+        state: editorState,
+        update: setEditorState
+    }
     return (
-        <Provider store={store}>
-            <PlaybackProvider>
-                <div
-                    className={styles.container + (className ? ' ' + className : '')}
-                >
-                    <MenuPanel/>
-                    <ActiveEditors/>
-                </div>
-            </PlaybackProvider>
-        </Provider>)
+        <EditorContext.Provider value={editorContext}>
+            <div
+                className={styles.container + (className ? ' ' + className : '')}
+            >
+                {/*<MenuPanel/>*/}
+                <ActiveEditors/>
+            </div>
+        </EditorContext.Provider>)
 }
 

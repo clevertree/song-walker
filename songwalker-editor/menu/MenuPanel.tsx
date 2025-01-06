@@ -1,14 +1,12 @@
 import React from "react";
-import {useDispatch, useSelector} from "react-redux";
 import styles from "./MenuPanel.module.scss";
-import {RootState} from "../types";
-import {startPlayback, stopPlayback} from "../document/documentActions";
+import {EditorState} from "../types";
 
 function MenuPanel({}) {
     const dispatch = useDispatch();
 
-    const isPlaying = useSelector((state: RootState) => state.document.isPlaying);
-    const hasError = useSelector((state: RootState) => state.document.errors);
+    const isPlaying = useSelector((state: EditorState) => state.document.isPlaying);
+    const hasError = useSelector((state: EditorState) => state.document.errors);
 
     return (
         <div className={styles.menuPanel}>

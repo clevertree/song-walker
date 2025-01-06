@@ -38,6 +38,9 @@
       "@songwalker-presets/*": [
         "./songwalker-presets/*"
       ],
+      "@songwalker-editor": [
+        "./songwalker-editor"
+      ],
       "@songwalker-editor/*": [
         "./songwalker-editor/*"
       ],

@@ -1,10 +1,7 @@
 import React, {useEffect, useMemo, useState} from "react";
 import {PlaybackManager} from "@songwalker-editor/playback/PlaybackManager";
-import {useDispatch, useSelector} from "react-redux";
-import {RootState} from "@songwalker-editor/types";
+import {EditorState} from "@songwalker-editor/types";
 import {PlaybackContext} from "./PlaybackContext";
-import {addError, stopPlayback} from "@songwalker-editor/document/documentActions";
-import {SongError, SongHandler} from "@songwalker/types";
 import {compileSongToCallback} from "@songwalker/compiler";
 import {loadSongAssets} from "@songwalker/songLoader";
 import {SongWalker} from "@songwalker/walker";
@@ -16,8 +13,8 @@ interface PlaybackProviderProps {
 export function PlaybackProvider(props: PlaybackProviderProps) {
     const dispatch = useDispatch();
     const playbackManager = useMemo<PlaybackManager>(() => new PlaybackManager(), [])
-    const isPlaying = useSelector((state: RootState) => state.document.isPlaying);
-    const documentValue = useSelector((state: RootState) => state.document.value);
+    const isPlaying = useSelector((state: EditorState) => state.document.isPlaying);
+    const documentValue = useSelector((state: EditorState) => state.document.value);
     const [songPlayer, setSongPlayer] = useState<SongHandler>()
 
     useEffect(() => {

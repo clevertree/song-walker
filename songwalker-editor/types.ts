@@ -1,25 +1,19 @@
-import {MenuState} from "./menu/menuActions";
-import {ConfigObject} from "./config/configActions";
-import {SongError} from "@songwalker/types";
+export interface IEditorContext {
+    state: IEditorState,
 
-export type RootState = {
-    menu: MenuState,
-    document: DocumentState,
+    update(newState: IEditorState): void
+}
 
-    config: ConfigObject
-    // [key: string]: SourceEditorState | object,
+export interface IEditorState {
+    // menu: MenuState,
+    document: IDocumentState,
 }
 
 
-export type DocumentState = {
+export interface IDocumentState {
+    path: string,
     value: string,
+    cursorPosition: number
     // isPlaying: boolean,
-    isPlaying: boolean,
-    errors: Array<SongError>,
-    // tokens: TokenList,
-    // trackList: TrackRanges,
-    activeEditors: {
-        [trackName: string]: boolean
-    },
-    mode: 'track' | 'full'
+    // errors: Array<string>,
 }

@@ -3,7 +3,7 @@ import Undo from "undoh";
 import {ConfigObject} from "../config/configActions";
 import {sourceToTokens} from "@songwalker/tokens";
 import {insertIntoSelection, mapTokensToDOM, walkDOM} from "@songwalker-editor/domUtils";
-import {EditorState} from "./SourceEditor";
+import {EditorState} from "./DocumentEditor";
 import {SongTrackEvent} from "@songwalker/types";
 import {addMIDIEventListener, removeMIDIEventListener} from "@songwalker-editor/midi/MIDIInterface";
 

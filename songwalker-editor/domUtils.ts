@@ -1,4 +1,4 @@
-import {TokenList} from "@songwalker/types";
+import {Token} from "prismjs";
 
 export function insertIntoSelection(insertString: string) {
     const selection: Selection | null = window.getSelection();
@@ -50,23 +50,14 @@ export function walkDOM(node: Node, callback: (childNode: Node, offset: number) 
     }
 }
 
-export function mapTokensToDOM(tokenList: TokenList, container: HTMLElement) {
+export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTMLElement) {
     let elmID = 0;
     let childNodes = container.childNodes;
-    container.replaceChildren(...tokenList.map(token => {
+    container.replaceChildren(...tokenList.map((token: (string | Token)) => {
         const oldNode = childNodes[elmID++];
         // console.log('token', token, oldNode);
         if (typeof token === "string") {
-            // if (token.trim().length > 0) {
-            //     let newNode: HTMLElement = <HTMLElement>oldNode;
-            //     if (!newNode || newNode.nodeName !== 'UNKNOWN') {
-            //         newNode = document.createElement('token-unknown');
-            //     } else {
-            //         // console.info("Reusing", oldNode);
-            //     }
-            //     newNode.innerText = token;
-            //     return newNode
-            // } else {
+
             if (oldNode && oldNode.nodeType === 3) {
                 oldNode.textContent = token;
                 // console.info("Reusing", oldNode);
@@ -85,7 +76,7 @@ export function mapTokensToDOM(tokenList: TokenList, container: HTMLElement) {
             if (Array.isArray(token.content)) {
                 mapTokensToDOM(token.content, <HTMLElement>newNode)
             } else {
-                newNode.innerText = token.content;
+                newNode.innerText = token.content as string;
             }
             return newNode;
         }
