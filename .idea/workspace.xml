@@ -5,21 +5,59 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e87670a7-8e55-4d3a-9cd9-39fed29fbd42" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/songwalker-editor/context.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/app/song/test.sw" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/songwalker/.gitignore" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/song-walker.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/song-walker.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/song/test.song" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/song/test.song.source.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/next.config.js" beforeDir="false" afterPath="$PROJECT_DIR$/next.config.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/package.json" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-editor/SongEditorComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/SongEditorComponent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/config/configActions.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-editor/context.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/context.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-editor/document/ActiveEditors.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/document/ActiveEditors.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/document/EditorNodeManager.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/document/EditorNodeManager.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/document/SourceEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/document/DocumentEditor.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/document/documentActions.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-editor/document/DocumentEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/document/DocumentEditor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-editor/document/SourceEditor.module.scss" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/document/SourceEditor.module.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-editor/domUtils.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/domUtils.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/menu/MenuPanel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/menu/MenuPanel.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/menu/menuActions.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/playback/PlaybackProvider.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/playback/PlaybackProvider.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/store.ts" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-editor/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/compiler/compiler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/compiler/compiler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/compiler/language.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/compiler/language.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/compiler/test/compiler.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/compiler/test/compiler.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/constants/buffer.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/constants/buffer.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/constants/drumToMIDI.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/constants/drumToMIDI.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/constants/errors.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/constants/errors.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/constants/percussion.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/constants/percussion.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/fileLoader.js" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/loader/fileLoader.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/helper/commandHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/helper/commandHelper.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/helper/renderHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/helper/renderHelper.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/helper/songHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/helper/songHelper.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/helper/test/commandHelper.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/helper/test/commandHelper.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/AudioBufferInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/AudioBufferInstrument.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/OscillatorInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/OscillatorInstrument.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/PolyphonyInstrument.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/PolyphonyInstrument.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/common/envelope.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/common/envelope.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/common/filter.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/common/filter.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/analyzer/AnalyzerEffect.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/effects/analyzer/AnalyzerEffect.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/delay/DelayEffect.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/effects/delay/DelayEffect.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/delay/delay.js" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/effects/delay/delay.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/delay/test/DelayEffect.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/effects/delay/test/DelayEffect.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/reverb/ReverbEffect.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/effects/reverb/ReverbEffect.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/effects/reverb/test/ReverbEffect.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/effects/reverb/test/ReverbEffect.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/AudioBufferInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/test/AudioBufferInstrument.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/OscillatorInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/test/OscillatorInstrument.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/PolyphonyInstrument.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/test/PolyphonyInstrument.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/instruments/test/testHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/instruments/test/testHelper.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/player.cy.js.old" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/player.cy.js.old" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/player.js.old" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/player.js.old" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/presets/PresetLibrary.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/presets/PresetLibrary.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/presets/index.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/presets/index.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/presets/test/PresetLibrary.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/presets/test/PresetLibrary.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/walker.cy.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/walker.cy.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/walker.ts.old" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/walker.ts.old" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tsconfig.json" beforeDir="false" afterPath="$PROJECT_DIR$/tsconfig.json" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -60,7 +98,7 @@
     "git-widget-placeholder": "refactor",
     "javascript.nodejs.core.library.configured.version": "18.20.4",
     "javascript.nodejs.core.library.typings.version": "18.19.67",
-    "last_opened_file_path": "/Users/ari.asulin/dev/p/song-walker/songwalker-editor",
+    "last_opened_file_path": "/Users/ari.asulin/dev/p/song-walker/songwalker",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.standard": "true",
     "node.js.detected.package.tslint": "true",
@@ -75,18 +113,18 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/songwalker" />
+      <recent name="$PROJECT_DIR$/songwalker/build/helper" />
       <recent name="$PROJECT_DIR$/songwalker-editor" />
       <recent name="$PROJECT_DIR$/songwalker/instruments/effects" />
       <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioFont/test" />
-      <recent name="$PROJECT_DIR$/songwalker/instruments/effects/convolver/test" />
-      <recent name="$PROJECT_DIR$/songwalker/instruments" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/songwalker/src" />
+      <recent name="$PROJECT_DIR$/songwalker/loader" />
+      <recent name="$PROJECT_DIR$/songwalker/compiler" />
       <recent name="$PROJECT_DIR$/songwalker-editor/" />
       <recent name="$PROJECT_DIR$/songwalker-editor/context" />
-      <recent name="$PROJECT_DIR$/songwalker/helper/test" />
-      <recent name="$PROJECT_DIR$/songwalker/compiler/test" />
-      <recent name="$PROJECT_DIR$/songwalker/presets/test" />
     </key>
     <key name="es6.move.members.recent.items">
       <recent name="$PROJECT_DIR$/songwalker/helper/renderHelper.ts" />
@@ -96,25 +134,32 @@
       <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioFont/mirrors.ts" />
     </key>
   </component>
-  <component name="RunManager" selected="npm.dev">
-    <configuration name="convert.mjs" type="NodeJSConfigurationType" temporary="true" nameIsGenerated="true" path-to-js-file="$PROJECT_DIR$/../webaudiofontdata/convert.mjs" working-dir="$PROJECT_DIR$/../webaudiofontdata">
-      <method v="2" />
-    </configuration>
-    <configuration name="cypress:component" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+  <component name="RunManager" selected="npm.build-loader">
+    <configuration name="build-compiler" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
-        <script value="cypress:component" />
+        <script value="build-compiler" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
       <method v="2" />
     </configuration>
-    <configuration name="cypress:e2e" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+    <configuration name="build-loader" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/package.json" />
       <command value="run" />
       <scripts>
-        <script value="cypress:e2e" />
+        <script value="build-loader" />
+      </scripts>
+      <node-interpreter value="project" />
+      <envs />
+      <method v="2" />
+    </configuration>
+    <configuration name="build-tsc" type="js.build_tools.npm" temporary="true" nameIsGenerated="true">
+      <package-json value="$PROJECT_DIR$/package.json" />
+      <command value="run" />
+      <scripts>
+        <script value="build-tsc" />
       </scripts>
       <node-interpreter value="project" />
       <envs />
@@ -143,10 +188,10 @@
     <recent_temporary>
       <list>
         <item itemvalue="npm.dev" />
+        <item itemvalue="npm.build-loader" />
+        <item itemvalue="npm.build-compiler" />
+        <item itemvalue="npm.build-tsc" />
         <item itemvalue="npm.cypress:open" />
-        <item itemvalue="npm.cypress:component" />
-        <item itemvalue="npm.cypress:e2e" />
-        <item itemvalue="Node.js.convert.mjs" />
       </list>
     </recent_temporary>
   </component>
@@ -169,7 +214,8 @@
       <workItem from="1735589656530" duration="9965000" />
       <workItem from="1735666537572" duration="596000" />
       <workItem from="1735674428482" duration="1197000" />
-      <workItem from="1735681749305" duration="71838000" />
+      <workItem from="1735681749305" duration="73947000" />
+      <workItem from="1736276555490" duration="9170000" />
     </task>
     <servers />
   </component>
@@ -180,7 +226,7 @@
     <breakpoint-manager>
       <breakpoints>
         <line-breakpoint enabled="true" type="javascript">
-          <url>file://$PROJECT_DIR$/songwalker/helper/songHelper.ts</url>
+          <url>file://$PROJECT_DIR$/songwalker/src/helper/songHelper.ts</url>
           <option name="timeStamp" value="1" />
         </line-breakpoint>
       </breakpoints>

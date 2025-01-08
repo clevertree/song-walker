@@ -1,5 +1,5 @@
 export interface IEditorContext {
-    state: IEditorState,
+    editor: IEditorState,
 
     update(newState: IEditorState): void
 }
@@ -13,7 +13,7 @@ export interface IEditorState {
 export interface IDocumentState {
     path: string,
     value: string,
-    cursorPosition: number
+    cursorPosition: number,
     // isPlaying: boolean,
     // errors: Array<string>,
 }

@@ -1,7 +1,7 @@
-import {OverrideAliases, SongCallback, SongWalkerState} from "@songwalker/types";
-import {formatCommandOverrides, parseWait} from "@songwalker/helper/commandHelper";
-import Prism, {Token} from "prismjs";
-import LANGUAGE from "@songwalker/compiler/language";
+import {OverrideAliases, SongCallback, SongWalkerState} from "../types";
+import {formatCommandOverrides, parseWait} from "../helper/commandHelper";
+import {Token, tokenize} from "prismjs";
+import LANGUAGE from "../compiler/language";
 
 
 function formatTokenContent(token: Token | string, currentTokenID = 0): string {
@@ -30,7 +30,7 @@ function formatTokenContent(token: Token | string, currentTokenID = 0): string {
 }
 
 export function sourceToTokens(source: string) {
-    return Prism.tokenize(source, LANGUAGE);
+    return tokenize(source, LANGUAGE);
 }
 
 export function compileSongToJavascript(

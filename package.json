@@ -12,6 +12,7 @@
     "cypress:open": "cypress open",
     "lint": "next lint",
     "lint-fix": "eslint --fix .",
+    "build-loader": "tsc songwalker/src/loader/fileLoader.ts --downLevelIteration --outDir songwalker/build",
     "electron": "electron ./scripts/runElectron.js"
   },
   "dependencies": {

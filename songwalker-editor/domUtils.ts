@@ -50,35 +50,45 @@ export function walkDOM(node: Node, callback: (childNode: Node, offset: number) 
     }
 }
 
-export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTMLElement) {
+export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTMLElement, callback = (newNode: ChildNode, charOffset: number, length: number) => {
+}) {
     let elmID = 0;
     let childNodes = container.childNodes;
+    let charOffset = 0;
     container.replaceChildren(...tokenList.map((token: (string | Token)) => {
         const oldNode = childNodes[elmID++];
+        let newNode = oldNode;
+        let length = 0;
         // console.log('token', token, oldNode);
         if (typeof token === "string") {
 
             if (oldNode && oldNode.nodeType === 3) {
                 oldNode.textContent = token;
                 // console.info("Reusing", oldNode);
-                return oldNode;
+                // return oldNode;
             } else {
-                return document.createTextNode(token);
+                newNode = document.createTextNode(token);
             }
+            length = token.length;
             // }
         } else {
-            let newNode: HTMLElement = <HTMLElement>oldNode;
             if (!newNode || newNode.nodeName.toLowerCase() !== token.type) {
                 newNode = document.createElement(token.type);
             } else {
                 // console.info("Reusing", oldNode);
             }
             if (Array.isArray(token.content)) {
-                mapTokensToDOM(token.content, <HTMLElement>newNode)
+                length = mapTokensToDOM(token.content, <HTMLElement>newNode)
+            } else if (typeof token.content === "string") {
+                (<HTMLElement>newNode).innerText = token.content;
+                length = token.content.length;
             } else {
-                newNode.innerText = token.content as string;
+                throw 'invalid token.content';
             }
-            return newNode;
         }
+        charOffset += length;
+        callback(newNode, charOffset, length);
+        return newNode
     }));
+    return charOffset
 }

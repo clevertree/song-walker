@@ -1,0 +1,55 @@
+const lead=await loadPreset(/FluidR3.*\/.*Guitar/i)
+const osc=await loadPreset("Oscillator", {'type':'square', mixer: 0.4})
+const perc=await loadPreset("FluidR3_GM/Room 1")
+const reverb=await loadPreset("Reverb")
+track.beatsPerMinute = 160;
+
+|track1(lead); |beat1^96@4 8
+|track1(osc) |beat1@7 8
+
+track track1(instrument) {
+    track.effects = [reverb];
+    track.instrument = instrument;
+    track.duration=1/4
+    C3 /2
+    track.pitchBend=-0.4
+    track.config={var: 'wut'}
+    C2@/4 /2  // override duration and velocity
+    G2 /2
+    Eb2 /2
+    Eb3 /2
+    F3 /2
+    Eb3 /2
+    D3 /2
+    C3 /2
+    C2 /2
+    G2 /2
+    Eb2 /2
+    D3 /2
+    C2 /2
+    Bb2 /2
+}
+
+track beat1() {
+// console.log(track.destination.context.currentTime, track.currentTime);
+   // track.effects = [reverb];
+    track.instrument=perc
+    track.velocityDivisor=10
+    chh^3           /2
+    chh^3           /2
+    chh     as      /2
+    chh^3@/8        /2
+    chh     abd     /2
+    chh^3   abd^6   /2
+    chh     as      /2
+    chh^3           /4
+    chh^3           /4
+    chh     abd     /2
+    chh^3           /2
+    chh     as      /2
+    chh^3           /2
+    chh     abd     /2
+    chh^3   abd^6   /2
+    chh     as      /2
+    ohh^3@/3           /2
+}

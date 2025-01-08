@@ -4,7 +4,7 @@ import DocumentEditor from "@songwalker-editor/document/DocumentEditor";
 import {EditorContext} from "@songwalker-editor/context";
 
 export function ActiveEditors() {
-    const {state} = useContext<IEditorContext>(EditorContext)
+    const {editor} = useContext<IEditorContext>(EditorContext)
 
-    return <DocumentEditor {...state.document}/>
+    return <DocumentEditor state={editor.document}/>
 }
