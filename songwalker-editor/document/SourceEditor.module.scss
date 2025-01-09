@@ -56,7 +56,7 @@
 
   wait-statement {
     //margin-right: 4px;
-    color: #F5E960;
+    color: #ff8383;
     //float: right;
   }
 
@@ -66,20 +66,27 @@
     //font-weight: bold;
   }
 
-  track-statement {
-    //margin-right: 4px;
-    color: #00fff7;
-    font-weight: bold;
-  }
+  //track-statement {
+  //  //margin-right: 4px;
+  //  color: #00fff7;
+  //  font-weight: bold;
+  //}
 
   track-definition {
-    color: #6bbaff;
+    color: #6b77ff;
     font-weight: bold;
   }
 
-  variable-statement,
+  variable-statement {
+    color: #F5E960;
+    //max-width: 100vw;
+    //display: inline-block;
+  }
+
   function-statement {
-    color: #ff8383;
+    color: #00daff;
+    //color: #6b77ff;
+    //color: #6bbaff;
     //max-width: 100vw;
     //display: inline-block;
   }
@@ -91,33 +98,33 @@
     //text-overflow: ellipsis;
   }
 
-  function-name {
-    color: #b571ff;
-  }
-
-  param-key,
-  assign-to-variable,
-  param-variable {
-    color: #38B9FF;
-  }
-
-  param-string {
-    color: #55D6C2;
-  }
-
-  param-numeric {
-    //color: #ff944d;
-    //font-weight: bold;
-  }
-
-  param-duration {
-    color: #ff944d;
-
-  }
-
-  param-factor {
-    font-weight: bold;
-  }
+  //function-name {
+  //  color: #b571ff;
+  //}
+  //
+  //param-key,
+  //assign-to-variable,
+  //param-variable {
+  //  color: #38B9FF;
+  //}
+  //
+  //param-string {
+  //  color: #55D6C2;
+  //}
+  //
+  //param-numeric {
+  //  //color: #ff944d;
+  //  //font-weight: bold;
+  //}
+  //
+  //param-duration {
+  //  color: #ff944d;
+  //
+  //}
+  //
+  //param-factor {
+  //  font-weight: bold;
+  //}
 }
 
 .errorBorder {
