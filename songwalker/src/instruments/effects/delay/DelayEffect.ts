@@ -1,5 +1,5 @@
-import {TrackState} from "@songwalker";
-import {InstrumentLoader} from "@songwalker/types";
+import {TrackState} from "../../..";
+import {InstrumentLoader} from "../../../types";
 
 export interface DelayEffectConfig {
     duration?: number,

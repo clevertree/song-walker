@@ -1,9 +1,6 @@
 // noinspection DuplicatedCode
 
-import {getSongPlayerState, playSong} from "@songwalker/helper/songHelper";
-import {songwalker} from "@songwalker/compiler/compiler";
-import {AudioBufferInstrument} from "@songwalker/instruments";
-import {renderSong} from "@songwalker/helper/renderHelper";
+import {playSong, renderSong, songwalker} from "../../../..";
 
 const song = songwalker`
 await loadPreset("Oscillator");
@@ -22,11 +19,7 @@ describe('Oscillator', () => {
     it('Oscillator with Delay', async () => {
         const {renderedBuffer} = await renderSong(song);
         console.log('renderedBuffer', renderedBuffer)
+        await playSong(songwalker`loadPreset('AudioBuffer', {src: track.custom.src}); play`, () => ({custom: {src: renderedBuffer}}))
 
-        const playerState = getSongPlayerState()
-        const instrument = await AudioBufferInstrument(playerState, {
-            src: renderedBuffer,
-        })
-        await playSong(songwalker`play`, {instrument})
     })
 })

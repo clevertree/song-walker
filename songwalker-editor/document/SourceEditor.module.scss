@@ -49,8 +49,7 @@
   //  }
   //}
 
-  & > [cursor],
-  & > *:hover {
+  & > [cursor] {
     font-weight: bold;
   }
 
@@ -61,28 +60,26 @@
     //float: right;
   }
 
-  play-statement {
-    //margin-right: 4px;
-
-    & > play-note {
-      color: #00FF09;
-      font-weight: bold;
-    }
-  }
-
-  play-track-statement {
+  command-statement {
     //margin-right: 4px;
     color: #00FF09;
+    //font-weight: bold;
+  }
+
+  track-statement {
+    //margin-right: 4px;
+    color: #00fff7;
     font-weight: bold;
   }
 
-  track-start {
-    color: #FF00F6;
+  track-definition {
+    color: #6bbaff;
     font-weight: bold;
   }
 
   variable-statement,
   function-statement {
+    color: #ff8383;
     //max-width: 100vw;
     //display: inline-block;
   }

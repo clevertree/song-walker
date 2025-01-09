@@ -5,7 +5,7 @@ import React, {useState} from 'react'
 import styles from "./SongEditorComponent.module.scss"
 import {ActiveEditors} from "@songwalker-editor/document/ActiveEditors";
 import {EditorContext} from "@songwalker-editor/context";
-import {IEditorContext, IEditorState} from "@songwalker-editor/types";
+import {IAppContext, IAppState} from "@songwalker-editor/types";
 
 interface SongEditorComponentProps {
     initialValue: string,
@@ -14,16 +14,16 @@ interface SongEditorComponentProps {
 
 export default function SongEditorComponent(props: SongEditorComponentProps) {
     const {className, initialValue} = props;
-    const [editorState, setEditorState] = useState<IEditorState>({
-        document: {
+    const [editorState, setEditorState] = useState<IAppState>({
+        activeEditor: {
             cursorPosition: 0,
             path: 'new.sw',
             value: initialValue
         }
     });
-    const editorContext: IEditorContext = {
-        editor: editorState,
-        update: setEditorState
+    const editorContext: IAppContext = {
+        appState: editorState,
+        updateAppState: setEditorState
     }
     return (
         <EditorContext.Provider value={editorContext}>

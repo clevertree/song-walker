@@ -1,5 +1,5 @@
-import {Preset, PresetBank} from "@songwalker/types";
-import {InstrumentPresetBank} from "@songwalker/instruments/";
+import {Preset, PresetBank} from "../types";
+import {InstrumentPresetBank} from "../instruments";
 
 
 const presetBanks: Array<PresetBank> = [

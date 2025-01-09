@@ -1,6 +1,6 @@
-import {SongWalkerState, TrackState} from "@songwalker/types";
+import {SongWalkerState, TrackState} from "./types";
 
-import {renderSong} from "@songwalker/helper/renderHelper";
+import {renderSong} from "./helper/renderHelper";
 
 describe('songPlayer', () => {
     it('plays sub-tracks', async () => {
@@ -40,18 +40,18 @@ describe('songPlayer', () => {
 
 
 async function testSong(songState: SongWalkerState) {
-    const {wait, rootTrackState: track, execute, executeTrack} = songState;
+    const {wait, rootTrackState: track, execute, executeCallback} = songState;
     // track.instrument = await testMelodicInstrument(track, instrumentCallback)
 
     track.beatsPerMinute = 160;
-    executeTrack(track, testTrack)
-    executeTrack(track, testTrack2)
+    executeCallback(track, testTrack)
+    executeCallback(track, testTrack2)
 
     await wait(track, 2);
 
     track.beatsPerMinute = 80;
-    executeTrack(track, testTrack)
-    executeTrack(track, testTrackLoadLate)
+    executeCallback(track, testTrack)
+    executeCallback(track, testTrackLoadLate)
 
     await wait(track, 2);
 

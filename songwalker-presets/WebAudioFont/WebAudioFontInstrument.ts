@@ -1,8 +1,7 @@
-import {InstrumentLoader, SongWalkerState, TrackState} from "@songwalker/types";
-import {parseNote} from "@songwalker";
+import {InstrumentLoader, parseNote, SongWalkerState, TrackState} from "@songwalker";
 import WebAudioFontPlayer from "./src/player";
 import {WavePreset} from "@songwalker-presets/WebAudioFont/src/otypes";
-import DrumToMIDI from "@songwalker/constants/drumToMIDI";
+import DrumToMIDI from "./constants/drumToMIDI";
 
 
 export interface WebAudioFontInstrumentConfig extends WavePreset {

@@ -1,4 +1,4 @@
-import {InstrumentInstance, InstrumentLoader, Preset, SongWalkerState, TrackState} from "@songwalker/types";
+import {InstrumentInstance, InstrumentLoader, Preset, SongWalkerState, TrackState} from "../types";
 
 
 export interface PolyphonyInstrumentConfig {

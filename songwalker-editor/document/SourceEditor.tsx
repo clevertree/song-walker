@@ -1,27 +1,29 @@
 "use client"
 
-import React, {useEffect, useRef} from 'react'
-import {IDocumentState} from "../types";
+import React, {useContext, useEffect, useMemo, useRef} from 'react'
+import {IAppContext, ISourceEditorState} from "../types";
 import styles from "./SourceEditor.module.scss"
-import {sourceToTokens} from "@songwalker/src/compiler/compiler";
-import {mapTokensToDOM} from "@songwalker-editor/domUtils";
+import {getCaretOffset, renderSourceEditor, renderValue} from "@songwalker-editor/helper/sourceHelper";
+import Undo from "undoh";
+import {EditorContext} from "@songwalker-editor/context";
 
-interface DocumentEditorProps {
-    state: IDocumentState
-}
 
 const TIMEOUT_SAVE_ON_CHANGE_EVENT = 500
 let saveTimeout: any = null;
 
-export default function DocumentEditor({state}: DocumentEditorProps) {
-    const {path, value: initialValue} = state;
+export default function SourceEditor(state: ISourceEditorState) {
+    const {path, value, cursorPosition} = state;
+    console.log(state);
+    const {updateAppState} = useContext<IAppContext>(EditorContext)
+    const undoBuffer = useMemo(() => new Undo<ISourceEditorState>(state), []);
     // const errors = useSelector((state: EditorState) => state.document.errors);
     // const updateTimeout = useRef(-1); // we can save timer in useRef and pass it to child
     // const playbackManager = useContext(PlaybackContext)
     const refEditor = useRef<HTMLInputElement>(null);
     useEffect(() => {
-        setValue(initialValue);
-    }, []);
+        const editor = getEditor();
+        renderSourceEditor(editor, value, cursorPosition)
+    });
 
     function getEditor() {
         const divEditor = refEditor.current;
@@ -30,44 +32,21 @@ export default function DocumentEditor({state}: DocumentEditorProps) {
         return divEditor;
     }
 
-    function setValue(value: string) {
-        state.value = value;
-        const tokenList = sourceToTokens(value);
-        const caretOffset = getCaretOffset();
-        console.log('render', tokenList, caretOffset)
-
-        mapTokensToDOM(tokenList, getEditor(), (newNode, charOffset, length) => {
-            if (caretOffset && (charOffset - length >= caretOffset) && (charOffset < caretOffset)) {
-            }
-        });
-
-        const renderedValue = renderValue();
-        if (renderedValue !== value)
-            console.error(`Rendering value mismatch: \n`, renderedValue, ` !== \n`, value);
-    }
-
-    function renderValue() {
-        return Array.prototype.map.call(getEditor().childNodes,
-            child => child.innerText || child.textContent).join('');
-    }
-
-    function getCaretOffset() {
-        let caretOffset = null;
-        let sel = window.getSelection();
-        if (sel && sel.rangeCount > 0) {
-            debugger;
-            var range = sel.getRangeAt(0);
-            var preCaretRange = range.cloneRange();
-            preCaretRange.selectNodeContents(getEditor());
-            preCaretRange.setEnd(range.endContainer, range.endOffset);
-            caretOffset = preCaretRange.toString().length;
-        }
-        return caretOffset;
-    }
-
     function handleChangeEvent(e: any) {
         clearTimeout(saveTimeout)
-        saveTimeout = setTimeout(() => setValue(renderValue()), TIMEOUT_SAVE_ON_CHANGE_EVENT) as any
+        saveTimeout = setTimeout(setValue, TIMEOUT_SAVE_ON_CHANGE_EVENT) as any
+    }
+
+    function setValue() {
+        const editor = getEditor();
+        const newSource = renderValue(editor);
+        const cursorPosition = getCaretOffset(editor) || 0;
+        const newState: ISourceEditorState = {value: newSource, path, cursorPosition};
+        undoBuffer.retain(newState)
+        updateAppState((prevState) => {
+            prevState.activeEditor = newState;
+            return {...prevState};
+        })
     }
 
     // useEffect(() => {
@@ -112,4 +91,5 @@ export default function DocumentEditor({state}: DocumentEditorProps) {
         </div>
     )
 }
+
 

@@ -15,14 +15,16 @@ import {
 } from "@songwalker-presets/WebAudioFont/constants";
 import WebAudioFontInstrument from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
 
-export const WebAudioFontLibrary = async function* listPresets() {
+export async function* WebAudioFontLibrary(): AsyncGenerator<Preset> {
     yield {
         title: "WebAudioFont",
-        loader: WebAudioFontInstrument
+        loader: WebAudioFontInstrument,
+        config: {}
     }
     yield {
         title: "WebAudioFontLoader",
-        loader: WebAudioFontInstrumentLoader
+        loader: WebAudioFontInstrumentLoader,
+        config: {}
     }
     yield* listInstruments()
     yield* listDrumAndDrumSets()

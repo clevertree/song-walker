@@ -1,5 +1,5 @@
-import {InstrumentInstance, TrackState} from "@songwalker";
-import {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBufferInstrument";
+import {InstrumentInstance, TrackState} from "../../..";
+import {AudioBufferInstrumentConfig} from "../../AudioBufferInstrument";
 
 
 export default async function AnalyzerEffect(track: TrackState, config: AudioBufferInstrumentConfig): Promise<InstrumentInstance> {

@@ -1,4 +1,4 @@
-import {SongWalker,} from "@songwalker/walker";
+import {SongWalker} from "@songwalker/walker";
 import {HandlesTrackEvents, SongTrackEvent, TrackEventHandler} from "@songwalker/types";
 import {compileSongToCallback} from "@songwalker/compiler";
 

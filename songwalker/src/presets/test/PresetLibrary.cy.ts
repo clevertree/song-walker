@@ -1,4 +1,4 @@
-import {findPreset} from "@songwalker/helper/songHelper";
+import {findPreset} from "../../helper/songHelper";
 
 describe('WebAudioFontLibrary', () => {
     it('load presets', async () => {

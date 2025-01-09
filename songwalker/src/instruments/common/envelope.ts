@@ -1,4 +1,4 @@
-import {TrackState} from "@songwalker";
+import {TrackState} from "../..";
 
 export interface EnvelopeConfig {
     mixer?: number,

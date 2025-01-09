@@ -4,8 +4,8 @@ const perc=await loadPreset("FluidR3_GM/Room 1")
 const reverb=await loadPreset("Reverb")
 track.beatsPerMinute = 160;
 
-|track1(lead); |beat1^96@4 8
-|track1(osc) |beat1@7 8
+track1(lead); beat1^96@4() 8
+track1(osc) beat1@7() 8
 
 track track1(instrument) {
     track.effects = [reverb];

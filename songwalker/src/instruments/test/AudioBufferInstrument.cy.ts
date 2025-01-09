@@ -1,8 +1,5 @@
-import AudioBufferInstrument from "@songwalker/instruments/AudioBufferInstrument";
-import {generateRandomBuffer} from "@songwalker/instruments/test/testHelper";
-import {getSongPlayerState, playSong} from "@songwalker/helper/songHelper";
-import {songwalker} from "@songwalker/compiler/compiler";
-import {renderSong} from "@songwalker/helper/renderHelper";
+import {generateRandomBuffer} from "../test/testHelper";
+import {playSong, renderSong, songwalker} from "../..";
 
 const song = songwalker`
 await loadPreset('AudioBuffer', {
@@ -27,11 +24,7 @@ describe('AudioBuffer', () => {
         const src = generateRandomBuffer(new AudioContext())
         const {renderedBuffer} = await renderSong(song, {custom: {src}});
         console.log('renderedBuffer', renderedBuffer)
+        await playSong(songwalker`loadPreset('AudioBuffer', {src: track.custom.src}); play`, () => ({custom: {src: renderedBuffer}}))
 
-        const playerState = getSongPlayerState()
-        const instrument = await AudioBufferInstrument(playerState, {
-            src: renderedBuffer,
-        })
-        await playSong(songwalker`play`, {instrument})
     })
 })

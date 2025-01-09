@@ -1,7 +1,7 @@
-import {PresetBank, SongCallback, SongWalkerState, TrackState, TrackStateOverrideCallback} from "@songwalker/types";
+import {PresetBank, SongCallback, SongWalkerState, TrackState, TrackStateOverrideCallback} from "../types";
 import PresetLibrary from "../presets/PresetLibrary";
-import {parseNote} from "@songwalker";
-import {DEFAULT_BUFFER_DURATION} from "@songwalker/constants/buffer";
+import {parseNote} from "..";
+import {DEFAULT_BUFFER_DURATION} from "../constants/buffer";
 
 
 export async function playSong(song: SongCallback,
@@ -78,9 +78,9 @@ export function getDefaultSongState(audioContext: BaseAudioContext,
             }
             instrument(instrumentTrack, commandString);
         },
-        executeTrack: function (track, trackCallback, overrides = {}, ...args) {
-            const newTrackState: TrackState = {...track, ...overrides, position: 0};
-            trackCallback(newTrackState, ...args)
+        executeCallback: function (track, callback, overrides = {}, ...args) {
+            // const newTrackState: TrackState = {...track, ...overrides};
+            callback.call({parent: track, overrides}, ...args)
         },
     };
     if (rootTrackOverrides) {

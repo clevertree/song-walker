@@ -1,4 +1,4 @@
-import {InstrumentLoader, SongWalkerState, TrackState} from "@songwalker/types";
+import {InstrumentLoader, SongWalkerState, TrackState} from "../types";
 import {parseNote} from "..";
 import {configEnvelope, EnvelopeConfig} from "./common/envelope";
 import {configFilterByKeyRange, KeyRangeConfig} from "./common/filter";

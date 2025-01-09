@@ -11,13 +11,12 @@ function formatTokenContent(token: Token | string, currentTokenID = 0): string {
         case 'comment':
         case 'function-definition':
         case 'loop-statement':
-        case 'function-statement':
-            return token.content as string;
-        // return exportFunctionStatement(token.content as string);
         case 'variable-statement':
-            return (token.content as Array<Token | string>).map(formatTokenContent).join('')
-        case 'track-statement':
-            return exportTrackStatement(token.content as string);
+            return token.content as string;
+        case 'function-statement':
+            return exportFunctionStatement(token.content as string);
+        // case 'track-statement':
+        //     return exportTrackStatement(token.content as string);
         case 'track-definition':
             return exportTrackDefinition(token.content as string);
         case 'command-statement':
@@ -39,7 +38,6 @@ export function compileSongToJavascript(
     // eventMode: boolean = false
 ) {
     const tokenList = sourceToTokens(songSource)
-    console.info((tokenList))
     const javascriptSource = tokenList
         .map((token, tokenID) => {
             if (typeof token === "string")
@@ -66,35 +64,25 @@ export function songwalker(strings: TemplateStringsArray, ...values: string[]) {
     return compileSongToCallback(result);
 }
 
-// export function getTokenLength(token: TokenItem | string): number {
-//     if (typeof token === 'string') {
-//         return token.length;
-//     } else {
-//         if (Array.isArray(token.content)) {
-//             return token.content.reduce((sum, token) => sum + getTokenLength(token), 0);
-//         } else {
-//             return token.content.length
-//         }
-//     }
-// }
 
 /** Compiler Exports **/
-
+type KS = keyof SongWalkerState;
 const ROOT_TRACK = 'rootTrack';
 const VAR_TRACK_STATE = 'track';
+const VAR_PARENT_TRACK_STATE = 'parentTrack';
 // export const F_WAIT = "_w";
 // export const F_LOAD = "_lp";
 // export const F_EXECUTE = "_e";
 export const F_EXPORT = `{${
-    'wait' as keyof SongWalkerState
+    'wait' as KS
 }, ${
-    'execute' as keyof SongWalkerState
+    'execute' as KS
 }, ${
-    'executeTrack' as keyof SongWalkerState
+    'executeTrack' as KS
 }, ${
-    'loadPreset' as keyof SongWalkerState
+    'loadPreset' as KS
 }, ${
-    'rootTrackState' as keyof SongWalkerState
+    'rootTrackState' as KS
 }:track}`;
 export const OVERRIDE_ALIAS: OverrideAliases = {
     '@': 'duration',
@@ -115,12 +103,12 @@ export function exportCommandStatement(commandString: string) {
         throw new Error("Invalid command statement: " + commandString)
     const [, command, overrideString] = match;
     const exportOverrides = overrideString ? ', ' + formatCommandOverrides(overrideString, OVERRIDE_ALIAS) : ''
-    return `${'execute' as keyof SongWalkerState}(${VAR_TRACK_STATE}, "${command}"${exportOverrides});`
+    return `${'execute' as KS}(${VAR_TRACK_STATE}, "${command}"${exportOverrides});`
 }
 
 // variable: (variableName: string, variableContent: string) => `${variableName}=${variableContent}`,
 export function exportWaitStatement(durationStatement: string) {
-    return `if(await ${'wait' as keyof SongWalkerState}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`;
+    return `if(await ${'wait' as KS}(${VAR_TRACK_STATE}${durationStatement ? ', ' + durationStatement : ''})) return;`;
 }
 
 export function exportTrackDefinition(trackDefinition: string) {
@@ -128,15 +116,34 @@ export function exportTrackDefinition(trackDefinition: string) {
     if (!match)
         throw new Error("Invalid track definition: " + trackDefinition)
     const [, trackName, trackArgs] = match;
-    return `async function ${trackName}(${VAR_TRACK_STATE}${trackArgs ? ', ' + trackArgs : ''}){`
+    return `async function ${trackName}(${trackArgs}){`
+        + `\n\tconst ${VAR_TRACK_STATE} = {...this.parent, ...this.overrides, ${'position' as KS}:0};`
 }
 
-export function exportTrackStatement(trackStatement: string) {
-    const match = (trackStatement).match(LANGUAGE["track-statement"]);
+// export function exportTrackStatement(trackStatement: string) {
+//     const match = (trackStatement).match(LANGUAGE["track-statement"]);
+//     if (!match)
+//         throw new Error("Invalid track statement: " + trackStatement)
+//     const [, trackName, overrideString, paramString] = match;
+//     let exportOverrides = ', ' + formatCommandOverrides(overrideString, TRACK_OVERRIDE_ALIAS)
+//     // const functionCall = trackName + `.bind(${VAR_TRACK_STATE}${paramString ? ', ' + paramString : ''})`
+//     return `${'executeTrack' as KS}(${VAR_TRACK_STATE}, ${trackName}${exportOverrides}${paramString ? ', ' + paramString : ''});`
+// }
+
+const reservedFunctions: Array<keyof SongWalkerState> = [
+    'loadPreset',
+    "wait",
+]
+
+export function exportFunctionStatement(functionStatement: string) {
+    const match = functionStatement.match(LANGUAGE["function-statement"]);
     if (!match)
-        throw new Error("Invalid track statement: " + trackStatement)
-    const [, trackName, overrideString, paramString] = match;
-    let exportOverrides = ', ' + formatCommandOverrides(overrideString, TRACK_OVERRIDE_ALIAS)
+        throw new Error("Invalid function statement: " + functionStatement)
+    const [, variableSet = '', awaitString = '', functionName, overrideString, paramString] = match;
+    if (reservedFunctions.includes(<keyof SongWalkerState>functionName))
+        return functionStatement;
+    let exportOverrides = formatCommandOverrides(overrideString, TRACK_OVERRIDE_ALIAS)
     // const functionCall = trackName + `.bind(${VAR_TRACK_STATE}${paramString ? ', ' + paramString : ''})`
-    return `${'executeTrack' as keyof SongWalkerState}(${VAR_TRACK_STATE}, ${trackName}${exportOverrides}${paramString ? ', ' + paramString : ''});`
+    return `${variableSet}${awaitString}${'executeCallback' as KS}(${VAR_TRACK_STATE}, ${functionName}, ${exportOverrides}${paramString ? ', ' + paramString : ''});`
+
 }

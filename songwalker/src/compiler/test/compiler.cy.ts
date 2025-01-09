@@ -8,7 +8,7 @@ import {
     sourceToTokens
 } from '../compiler'
 
-import {renderSong} from "@songwalker/helper/renderHelper";
+import {renderSong} from "../../helper/renderHelper";
 
 describe('compiler', () => {
     const emptyTemplate = (s: string) => s;

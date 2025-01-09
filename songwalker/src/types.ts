@@ -58,7 +58,12 @@ export type TrackStateOverrides = {
 }
 export type TrackStateOverrideCallback = TrackStateOverrides | ((songState: SongWalkerState) => TrackStateOverrides)
 
-export type TrackCallback = (track: TrackState, ...args: any[]) => void
+export interface TrackContext {
+    parent: TrackState,
+    overrides: TrackStateOverrides
+}
+
+export type TrackCallback = (this: TrackContext, ...args: any[]) => void
 
 
 export interface SongWalkerState {
@@ -71,7 +76,7 @@ export interface SongWalkerState {
     // waitForSongToFinish: () => Promise<void>
     loadPreset: (presetID: string, config: object) => Promise<InstrumentInstance>,
     execute: (track: TrackState, command: string, overrides?: TrackStateOverrides) => void
-    executeTrack: (track: TrackState, trackCallback: TrackCallback, overrides?: TrackStateOverrides) => void
+    executeCallback: (track: TrackState, callback: TrackCallback, overrides?: TrackStateOverrides) => void
     // parseCommand: (commandString: string) => CommandWithOverrides,
     parseNote: (noteString: string) => ParsedNote
     // parseAndExecute: (track: TrackState, commandString: string, additionalParams?: CommandParams) => void

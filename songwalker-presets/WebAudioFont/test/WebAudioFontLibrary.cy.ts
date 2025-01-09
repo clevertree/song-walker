@@ -1,7 +1,7 @@
 import {WebAudioFontLibrary} from "@songwalker-presets/WebAudioFont/WebAudioFontLibrary";
 import {Preset} from "@songwalker/types";
 
-import {getSongRendererState} from "@songwalker/helper/renderHelper";
+import {getSongRendererState} from "@songwalker/src/helper/renderHelper";
 
 describe('WebAudioFontLibrary', () => {
     it('lists all presets. load 3', async () => {

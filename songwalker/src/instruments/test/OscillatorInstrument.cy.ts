@@ -1,7 +1,4 @@
-import {renderSong} from "@songwalker/helper/renderHelper";
-import {songwalker} from "@songwalker/compiler/compiler";
-import {getSongPlayerState, playSong} from "@songwalker/helper/songHelper";
-import AudioBufferInstrument from "../AudioBufferInstrument";
+import {playSong, renderSong, songwalker} from "../..";
 
 const song = songwalker`
 await loadPreset('Oscillator', {
@@ -22,11 +19,6 @@ describe('Oscillator', () => {
     it('Oscillator plays C#4d1/2', async () => {
         const {renderedBuffer} = await renderSong(song);
         console.log('renderedBuffer', renderedBuffer)
-
-        const playerState = getSongPlayerState()
-        const instrument = await AudioBufferInstrument(playerState, {
-            src: renderedBuffer,
-        })
-        await playSong(songwalker`play`, {instrument})
+        await playSong(songwalker`loadPreset('AudioBuffer', {src: track.custom.src}); play`, () => ({custom: {src: renderedBuffer}}))
     })
 })

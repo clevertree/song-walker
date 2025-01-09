@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "predev": "npm run build-loader",
     "dev-electron": "next dev & npm run electron",
     "build": "next build",
     "start": "next start",

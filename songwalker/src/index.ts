@@ -1,13 +1,17 @@
 import {parseNote, parseNumeric} from './helper/commandHelper'
-import {InstrumentInstance, TrackState} from './types'
 
+import {renderSong} from "./helper/renderHelper";
+import {songwalker, sourceToTokens} from "./compiler/compiler";
+import {playSong} from "./helper/songHelper";
+import {registerPresetBank} from "./presets"
 
-export type {
-    InstrumentInstance,
-    TrackState,
-}
 
 export {
+    renderSong,
+    playSong,
+    songwalker,
     parseNote,
-    parseNumeric
+    parseNumeric,
+    sourceToTokens,
+    registerPresetBank
 }

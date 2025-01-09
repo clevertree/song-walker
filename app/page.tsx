@@ -3,7 +3,6 @@ import song from "./song/test.sw";
 
 export default function Home() {
     console.log('song', song)
-    debugger;
     return (
         <>
             <header className="App-header">

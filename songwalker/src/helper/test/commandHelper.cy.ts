@@ -1,5 +1,5 @@
 import {formatCommandOverrides, parseNote} from "../commandHelper";
-import {OVERRIDE_ALIAS} from "@songwalker/compiler/compiler";
+import {OVERRIDE_ALIAS} from "../../compiler/compiler";
 
 describe('noteHelper', () => {
     it('formatCommandOverrides v0.5d1/2', async () => {

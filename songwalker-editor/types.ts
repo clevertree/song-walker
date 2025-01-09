@@ -1,16 +1,16 @@
-export interface IEditorContext {
-    editor: IEditorState,
+export interface IAppContext {
+    appState: IAppState,
 
-    update(newState: IEditorState): void
+    updateAppState(newState: IAppState | ((oldState: IAppState) => IAppState)): void
 }
 
-export interface IEditorState {
+export interface IAppState {
     // menu: MenuState,
-    document: IDocumentState,
+    activeEditor: ISourceEditorState,
 }
 
 
-export interface IDocumentState {
+export interface ISourceEditorState {
     path: string,
     value: string,
     cursorPosition: number,

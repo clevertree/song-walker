@@ -1,5 +1,5 @@
-import {parseNote} from "@songwalker";
-import {ParsedNote} from "@songwalker/types";
+import {parseNote} from "../..";
+import {ParsedNote} from "../../types";
 
 export interface KeyRangeConfig {
     keyRangeLow?: string,

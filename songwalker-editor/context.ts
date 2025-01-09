@@ -1,12 +1,12 @@
 import {createContext} from 'react';
-import {IEditorContext, IEditorState} from './types';
+import {IAppContext, IAppState} from './types';
 
 
-export const EditorContext = createContext<IEditorContext>({
-    update(newState: IEditorState): void {
+export const EditorContext = createContext<IAppContext>({
+    updateAppState(newState: IAppState): void {
     },
-    editor: {
-        document: {
+    appState: {
+        activeEditor: {
             cursorPosition: 0,
             value: 'C4',
             path: 'new.sw'

@@ -1,12 +1,6 @@
-import {
-    InstrumentInstance,
-    PresetBank,
-    SongCallback,
-    SongWalkerState,
-    TrackStateOverrideCallback
-} from "@songwalker/types";
-import PresetLibrary from "@songwalker/presets/PresetLibrary";
-import {getDefaultSongState} from "@songwalker/helper/songHelper";
+import {InstrumentInstance, PresetBank, SongCallback, SongWalkerState, TrackStateOverrideCallback} from "../types";
+import PresetLibrary from "../presets/PresetLibrary";
+import {getDefaultSongState} from "../helper/songHelper";
 
 export async function renderSong(song: SongCallback,
                                  rootTrackOverrides?: TrackStateOverrideCallback,
@@ -49,7 +43,7 @@ export function getSongAnalysisState(
         execute: () => {
             // Do not execute notes
         },
-        executeTrack: () => {
+        executeCallback: () => {
             // Do not execute sub-tracks
         },
         loadPreset: async () => {

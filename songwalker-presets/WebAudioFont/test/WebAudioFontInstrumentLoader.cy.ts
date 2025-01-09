@@ -11,10 +11,7 @@ import {
     PRESET_PATH_PERCUSSION_KEYS
 } from "@songwalker-presets/WebAudioFont/constants";
 
-import {renderSong} from "@songwalker/helper/renderHelper";
-import {getSongPlayerState, playSong} from "@songwalker/helper/songHelper";
-import AudioBufferInstrument from "../../../songwalker/instruments/AudioBufferInstrument";
-import {songwalker} from "@songwalker/compiler/compiler";
+import {playSong, renderSong, songwalker} from "@songwalker";
 
 describe('WebAudioFontInstrument', () => {
 
@@ -42,12 +39,7 @@ D4 1 C4 1
             custom: {webAudioFontInstrumentLoaderConfig}
         });
         console.log('renderedBuffer', renderedBuffer)
-
-        const playerState = getSongPlayerState()
-        const instrument = await AudioBufferInstrument(playerState, {
-            src: renderedBuffer,
-        })
-        await playSong(songwalker`play`, {instrument})
+        await playSong(songwalker`loadPreset('AudioBuffer', {src: track.custom.src}); play`, () => ({custom: {src: renderedBuffer}}))
     })
 
     it('loads and plays percussion', async () => {
@@ -72,12 +64,8 @@ D4 1 C4 1
             custom: {webAudioFontInstrumentLoaderConfig}
         });
         console.log('renderedBuffer', renderedBuffer)
+        await playSong(songwalker`loadPreset('AudioBuffer', {src: track.custom.src}); play`, () => ({custom: {src: renderedBuffer}}))
 
-        const playerState = getSongPlayerState()
-        const instrument = await AudioBufferInstrument(playerState, {
-            src: renderedBuffer,
-        })
-        await playSong(songwalker`play`, {instrument})
     })
 
     it('loads and plays drumset', async () => {
@@ -102,11 +90,7 @@ D4 1 C4 1
             custom: {webAudioFontInstrumentLoaderConfig}
         });
         console.log('renderedBuffer', renderedBuffer)
+        await playSong(songwalker`loadPreset('AudioBuffer', {src: track.custom.src}); play`, () => ({custom: {src: renderedBuffer}}))
 
-        const playerState = getSongPlayerState()
-        const instrument = await AudioBufferInstrument(playerState, {
-            src: renderedBuffer,
-        })
-        await playSong(songwalker`play`, {instrument})
     })
 })

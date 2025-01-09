@@ -2,10 +2,7 @@
 
 import {WebAudioFontInstrumentConfig} from "@songwalker-presets/WebAudioFont/WebAudioFontInstrument";
 
-import {renderSong} from "@songwalker/helper/renderHelper";
-import {songwalker} from "@songwalker/compiler/compiler";
-import {getSongPlayerState, playSong} from "@songwalker/helper/songHelper";
-import AudioBufferInstrument from "../../../songwalker/instruments/AudioBufferInstrument";
+import {playSong, renderSong, songwalker} from "@songwalker";
 
 const song = songwalker`
 await loadPreset('WebAudioFont', track.custom.webAudioFontConfig);
@@ -45,10 +42,6 @@ describe('WebAudioFontInstrument', () => {
         });
         console.log('renderedBuffer', renderedBuffer)
 
-        const playerState = getSongPlayerState()
-        const instrument = await AudioBufferInstrument(playerState, {
-            src: renderedBuffer,
-        })
-        await playSong(songwalker`play`, {instrument})
+        await playSong(songwalker`loadPreset('AudioBuffer', {src: track.custom.src}); play`, () => ({custom: {src: renderedBuffer}}))
     })
 })

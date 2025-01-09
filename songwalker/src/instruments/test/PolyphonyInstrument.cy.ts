@@ -1,11 +1,9 @@
-import {PolyphonyInstrumentConfig} from "@songwalker/instruments/PolyphonyInstrument";
-import OscillatorInstrument, {OscillatorInstrumentConfig} from "@songwalker/instruments/OscillatorInstrument";
-import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "@songwalker/instruments/AudioBufferInstrument";
-import {Preset} from "@songwalker/types";
-import {generateRandomBuffer} from "@songwalker/instruments/test/testHelper";
-import {renderSong} from "@songwalker/helper/renderHelper";
-import {songwalker} from "@songwalker/compiler/compiler";
-import {getSongPlayerState, playSong} from "@songwalker/helper/songHelper";
+import {PolyphonyInstrumentConfig} from "../PolyphonyInstrument";
+import OscillatorInstrument, {OscillatorInstrumentConfig} from "../OscillatorInstrument";
+import AudioBufferInstrument, {AudioBufferInstrumentConfig} from "../AudioBufferInstrument";
+import {Preset} from "../../types";
+import {generateRandomBuffer} from "./testHelper";
+import {playSong, renderSong, songwalker} from "../..";
 
 const song = songwalker`
 await loadPreset('Polyphony', track.custom.polyphonyConfig);
@@ -45,11 +43,7 @@ describe('Polyphony', () => {
             custom: {polyphonyConfig}
         });
         console.log('renderedBuffer', renderedBuffer)
+        await playSong(songwalker`loadPreset('AudioBuffer', {src: track.custom.src}); play`, () => ({custom: {src: renderedBuffer}}))
 
-        const playerState = getSongPlayerState()
-        const instrument = await AudioBufferInstrument(playerState, {
-            src: renderedBuffer,
-        })
-        await playSong(songwalker`play`, {instrument})
     })
 })
