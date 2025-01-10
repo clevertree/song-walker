@@ -7,6 +7,8 @@ import {getCaretOffset, renderSourceEditor, renderValue} from "@songwalker-edito
 import Undo from "undoh";
 import {EditorContext} from "@songwalker-editor/context";
 import {insertIntoSelection, isMac} from "@songwalker-editor/helper/domHelper";
+import {compileSongToCallback} from "@songwalker/compiler/compiler";
+import {playSong} from "@songwalker";
 
 
 const TIMEOUT_SAVE_ON_CHANGE_EVENT = 500
@@ -126,6 +128,12 @@ export default function SourceEditor(state: ISourceEditorState) {
         return newState;
     }
 
+    async function startPlayback(e: any) {
+        const callback = compileSongToCallback(value);
+        console.log('callback', callback)
+        await playSong(callback)
+    }
+
     // useEffect(() => {
     //     const cursorPosition = nodeManager.getLastCursorPosition();
     //     // console.log('cursorPosition', cursorPosition)
@@ -151,6 +159,10 @@ export default function SourceEditor(state: ISourceEditorState) {
     return (
         <div className={styles.container}>
             <div className={styles.title}>[{path}]</div>
+            <button
+                onClick={startPlayback}
+            >play
+            </button>
             <div
                 key={path}
                 className={styles.editor}
@@ -170,3 +182,8 @@ export default function SourceEditor(state: ISourceEditorState) {
 }
 
 
+const SourcePlayback = function (props: any) {
+    return <div>
+
+    </div>
+}

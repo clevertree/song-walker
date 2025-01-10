@@ -78,7 +78,7 @@ export const F_EXPORT = `{${
 }, ${
     'execute' as KS
 }, ${
-    'executeTrack' as KS
+    'executeCallback' as KS
 }, ${
     'loadPreset' as KS
 }, ${
@@ -127,7 +127,7 @@ export function exportTrackDefinition(trackDefinition: string) {
 //     const [, trackName, overrideString, paramString] = match;
 //     let exportOverrides = ', ' + formatCommandOverrides(overrideString, TRACK_OVERRIDE_ALIAS)
 //     // const functionCall = trackName + `.bind(${VAR_TRACK_STATE}${paramString ? ', ' + paramString : ''})`
-//     return `${'executeTrack' as KS}(${VAR_TRACK_STATE}, ${trackName}${exportOverrides}${paramString ? ', ' + paramString : ''});`
+//     return `${'executeCallback' as KS}(${VAR_TRACK_STATE}, ${trackName}${exportOverrides}${paramString ? ', ' + paramString : ''});`
 // }
 
 const reservedFunctions: Array<keyof SongWalkerState> = [
