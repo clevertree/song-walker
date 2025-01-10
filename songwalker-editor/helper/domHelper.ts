@@ -50,6 +50,10 @@ export function walkDOM(node: Node, callback: (childNode: Node, offset: number) 
     }
 }
 
+export function isMac(navigator: Navigator) {
+    return navigator.userAgent.includes('Mac');
+}
+
 export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTMLElement, callback = (newNode: ChildNode, charOffset: number, length: number) => {
 }) {
     let elmID = 0;

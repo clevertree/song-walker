@@ -6,6 +6,7 @@ import styles from "./SourceEditor.module.scss"
 import {getCaretOffset, renderSourceEditor, renderValue} from "@songwalker-editor/helper/sourceHelper";
 import Undo from "undoh";
 import {EditorContext} from "@songwalker-editor/context";
+import {insertIntoSelection, isMac} from "@songwalker-editor/helper/domHelper";
 
 
 const TIMEOUT_SAVE_ON_CHANGE_EVENT = 500
@@ -13,7 +14,6 @@ let saveTimeout: any = null;
 
 export default function SourceEditor(state: ISourceEditorState) {
     const {path, value, cursorPosition} = state;
-    console.log(state);
     const {updateAppState} = useContext<IAppContext>(EditorContext)
     const undoBuffer = useMemo(() => new Undo<ISourceEditorState>(state), []);
     // const errors = useSelector((state: EditorState) => state.document.errors);
@@ -34,19 +34,96 @@ export default function SourceEditor(state: ISourceEditorState) {
 
     function handleChangeEvent(e: any) {
         clearTimeout(saveTimeout)
-        saveTimeout = setTimeout(setValue, TIMEOUT_SAVE_ON_CHANGE_EVENT) as any
+        saveTimeout = setTimeout(() => {
+            const newState = updateState();
+            undoBuffer.retain(newState)
+        }, TIMEOUT_SAVE_ON_CHANGE_EVENT) as any
     }
 
-    function setValue() {
+    function handleKeyEvent(e: React.SyntheticEvent<HTMLDivElement>) {
+        switch (e.type) {
+            default:
+                break;
+            // case 'click':
+            //     console.log(e.type, e);
+            //     let cursorNode = findEditorNode(e.target as Node, this.getNode());
+            //     if (cursorNode)
+            //         this.setCursorNode(cursorNode);
+            //     break;
+            // case 'focus':
+            //     this.midiEventListener = (e: MIDIMessageEvent) => console.log("MIDI", e.data, e.timeStamp, this.trackName);
+            //     addMIDIEventListener(this.midiEventListener)
+            //     break;
+            // case 'blur':
+            //     if (this.midiEventListener)
+            //         removeMIDIEventListener(this.midiEventListener)
+            //     break;
+            //
+            // // this.setCursorPosition(this.lastCursorPosition)
+            // // break;
+            // case 'input':
+            //     this.refreshNode()
+            //     break;
+            // case 'keyup':
+            //     this.getCursorPosition();
+            //     const focusNode = this.getFocusNode();
+            //     if (focusNode)
+            //         this.setCursorNode(focusNode)
+            //     this.startRetainTimeout(config.editorRetainTimeout);
+            //     break;
+            case 'keydown':
+                let ke = e as React.KeyboardEvent<HTMLDivElement>
+                switch (ke.code) {
+                    case 'Enter':
+                        ke.preventDefault();
+                        insertIntoSelection("\n")
+                        return;
+                    // case 'Tab': // TODO group shift?
+                    //     e.preventDefault();
+                    //     insertIntoOffset("\t")
+                    //     return;
+                    case 'KeyZ':
+                        if (ke[isMac(navigator) ? 'metaKey' : 'ctrlKey']) {
+                            ke.preventDefault();
+                            if (ke.shiftKey) {
+                                const redoValue = undoBuffer.redo();
+                                console.log('redoValue', redoValue)
+                                updateState(redoValue)
+                            } else {
+                                const undoValue = undoBuffer.undo();
+                                console.log('undoValue', undoValue)
+                                updateState(undoValue)
+                            }
+                        }
+                        return;
+                    // case 'ControlLeft':
+                    //     e.preventDefault();
+                    //     setEditorPosition(getEditorPosition() - 1);
+                    //     console.log(e.code)
+                    //     break;
+                    default:
+                        // console.log(e.key)
+                        break;
+                }
+                break;
+        }
+    }
+
+    function updateState(newState ?: ISourceEditorState) {
         const editor = getEditor();
-        const newSource = renderValue(editor);
-        const cursorPosition = getCaretOffset(editor) || 0;
-        const newState: ISourceEditorState = {value: newSource, path, cursorPosition};
-        undoBuffer.retain(newState)
+        if (!newState) {
+            newState = {
+                value: renderValue(editor),
+                path,
+                cursorPosition: getCaretOffset(editor) || 0
+            }
+        }
         updateAppState((prevState) => {
-            prevState.activeEditor = newState;
+            if (newState)
+                prevState.activeEditor = newState;
             return {...prevState};
         })
+        return newState;
     }
 
     // useEffect(() => {
@@ -80,8 +157,8 @@ export default function SourceEditor(state: ISourceEditorState) {
                 ref={refEditor}
                 contentEditable
                 spellCheck={false}
-                // onKeyDown={handleEvent}
-                // onKeyUp={handleEvent}
+                onKeyDown={handleKeyEvent}
+                onKeyUp={handleKeyEvent}
                 onInput={handleChangeEvent}
                 // onFocus={handleEvent}
                 // onMouseDown={handleEvent}
