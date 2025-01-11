@@ -7,7 +7,7 @@ export const EditorContext = createContext<IAppContext>({
     },
     appState: {
         activeEditor: {
-            cursorPosition: 0,
+            cursorRange: 0,
             value: 'C4',
             path: 'new.sw'
         }

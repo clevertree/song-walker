@@ -1,5 +1,6 @@
 import {mapTokensToDOM} from "@songwalker-editor/helper/domHelper";
 import {sourceToTokens} from "@songwalker";
+import {ISourceEditorCursorRange} from "@songwalker-editor/types";
 
 export function renderSourceEditor(editor: HTMLElement, sourceValue: string, cursorPosition: number) {
     const tokenList = sourceToTokens(sourceValue);
@@ -30,17 +31,23 @@ export function renderValue(editor: HTMLElement) {
     //     child => child.innerText || child.textContent).join('');
 }
 
-export function getCaretOffset(editor: HTMLElement) {
-    let caretOffset = null;
+export function getSelectionRange(editor: HTMLElement): ISourceEditorCursorRange {
     let sel = window.getSelection();
-    if (sel && sel.rangeCount > 0) {
-        const range = sel.getRangeAt(0);
-        const preCaretRange = range.cloneRange();
-        preCaretRange.selectNodeContents(editor);
-        preCaretRange.setEnd(range.endContainer, range.endOffset);
-        caretOffset = preCaretRange.toString().length;
-    }
-    return caretOffset;
+    if (!sel || sel.rangeCount === 0)
+        throw new Error("Invalid window.getSelection()")
+    const range = sel.getRangeAt(0);
+    const preCaretRange = range.cloneRange();
+    preCaretRange.selectNodeContents(editor);
+    preCaretRange.setEnd(range.startContainer, range.startOffset);
+    const start = preCaretRange.toString().length;
+    // preCaretRange.selectNodeContents(editor);
+    preCaretRange.setEnd(range.endContainer, range.endOffset);
+    const end = preCaretRange.toString().length;
+    return {
+        start,
+        end,
+        collapsed: range.collapsed
+    };
 }
 
 function setCursorPosition(contentEditable: HTMLElement, cursorPosition: number) {

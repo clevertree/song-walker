@@ -3,7 +3,7 @@
 import React, {useContext, useEffect, useMemo, useRef} from 'react'
 import {IAppContext, ISourceEditorState} from "../types";
 import styles from "./SourceEditor.module.scss"
-import {getCaretOffset, renderSourceEditor, renderValue} from "@songwalker-editor/helper/sourceHelper";
+import {getSelectionRange, renderSourceEditor, renderValue} from "@songwalker-editor/helper/sourceHelper";
 import Undo from "undoh";
 import {EditorContext} from "@songwalker-editor/context";
 import {insertIntoSelection, isMac} from "@songwalker-editor/helper/domHelper";
@@ -15,7 +15,7 @@ const TIMEOUT_SAVE_ON_CHANGE_EVENT = 500
 let saveTimeout: any = null;
 
 export default function SourceEditor(state: ISourceEditorState) {
-    const {path, value, cursorPosition} = state;
+    const {path, value, cursorRange} = state;
     const {updateAppState} = useContext<IAppContext>(EditorContext)
     const undoBuffer = useMemo(() => new Undo<ISourceEditorState>(state), []);
     // const errors = useSelector((state: EditorState) => state.document.errors);
@@ -24,7 +24,7 @@ export default function SourceEditor(state: ISourceEditorState) {
     const refEditor = useRef<HTMLInputElement>(null);
     useEffect(() => {
         const editor = getEditor();
-        renderSourceEditor(editor, value, cursorPosition)
+        renderSourceEditor(editor, value, cursorRange)
     });
 
     function getEditor() {
@@ -40,6 +40,19 @@ export default function SourceEditor(state: ISourceEditorState) {
             const newState = updateState();
             undoBuffer.retain(newState)
         }, TIMEOUT_SAVE_ON_CHANGE_EVENT) as any
+    }
+
+    function handlePasteEvent(event: ClipboardEvent) {
+        console.log('paste', event);
+        if (!event.clipboardData)
+            throw new Error("Invalid clipboard data");
+        event.clipboardData.clearData('text/html')
+        const pastedString = event.clipboardData.getData('text/plain');
+        const range = getSelectionRange(getEditor())
+        const newValue = value.substring(0, range.start)
+            + pastedString
+            + value.substring(range.end)
+        debugger;
     }
 
     function handleKeyEvent(e: React.SyntheticEvent<HTMLDivElement>) {
@@ -117,7 +130,7 @@ export default function SourceEditor(state: ISourceEditorState) {
             newState = {
                 value: renderValue(editor),
                 path,
-                cursorPosition: getCaretOffset(editor) || 0
+                cursorRange: getSelectionRange(editor) || 0
             }
         }
         updateAppState((prevState) => {
@@ -172,6 +185,7 @@ export default function SourceEditor(state: ISourceEditorState) {
                 onKeyDown={handleKeyEvent}
                 onKeyUp={handleKeyEvent}
                 onInput={handleChangeEvent}
+                onPaste={handlePasteEvent}
                 // onFocus={handleEvent}
                 // onMouseDown={handleEvent}
                 // onMouseUp={getCursorPosition}

@@ -10,10 +10,16 @@ export interface IAppState {
 }
 
 
+export interface ISourceEditorCursorRange {
+    start: number,
+    end: number,
+    collapsed: boolean
+}
+
 export interface ISourceEditorState {
     path: string,
     value: string,
-    cursorPosition: number,
+    cursorRange: ISourceEditorCursorRange,
     // isPlaying: boolean,
     // errors: Array<string>,
 }
