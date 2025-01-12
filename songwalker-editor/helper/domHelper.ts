@@ -1,3 +1,4 @@
+import {ISourceEditorCursorRange} from "@songwalker-editor/types";
 import {Token} from "prismjs";
 
 export function insertIntoSelection(insertString: string) {
@@ -24,57 +25,24 @@ export function insertIntoSelection(insertString: string) {
     sel.addRange(range)
 }
 
-export function walkDOM(node: Node, callback: (childNode: Node, offset: number) => boolean | undefined) {
-    let offset = 0;
-    return walk(node)
-
-    function walk(node: Node) {
-        const {childNodes} = node;
-        if (childNodes.length) {
-            for (let i = 0; i < childNodes.length; i++) {
-                const childNode = childNodes[i];
-                if (callback(childNode, offset))
-                    return true;
-
-                if (childNode.nodeType === Node.TEXT_NODE) {
-                    offset += (childNode.nodeValue + '').length;
-                } else if (childNode.nodeName === "BR") {
-                    offset += 1;
-                }
-                if (childNode.nodeType === Node.ELEMENT_NODE)
-                    if (walk(childNode))
-                        return true;
-            }
-        }
-        return false; // callback never returned true
-    }
-}
 
 export function isMac(navigator: Navigator) {
     return navigator.userAgent.includes('Mac');
 }
 
-export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTMLElement, callback = (newNode: ChildNode, charOffset: number, length: number) => {
-}) {
-    let elmID = 0;
+export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTMLElement) {
     let childNodes = container.childNodes;
-    let charOffset = 0;
-    container.replaceChildren(...tokenList.map((token: (string | Token)) => {
-        const oldNode = childNodes[elmID++];
-        let newNode = oldNode;
-        let length = 0;
-        // console.log('token', token, oldNode);
+    var newChildren = document.createDocumentFragment();
+    for (let tokenID = 0; tokenID < tokenList.length; tokenID++) {
+        const token = tokenList[tokenID];
+        let oldNode = childNodes[tokenID];
+        let newNode = oldNode
         if (typeof token === "string") {
-
-            if (oldNode && oldNode.nodeType === 3) {
-                oldNode.textContent = token;
-                // console.info("Reusing", oldNode);
-                // return oldNode;
+            if (newNode && newNode.nodeType === 3) {
+                newNode.textContent = token;
             } else {
                 newNode = document.createTextNode(token);
             }
-            length = token.length;
-            // }
         } else {
             if (!newNode || newNode.nodeName.toLowerCase() !== token.type) {
                 newNode = document.createElement(token.type);
@@ -82,17 +50,109 @@ export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTML
                 // console.info("Reusing", oldNode);
             }
             if (Array.isArray(token.content)) {
-                length = mapTokensToDOM(token.content, <HTMLElement>newNode)
+                mapTokensToDOM(token.content, <HTMLElement>newNode)
             } else if (typeof token.content === "string") {
                 (<HTMLElement>newNode).innerText = token.content;
-                length = token.content.length;
             } else {
                 throw 'invalid token.content';
             }
         }
-        charOffset += length;
-        callback(newNode, charOffset, length);
-        return newNode
-    }));
-    return charOffset
+        newChildren.appendChild(newNode)
+    }
+    while (container.firstChild) {
+        container.firstChild.remove();
+    }
+
+    container.appendChild(newChildren)
+}
+
+// export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTMLElement, callback = (newNode: ChildNode, charOffset: number, length: number) => {
+// }) {
+//     let elmID = 0;
+//     let childNodes = container.childNodes;
+//     let charOffset = 0;
+//     container.replaceChildren(...tokenList.map((token: (string | Token)) => {
+//         const oldNode = childNodes[elmID++];
+//         let newNode = oldNode;
+//         let length = 0;
+//         // console.log('token', token, oldNode);
+//         if (typeof token === "string") {
+//
+//             if (oldNode && oldNode.nodeType === 3) {
+//                 oldNode.textContent = token;
+//                 // console.info("Reusing", oldNode);
+//                 // return oldNode;
+//             } else {
+//                 newNode = document.createTextNode(token);
+//             }
+//             length = token.length;
+//             // }
+//         } else {
+//             if (!newNode || newNode.nodeName.toLowerCase() !== token.type) {
+//                 newNode = document.createElement(token.type);
+//             } else {
+//                 // console.info("Reusing", oldNode);
+//             }
+//             if (Array.isArray(token.content)) {
+//                 length = mapTokensToDOM(token.content, <HTMLElement>newNode)
+//             } else if (typeof token.content === "string") {
+//                 (<HTMLElement>newNode).innerText = token.content;
+//                 length = token.content.length;
+//             } else {
+//                 throw 'invalid token.content';
+//             }
+//         }
+//         charOffset += length;
+//         callback(newNode, charOffset, length);
+//         return newNode
+//     }));
+//     return charOffset
+// }
+export function setCursorPosition(contentEditable: HTMLElement, cursorRange: ISourceEditorCursorRange) {
+    const {start, end, collapsed} = cursorRange;
+    const range = createRange();
+    const selection = window.getSelection();
+    if (!selection)
+        throw 'window.getSelection() is null. Iframe?';
+    selection.removeAllRanges();
+    selection.addRange(range);
+    if (collapsed)
+        range.collapse(true);
+
+
+    function createRange() {
+        let range = document.createRange();
+        range.selectNode(contentEditable);
+        range.setStart(contentEditable, 0);
+
+        let pos = 0;
+        const stack = [contentEditable];
+        let current;
+        let startFound = false;
+        while (current = stack.pop()) {
+            if (current.nodeType === Node.TEXT_NODE) {
+                if (!current.textContent)
+                    throw 'text node has no textContent';
+                const len = current.textContent.length;
+                if (!startFound && pos + len >= start) {
+                    startFound = true;
+                    range.setStart(current, start - pos);
+                }
+                if (pos + len >= end) {
+                    range.setEnd(current, end - pos);
+                    return range;
+                }
+                pos += len;
+            } else if (current.childNodes && current.childNodes.length > 0) {
+                for (let i = current.childNodes.length - 1; i >= 0; i--) {
+                    stack.push(<HTMLElement>current.childNodes[i]);
+                }
+            }
+        }
+
+        console.error("The target position is greater than the length of the contenteditable element.")
+        range.setEnd(contentEditable, contentEditable.childNodes.length);
+        return range;
+    }
+
 }

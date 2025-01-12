@@ -1,24 +1,15 @@
-import {mapTokensToDOM} from "@songwalker-editor/helper/domHelper";
-import {sourceToTokens} from "@songwalker";
 import {ISourceEditorCursorRange} from "@songwalker-editor/types";
+import {sourceToTokens} from "@songwalker";
+import {mapTokensToDOM, setCursorPosition} from "@songwalker-editor/helper/domHelper";
 
-export function renderSourceEditor(editor: HTMLElement, sourceValue: string, cursorPosition: number) {
+export function renderSourceEditor(editor: HTMLElement, sourceValue: string, cursorRange: ISourceEditorCursorRange) {
     const tokenList = sourceToTokens(sourceValue);
     // const caretOffset = getCaretOffset(editor);
     // console.log('render', tokenList, cursorPosition)
 
-    mapTokensToDOM(tokenList, editor, (newNode, charOffset, length) => {
-        // if (!cursorNode && (charOffset - length <= cursorPosition) && (charOffset > cursorPosition)) {
-        //     cursorNode = newNode;
-        //     cursorNodeOffset = charOffset - length;
-        //     if ((cursorPosition - cursorNodeOffset) > (<HTMLElement>cursorNode).innerHTML.length) {
-        //         debugger;
-        //     }
-        // }
-    });
+    mapTokensToDOM(tokenList, editor);
 
-    // TODO move set cursor logic here < ^ v
-    setCursorPosition(editor, cursorPosition);
+    setCursorPosition(editor, cursorRange);
 
     const renderedValue = renderValue(editor);
     if (renderedValue !== sourceValue)
@@ -50,46 +41,3 @@ export function getSelectionRange(editor: HTMLElement): ISourceEditorCursorRange
     };
 }
 
-function setCursorPosition(contentEditable: HTMLElement, cursorPosition: number) {
-    const range = createRange();
-    const selection = window.getSelection();
-    if (!selection)
-        throw 'window.getSelection() is null. Iframe?';
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    range.collapse(false);
-
-
-    function createRange() {
-        let range = document.createRange();
-        range.selectNode(contentEditable);
-        range.setStart(contentEditable, 0);
-
-        let pos = 0;
-        const stack = [contentEditable];
-        let current;
-        while (current = stack.pop()) {
-            if (current.nodeType === Node.TEXT_NODE) {
-                if (!current.textContent)
-                    throw 'text node has no textContent';
-                const len = current.textContent.length;
-                if (pos + len >= cursorPosition) {
-                    range.setEnd(current, cursorPosition - pos);
-                    return range;
-                }
-                pos += len;
-            } else if (current.childNodes && current.childNodes.length > 0) {
-                for (let i = current.childNodes.length - 1; i >= 0; i--) {
-                    stack.push(<HTMLElement>current.childNodes[i]);
-                }
-            }
-        }
-
-        // The target position is greater than the
-        // length of the contenteditable element.
-        range.setEnd(contentEditable, contentEditable.childNodes.length);
-        return range;
-    }
-
-}

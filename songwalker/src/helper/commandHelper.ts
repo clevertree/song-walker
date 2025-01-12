@@ -69,7 +69,7 @@ export function parseNote(noteCommand: string, baseFrequency: number = DEFAULT_F
 
 
 export function parseWait(fullWaitString: string) {
-    const match = fullWaitString.match(LANGUAGE["wait-statement"]);
+    const match = fullWaitString.match(LANGUAGE["swe-wait"]);
     if (!match)
         throw new Error("Invalid wait string: " + fullWaitString);
     const [, duration] = match;

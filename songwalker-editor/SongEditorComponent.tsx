@@ -16,7 +16,11 @@ export default function SongEditorComponent(props: SongEditorComponentProps) {
     const {className, initialValue} = props;
     const [editorState, setEditorState] = useState<IAppState>({
         activeEditor: {
-            cursorRange: 0,
+            cursorRange: {
+                start: 10,
+                end: 2,
+                collapsed: false
+            },
             path: 'new.sw',
             value: initialValue
         }

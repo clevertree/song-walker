@@ -8,20 +8,20 @@ function formatTokenContent(token: Token | string, currentTokenID = 0): string {
     if (typeof token === "string")
         return token;
     switch (token.type as keyof typeof LANGUAGE) {
-        case 'comment':
-        case 'function-definition':
-        case 'loop-statement':
-        case 'variable-statement':
+        case 'swe-comment':
+        case 'swe-func-def':
+        case 'swe-loop':
+        case 'swe-var':
             return token.content as string;
-        case 'function-statement':
+        case 'swe-func':
             return exportFunctionStatement(token.content as string);
         // case 'track-statement':
         //     return exportTrackStatement(token.content as string);
-        case 'track-definition':
+        case 'swe-track':
             return exportTrackDefinition(token.content as string);
-        case 'command-statement':
+        case 'swe-cmd':
             return exportCommandStatement(token.content as string);
-        case 'wait-statement':
+        case 'swe-wait':
             return exportWaitStatement(parseWait(token.content as string));
         default:
             throw new Error(`Unknown token type '${token.content}': ${JSON.stringify(token)} at tokenID ${currentTokenID}`);
@@ -98,7 +98,7 @@ export function exportSongTemplate(sourceCode: string) {
 }
 
 export function exportCommandStatement(commandString: string) {
-    const match = (commandString).match(LANGUAGE["command-statement"]);
+    const match = (commandString).match(LANGUAGE["swe-cmd"]);
     if (!match)
         throw new Error("Invalid command statement: " + commandString)
     const [, command, overrideString] = match;
@@ -112,7 +112,7 @@ export function exportWaitStatement(durationStatement: string) {
 }
 
 export function exportTrackDefinition(trackDefinition: string) {
-    const match = (trackDefinition).match(LANGUAGE["track-definition"]);
+    const match = (trackDefinition).match(LANGUAGE["swe-track"]);
     if (!match)
         throw new Error("Invalid track definition: " + trackDefinition)
     const [, trackName, trackArgs] = match;
@@ -136,7 +136,7 @@ const reservedFunctions: Array<keyof SongWalkerState> = [
 ]
 
 export function exportFunctionStatement(functionStatement: string) {
-    const match = functionStatement.match(LANGUAGE["function-statement"]);
+    const match = functionStatement.match(LANGUAGE["swe-func"]);
     if (!match)
         throw new Error("Invalid function statement: " + functionStatement)
     const [, variableSet = '', awaitString = '', functionName, overrideString, paramString] = match;

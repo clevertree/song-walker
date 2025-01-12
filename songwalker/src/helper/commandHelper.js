@@ -5,28 +5,29 @@ var __read = (this && this.__read) || function (o, n) {
     var i = m.call(o), r, ar = [], e;
     try {
         while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
+    } catch (error) {
+        e = {error: error};
+    } finally {
         try {
             if (r && !r.done && (m = i["return"])) m.call(i);
+        } finally {
+            if (e) throw e.error;
         }
-        finally { if (e) throw e.error; }
     }
     return ar;
 };
-var __values = (this && this.__values) || function(o) {
+var __values = (this && this.__values) || function (o) {
     var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
     if (m) return m.call(o);
     if (o && typeof o.length === "number") return {
         next: function () {
             if (o && i >= o.length) o = void 0;
-            return { value: o && o[i++], done: !o };
+            return {value: o && o[i++], done: !o};
         }
     };
     throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
 };
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", {value: true});
 exports.formatDuration = exports.parseWait = exports.parseNote = exports.formatCommandOverrides = exports.parseNumeric = void 0;
 var language_1 = require("../compiler/language");
 var DEFAULT_FREQUENCY_A4 = 440; // 432;
@@ -34,6 +35,7 @@ var DEFAULT_FREQUENCY_A4 = 440; // 432;
 var REGEX_PARSE_COMMAND_PARAMS = /([@^])([^@^=;\s]+)/g;
 var REGEX_PARSE_FRACTION = /^(\d*)\/(\d+)?$/;
 var REGEX_NOTE_COMMAND = /^([A-G][#qb]{0,2})(\d*)$/;
+
 function parseNumeric(numericString) {
     if (numericString.indexOf('/') !== -1) {
         var match = numericString.match(REGEX_PARSE_FRACTION);
@@ -41,12 +43,13 @@ function parseNumeric(numericString) {
             throw new Error("Invalid numeric string: " + numericString);
         var _a = __read(match, 3), numerator = _a[1], denominator = _a[2];
         return (numerator !== '' ? parseFloat(numerator) : 1) / parseFloat(denominator);
-    }
-    else {
+    } else {
         return parseFloat(numericString);
     }
 }
+
 exports.parseNumeric = parseNumeric;
+
 function formatCommandOverrides(overrides, aliases) {
     var e_1, _a;
     var formattedProperties = '';
@@ -61,16 +64,18 @@ function formatCommandOverrides(overrides, aliases) {
                 value = '1' + value;
             formattedProperties += (formattedProperties ? ', ' : '') + "".concat(propertyName, ":").concat(value);
         }
-    }
-    catch (e_1_1) { e_1 = { error: e_1_1 }; }
-    finally {
+    } catch (e_1_1) {
+        e_1 = {error: e_1_1};
+    } finally {
         try {
             if (matches_1_1 && !matches_1_1.done && (_a = matches_1.return)) _a.call(matches_1);
+        } finally {
+            if (e_1) throw e_1.error;
         }
-        finally { if (e_1) throw e_1.error; }
     }
     return "{".concat(formattedProperties, "}");
 }
+
 exports.formatCommandOverrides = formatCommandOverrides;
 // export function parseCommandParams(paramString: string): ParsedParams {
 //     const parsedParams: ParsedParams = {};
@@ -82,7 +87,9 @@ exports.formatCommandOverrides = formatCommandOverrides;
 //     return parsedParams;
 // }
 function parseNote(noteCommand, baseFrequency) {
-    if (baseFrequency === void 0) { baseFrequency = DEFAULT_FREQUENCY_A4; }
+    if (baseFrequency === void 0) {
+        baseFrequency = DEFAULT_FREQUENCY_A4;
+    }
     var match = noteCommand.match(REGEX_NOTE_COMMAND);
     if (!match)
         throw new Error("Invalid note command string: " + noteCommand);
@@ -103,18 +110,23 @@ function parseNote(noteCommand, baseFrequency) {
         frequency: frequency,
     };
 }
+
 exports.parseNote = parseNote;
+
 function parseWait(fullWaitString) {
-    var match = fullWaitString.match(language_1.default["wait-statement"]);
+    var match = fullWaitString.match(language_1.default["swe-wait"]);
     if (!match)
         throw new Error("Invalid wait string: " + fullWaitString);
     var _a = __read(match, 2), duration = _a[1];
     return formatDuration(duration);
 }
+
 exports.parseWait = parseWait;
+
 function formatDuration(durationString) {
     return durationString.replace(/^\//, '1/');
 }
+
 exports.formatDuration = formatDuration;
 // TODO: change to regex calculation
 var LIST_NOTE_NAMES = {

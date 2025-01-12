@@ -2,7 +2,7 @@ import SongEditorComponent from "@songwalker-editor/SongEditorComponent";
 import song from "./song/test.sw";
 
 export default function Home() {
-    console.log('song', song)
+    // console.log('song', song)
     return (
         <>
             <header className="App-header">

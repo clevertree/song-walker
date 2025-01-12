@@ -5,12 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="e87670a7-8e55-4d3a-9cd9-39fed29fbd42" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/app/page.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/app/page.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-editor/SongEditorComponent.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/SongEditorComponent.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/context.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/context.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-editor/document/SourceEditor.module.scss" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/document/SourceEditor.module.scss" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-editor/document/SourceEditor.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/document/SourceEditor.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker-editor/helper/domHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/helper/domHelper.ts" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/songwalker-editor/helper/sourceHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/helper/sourceHelper.ts" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/songwalker-editor/types.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker-editor/types.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/src/compiler/compiler.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/compiler/compiler.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/src/compiler/language.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/compiler/language.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/src/helper/commandHelper.js" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/helper/commandHelper.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/src/helper/commandHelper.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/helper/commandHelper.ts" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/songwalker/src/loader/fileLoader.ts" beforeDir="false" afterPath="$PROJECT_DIR$/songwalker/src/loader/fileLoader.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -79,11 +86,11 @@
       <recent name="$PROJECT_DIR$/songwalker/compiler" />
     </key>
     <key name="es6.move.members.recent.items">
+      <recent name="$PROJECT_DIR$/songwalker-editor/helper/domHelper.ts" />
       <recent name="$PROJECT_DIR$/songwalker-editor/helper/sourceHelper.ts" />
       <recent name="$PROJECT_DIR$/songwalker/helper/renderHelper.ts" />
       <recent name="$PROJECT_DIR$/songwalker/compiler/language.ts" />
       <recent name="$PROJECT_DIR$/songwalker/instruments/test/testHelper.ts" />
-      <recent name="$PROJECT_DIR$/songwalker-presets/WebAudioFont/constants.ts" />
     </key>
   </component>
   <component name="RunManager" selected="npm.build-loader">
@@ -168,7 +175,7 @@
       <workItem from="1735674428482" duration="1197000" />
       <workItem from="1735681749305" duration="73947000" />
       <workItem from="1736276555490" duration="18355000" />
-      <workItem from="1736371381465" duration="21590000" />
+      <workItem from="1736371381465" duration="29909000" />
     </task>
     <servers />
   </component>
