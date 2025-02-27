@@ -38,3 +38,6 @@ next-env.d.ts
 
 # Cypress
 cypress/screenshots
+
+# IDE
+.idea

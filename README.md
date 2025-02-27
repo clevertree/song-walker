@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# SongWalker
 
-## Getting Started
+Write songs & learn to program!
 
-First, run the development server:
+## Concept
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+SongWalker is a js library that compiles SongWalker code into javascript code to be used
+to render music and other media. A `Music Programming Language` is capable of writing songs of
+*unlimited* potential, unconstrained by the technical requirements of
+modern [DAWs](https://en.wikipedia.org/wiki/Digital_audio_workstation).
+
+## SongWalker Code Examples
+
+Here is a breakdown of source code for a renderable song which can played back or compiled directly
+into a game or other piece of software.
+
+### Loading Instruments
+
+This code loads a guitar sample bank as a `lead`, an oscillator as `osc`,
+a percussion set `perc` and a reverb effect `reverb`.
+
+```javascript
+const lead = await loadPreset(/FluidR3.*\/.*Guitar/i) // Load first matching preset
+const osc = await loadPreset("Oscillator", {'type': 'square', mixer: 0.4})
+const perc = await loadPreset("FluidR3_GM/Room 1")
+const reverb = await loadPreset("Reverb")
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Setting track / global variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+SongWalker auto-generates the variable `track` to represent the current playing track
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```javascript
+track.beatsPerMinute = 160;
+```
 
-## Learn More
+### Playing Tracks
 
-To learn more about Next.js, take a look at the following resources:
+This code plays both tracks `track1` (with an guitar sample instrument) and `beat1`
+simultaneously, then **waits 8 beats**, then plays both tracks again, but this time `track1` uses an oscillator
+instrument.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+track1(lead); beat1^96@4; 8
+track1(osc); beat1@7; 8
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+### Defining Tracks
 
-## Deploy on Vercel
+This code defines a track function. Track functions differ from normal javascript functions
+because they generate a local `track` variable which represents the current track state.
+By changing this track state, we can switch up or reconfigure instruments and effects.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```
+track track1(instrument) {
+    track.effects = [reverb];           // This track will use the reverb effect only
+    track.instrument = instrument;      // Instrument is set to the parameter variable
+    track.duration=1/4                  // Note duration will be 1/4th a beat
+    C3 /2                               // Play C3, wait 1/2 beat
+    C2@/2 /2                            // override note duration with 1/2 beat
+    G2 /2                               // Play G2, wait 1/2 beat
+    Eb2 /2                              // Play Eb2, wait 1/2 beat
+    Eb3 /2                              // Play Eb3, wait 1/2 beat
+    F3 /2                               // Play F3, wait 1/2 beat
+    Eb3 /2                              // Play Eb3, wait 1/2 beat
+    D3 /2                               // Play D3, wait 1/2 beat
+    C3 /2                               // Play C3, wait 1/2 beat
+    C2 /2                               // Play C2, wait 1/2 beat
+    G2 /2                               // Play G2, wait 1/2 beat
+    Eb2 /2                              // Play Eb2, wait 1/2 beat
+    D3 /2                               // Play D3, wait 1/2 beat
+    C2 /2                               // Play C2, wait 1/2 beat
+    Bb2 /2                              // Play Bb2, wait 1/2 beat
+}
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+Define a percussion track with no parameters
+
+```
+track beat1() {
+    track.instrument=perc               // Set track instrument to percussion kit
+    track.velocityDivisor=10            // Set velocity devisor to 10
+    chh^3           /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
+    chh^3           /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
+    chh     as      /2                  // Play CloseHiHat & Acolustic Snare, wait 1/2
+    chh^3@/8        /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
+    chh     abd     /2                  // Play CloseHiHat & Base Drum, wait 1/2
+    chh^3   abd^6   /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
+    chh     as      /2                  // Play CloseHiHat & Acolustic Snare, wait 1/2
+    chh^3           /4                  // Play CloseHiHat at 3/10 velocity, wait 1/4
+    chh^3           /4                  // Play CloseHiHat at 3/10 velocity, wait 1/4
+    chh     abd     /2                  // Play CloseHiHat & Base Drum, wait 1/2
+    chh^3           /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
+    chh     as      /2                  // Play CloseHiHat & Acolustic Snare, wait 1/2
+    chh^3           /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
+    chh     abd     /2                  // Play CloseHiHat & Base Drum, wait 1/2
+    chh^3   abd^6   /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
+    chh     as      /2                  // Play CloseHiHat & Acolustic Snare, wait 1/2
+    ohh^3@/3        /2                  // Play OpenHiHat at 3/10 velocity, wait 1/2
+}
+```
+
+## Render a Song File
+
+```javascript
+import {compileSongToCallback, renderSong} from "@songwalker";
+
+const song = compileSongToCallback(SONG_SOURCE);
+await renderSong(song);
+```
+
+## Preset Library
+
+SongWalker Preset Library comes with all presets from [WebAudioFont](https://github.com/clevertree/webaudiofontdata/)
+
+See [index](https://surikov.github.io/webaudiofontdata/sound/) of wavetables
+
+- [GeneralUserGS.sf2 license](http://www.schristiancollins.com/generaluser.php)
+- [FluidR3.sf2 license](https://github.com/musescore/MuseScore/blob/master/share/sound/FluidR3Mono_License.md)
+
+Main project - [WebAudioFont](https://surikov.github.io/webaudiofont/)
+
+## Looking for help
+
+If you're interested in contributing to this project please contact me at [ari@asu.edu](mailto:ari@asu.edu)
