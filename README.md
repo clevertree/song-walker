@@ -82,20 +82,20 @@ track beat1() {
     track.velocityDivisor=10            // Set velocity devisor to 10
     chh^3           /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
     chh^3           /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
-    chh     as      /2                  // Play CloseHiHat & Acolustic Snare, wait 1/2
+    chh     as      /2                  // Play CloseHiHat & Acoustic Snare, wait 1/2
     chh^3@/8        /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
     chh     abd     /2                  // Play CloseHiHat & Base Drum, wait 1/2
     chh^3   abd^6   /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
-    chh     as      /2                  // Play CloseHiHat & Acolustic Snare, wait 1/2
+    chh     as      /2                  // Play CloseHiHat & Acoustic Snare, wait 1/2
     chh^3           /4                  // Play CloseHiHat at 3/10 velocity, wait 1/4
     chh^3           /4                  // Play CloseHiHat at 3/10 velocity, wait 1/4
     chh     abd     /2                  // Play CloseHiHat & Base Drum, wait 1/2
     chh^3           /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
-    chh     as      /2                  // Play CloseHiHat & Acolustic Snare, wait 1/2
+    chh     as      /2                  // Play CloseHiHat & Acoustic Snare, wait 1/2
     chh^3           /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
     chh     abd     /2                  // Play CloseHiHat & Base Drum, wait 1/2
     chh^3   abd^6   /2                  // Play CloseHiHat at 3/10 velocity, wait 1/2
-    chh     as      /2                  // Play CloseHiHat & Acolustic Snare, wait 1/2
+    chh     as      /2                  // Play CloseHiHat & Acoustic Snare, wait 1/2
     ohh^3@/3        /2                  // Play OpenHiHat at 3/10 velocity, wait 1/2
 }
 ```
