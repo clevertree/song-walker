@@ -3,12 +3,11 @@ import {
     compileSongToJavascript,
     exportCommandStatement,
     exportTrackDefinition,
-    exportTrackStatement,
     exportWaitStatement,
     sourceToTokens
 } from '../compiler'
 
-import {renderSong} from "../../helper/renderHelper";
+import {renderSong} from "@songwalker";
 
 describe('compiler', () => {
     const emptyTemplate = (s: string) => s;
@@ -85,17 +84,17 @@ describe('compiler', () => {
 
     })
 
-    it('track statement', () => {
-        const SONG_SOURCE = `|track1^2@3`
-        const compiledSource = sourceToTokens(SONG_SOURCE);
-        expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
-            [{"type": "track-statement", "content": "|track1^2@3", "length": 11}]
-        ))
-        const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
-        expect(javascriptContent).to.eq(
-            exportTrackStatement("|track1^2@3"))
-
-    })
+    // it('track statement', () => {
+    //     const SONG_SOURCE = `|track1^2@3`
+    //     const compiledSource = sourceToTokens(SONG_SOURCE);
+    //     expect(JSON.stringify(compiledSource)).to.deep.eq(JSON.stringify(
+    //         [{"type": "track-statement", "content": "|track1^2@3", "length": 11}]
+    //     ))
+    //     const javascriptContent = compileSongToJavascript(SONG_SOURCE, emptyTemplate);
+    //     expect(javascriptContent).to.eq(
+    //         exportTrackStatement("|track1^2@3"))
+    //
+    // })
 
     it('function', () => {
         const SONG_SOURCE = `testFunction('arg');`

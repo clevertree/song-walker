@@ -1,5 +1,5 @@
 import React, {useEffect, useMemo, useState} from "react";
-import {PlaybackManager} from "@songwalker-editor/playback/PlaybackManager";
+import {PlaybackManager} from "@songwalker-editor/playback/PlaybackManager.tsx.old";
 import {EditorState} from "@songwalker-editor/types";
 import {PlaybackContext} from "./PlaybackContext";
 import {compileSongToCallback} from "@songwalker/compiler";

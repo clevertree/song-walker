@@ -18,7 +18,7 @@ export default function SongEditorComponent(props: SongEditorComponentProps) {
         activeEditor: {
             cursorRange: {
                 start: 10,
-                end: 2,
+                end: 20,
                 collapsed: false
             },
             path: 'new.sw',

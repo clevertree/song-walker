@@ -35,35 +35,31 @@ export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTML
     var newChildren = document.createDocumentFragment();
     for (let tokenID = 0; tokenID < tokenList.length; tokenID++) {
         const token = tokenList[tokenID];
-        let oldNode = childNodes[tokenID];
-        let newNode = oldNode
+        let node = childNodes[tokenID]
         if (typeof token === "string") {
-            if (newNode && newNode.nodeType === 3) {
-                newNode.textContent = token;
+            if (node && node.nodeType === 3) {
+                node.textContent = token;
             } else {
-                newNode = document.createTextNode(token);
+                node = document.createTextNode(token);
             }
         } else {
-            if (!newNode || newNode.nodeName.toLowerCase() !== token.type) {
-                newNode = document.createElement(token.type);
+            if (!node || node.nodeName.toLowerCase() !== token.type) {
+                node = document.createElement(token.type);
             } else {
                 // console.info("Reusing", oldNode);
             }
             if (Array.isArray(token.content)) {
-                mapTokensToDOM(token.content, <HTMLElement>newNode)
+                mapTokensToDOM(token.content, <HTMLElement>node)
             } else if (typeof token.content === "string") {
-                (<HTMLElement>newNode).innerText = token.content;
+                (<HTMLElement>node).innerText = token.content;
             } else {
                 throw 'invalid token.content';
             }
         }
-        newChildren.appendChild(newNode)
-    }
-    while (container.firstChild) {
-        container.firstChild.remove();
+        newChildren.appendChild(node)
     }
 
-    container.appendChild(newChildren)
+    container.replaceChildren(newChildren)
 }
 
 // export function mapTokensToDOM(tokenList: Array<string | Token>, container: HTMLElement, callback = (newNode: ChildNode, charOffset: number, length: number) => {
